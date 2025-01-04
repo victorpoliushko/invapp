@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class StockService {
