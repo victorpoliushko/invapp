@@ -2,19 +2,19 @@ import { Injectable } from '@nestjs/common';
 
 export type User = {
   userId: string;
-  userName: string;
+  username: string;
   password: string;
 };
 
 const users = [
   {
     userId: '123',
-    userName: 'viktor',
+    username: 'viktor',
     password: '123',
   },
   {
     userId: '1234',
-    userName: 'viktor2',
+    username: 'viktor2',
     password: '1234',
   },
 ];
@@ -22,6 +22,6 @@ const users = [
 @Injectable()
 export class UsersService {
   async findUserByName(username: string): Promise<User | undefined> {
-    return users.find(user => user.userName === username);
+    return users.find(user => user.username === username);
   }
 }

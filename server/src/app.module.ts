@@ -6,10 +6,13 @@ import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { StockController } from './stock/stock.controller';
 import { UsersModule } from './users/users.module';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
-  imports: [ConfigModule.forRoot(), HttpModule, UsersModule],
-  controllers: [AppController, StockController],
-  providers: [AppService, StockService],
+  imports: [ConfigModule.forRoot(), HttpModule, UsersModule, AuthModule],
+  controllers: [AppController, StockController, AuthController],
+  providers: [AppService, StockService, AuthService],
 })
 export class AppModule {}
