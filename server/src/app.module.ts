@@ -9,10 +9,11 @@ import { UsersModule } from './users/users.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [ConfigModule.forRoot(), HttpModule, UsersModule, AuthModule],
   controllers: [AppController, StockController, AuthController],
-  providers: [AppService, StockService, AuthService],
+  providers: [AppService, StockService, AuthService, JwtService],
 })
 export class AppModule {}
