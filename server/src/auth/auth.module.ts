@@ -4,19 +4,17 @@ import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
-import * as dotenv from 'dotenv';
+import { jwtConstants } from './constants';
 
-dotenv.config();
-
-console.log(`${process.env.JWT_SECRET}`)
+console.log(`!: ${jwtConstants.secret}`)
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
     }),
   ],
   providers: [AuthService, UsersService],
