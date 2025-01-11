@@ -16,13 +16,13 @@ type AuthResult = {
   accessToken: string;
   userId: string;
   username: string;
-}
+};
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async authenticate(input: AuthInput): Promise<AuthResult> {
@@ -36,22 +36,28 @@ export class AuthService {
 
   async validateUser(input: AuthInput): Promise<SingInData | null> {
     const user = await this.userService.findUserByName(input.username);
-    if (user && user.password === input.password) return {
-      userId: user.userId,
-      username: user.username
-    }
+    if (user && user.password === input.password)
+      return {
+        userId: user.userId,
+        username: user.username,
+      };
     return null;
   }
 
   async signIn(input: SingInData): Promise<AuthResult> {
-    const {username, userId} = input;
+    const { username, userId } = input;
     const tokenPayload = {
       sub: input.userId,
-      username
+      username,
+    };
+
+    console.log('good until here')
+    try {
+      const accessToken = await this.jwtService.signAsync(tokenPayload);
+      return { accessToken, userId, username };
+    } catch (e) {
+      console.log('Error during token generation: ', e.message, e.stack);
+      throw new Error('Failed to generate token');
     }
-
-    const accessToken = await this.jwtService.signAsync(tokenPayload);
-
-    return { accessToken, userId, username };
   }
 }
