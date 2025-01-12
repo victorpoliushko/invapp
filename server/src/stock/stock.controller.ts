@@ -10,4 +10,9 @@ export class StockController {
     const price = await this.stockService.getSharePrice(symbol);
     return { price };
   }
+
+  @Get('test')
+  testGetPort() {
+    return this.stockService.testGetPort();
+  }
 }

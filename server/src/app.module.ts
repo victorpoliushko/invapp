@@ -10,9 +10,15 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { JwtService } from '@nestjs/jwt';
+import configuration from './config/configuration';
 
 @Module({
-  imports: [ConfigModule.forRoot(), HttpModule, UsersModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    HttpModule,
+    UsersModule,
+    AuthModule,
+  ],
   controllers: [AppController, StockController, AuthController],
   providers: [AppService, StockService, AuthService, JwtService],
 })
