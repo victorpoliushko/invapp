@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { JwtService } from '@nestjs/jwt';
 import configuration from './config/configuration';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import configuration from './config/configuration';
     HttpModule,
     UsersModule,
     AuthModule,
+    MongooseModule.forRoot('mongodb://localhost/nest')
   ],
   controllers: [AppController, StockController, AuthController],
   providers: [AppService, StockService, AuthService, JwtService],
