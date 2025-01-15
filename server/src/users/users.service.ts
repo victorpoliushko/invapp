@@ -24,18 +24,18 @@ const users = [
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  // constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async findUserByName(username: string): Promise<User | undefined> {
+  async findUserByName(username: string): Promise<MockUser | undefined> {
     return users.find(user => user.username === username);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const userCreated = new this.userModel(createUserDto);
-    return userCreated.save();
-  }
+  // async create(createUserDto: CreateUserDto): Promise<User> {
+  //   const userCreated = new this.userModel(createUserDto);
+  //   return userCreated.save();
+  // }
 
-  async findAll() {
-    return this.userModel.find().exec();
-  }
+  // async findAll() {
+  //   return this.userModel.find().exec();
+  // }
 }

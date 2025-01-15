@@ -19,7 +19,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     HttpModule,
     UsersModule,
     AuthModule,
-    MongooseModule.forRoot('mongodb://localhost/nest')
+    MongooseModule.forRoot('mongodb://localhost/invapp_mongo_db')
   ],
   controllers: [AppController, StockController, AuthController],
   providers: [AppService, StockService, AuthService, JwtService],
