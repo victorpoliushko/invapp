@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
+import { CreateUserDto } from './dto/CreateUser.dto';
 
 export type MockUser = {
   userId: string;
@@ -24,16 +25,16 @@ const users = [
 
 @Injectable()
 export class UsersService {
-  // constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async findUserByName(username: string): Promise<MockUser | undefined> {
     return users.find(user => user.username === username);
   }
 
-  // async create(createUserDto: CreateUserDto): Promise<User> {
-  //   const userCreated = new this.userModel(createUserDto);
-  //   return userCreated.save();
-  // }
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const userCreated = new this.userModel(createUserDto);
+    return userCreated.save();
+  }
 
   // async findAll() {
   //   return this.userModel.find().exec();

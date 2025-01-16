@@ -26,7 +26,7 @@ console.log(`JWT Secret: ${jwtConstants.secret}`);
     //   isGlobal: true,
     // })
   ],
-  providers: [AuthService, UsersService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController, PassportAuthController]
 })
 export class AuthModule {}
