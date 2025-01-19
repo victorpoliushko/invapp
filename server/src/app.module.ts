@@ -20,7 +20,7 @@ import { UsersController } from './users/users.controller';
     HttpModule,
     UsersModule,
     AuthModule,
-    MongooseModule.forRoot('mongodb://@localhost/invapp_mongo_db')
+    MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],
   controllers: [AppController, StockController, AuthController],
   providers: [AppService, StockService, AuthService, JwtService],
