@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/CreateUser.dto';
+import { UpdateUserDto } from './dto/UpdareUser.dto';
 
 export type MockUser = {
   userId: string;
@@ -31,16 +32,20 @@ export class UsersService {
     return users.find(user => user.username === username);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  create(createUserDto: CreateUserDto): Promise<User> {
     const userCreated = new this.userModel(createUserDto);
     return userCreated.save();
   }
 
-  async find(): Promise<User[]> {
+  find(): Promise<User[]> {
     return this.userModel.find();
   }
 
-  async getById(id: string): Promise<User> {
+  getById(id: string): Promise<User> {
     return this.userModel.findById(id);
+  }
+
+  update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
   }
 }
