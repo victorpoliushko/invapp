@@ -48,4 +48,8 @@ export class UsersService {
   update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
   }
+
+  delete(id: string) {
+    return this.userModel.findByIdAndDelete(id);
+  }
 }
