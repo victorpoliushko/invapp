@@ -1,19 +1,18 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './schemas/user.schema';
-import { UsersController } from './users.controller';
 import {
   UserSettings,
   UserSettingsSchema,
 } from '../userSettings/schemas/userSettings.schema';
+import { UsersSettingsService } from './userSettings.service';
+import { UsersSettingsController } from './userSettings.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: User.name,
-        schema: UserSchema,
+        name: UserSettings.name,
+        schema: UserSettingsSchema,
       },
       {
         name: UserSettings.name,
@@ -21,8 +20,8 @@ import {
       },
     ]),
   ],
-  providers: [UsersService],
-  exports: [UsersService],
-  controllers: [UsersController],
+  providers: [UsersSettingsService],
+  exports: [UsersSettingsService],
+  controllers: [UsersSettingsController],
 })
-export class UsersModule {}
+export class UsersSettingsModule {}
