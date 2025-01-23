@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, Param, Patch, Post, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CreateUserSettingsDto } from "./dto/CreateUserSettings.dto";
-import { UserSettings } from "./schemas/userSettings.schema";
 import { UsersSettingsService } from "./userSettings.service";
 import mongoose from "mongoose";
 import { UpdateUserSettingsDto } from "./dto/UpdateUserSettings.dto";

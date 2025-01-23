@@ -12,13 +12,14 @@ import { AuthController } from './auth/auth.controller';
 import { JwtService } from '@nestjs/jwt';
 import configuration from './config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersController } from './users/users.controller';
+import { UsersSettingsModule } from './userSettings/userSettings.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     HttpModule,
     UsersModule,
+    UsersSettingsModule,
     AuthModule,
     MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],
