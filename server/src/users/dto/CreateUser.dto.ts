@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDefined, IsNotEmpty, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
+import { IsDefined, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 import { CreateUserSettingsDto } from "src/userSettings/dto/CreateUserSettings.dto";
 
 export class CreateUserDto {

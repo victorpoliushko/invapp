@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   UserSettings,
   UserSettingsSchema,
-} from '../userSettings/schemas/userSettings.schema';
+} from '../schemas/userSettings.schema';
 import { UsersSettingsService } from './userSettings.service';
 import { UsersSettingsController } from './userSettings.controller';
 

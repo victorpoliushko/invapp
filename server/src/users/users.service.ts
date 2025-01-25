@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schemas/user.schema';
+import { User } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdareUser.dto';
 import { CreateUserSettingsDto } from 'src/userSettings/dto/CreateUserSettings.dto';
-import { UserSettings } from 'src/userSettings/schemas/userSettings.schema';
+import { UserSettings } from 'src/schemas/userSettings.schema';
 
 export type MockUser = {
   userId: string;
@@ -44,12 +44,15 @@ export class UsersService {
     if (settings) {
       console.log(`settings: ${JSON.stringify(settings)}`);
       const newSettings = new this.userSettingsModel(settings);
-      console.log(`newSewttings: ${newSettings}`);
       const savedNewSettings = await newSettings.save();
       console.log(`savedNewSettings: ${savedNewSettings}`);
       const newUser = new this.userModel({
         ...createUserDto,
-        settings: { ...savedNewSettings }
+        settings: {
+          _id: savedNewSettings.id,
+          ...settings
+        }
+        // settings: savedNewSettings.id
       });
       console.log(`newUser: ${newUser}`);
       return newUser.save();
@@ -59,11 +62,11 @@ export class UsersService {
   }
 
   find(): Promise<User[]> {
-    return this.userModel.find();
+    return this.userModel.find().populate('settings');
   }
 
   getById(id: string): Promise<User> {
-    return this.userModel.findById(id);
+    return this.userModel.findById(id).populate('settings');
   }
 
   update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
