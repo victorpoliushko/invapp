@@ -62,7 +62,7 @@ export class UsersService {
   }
 
   find(): Promise<User[]> {
-    return this.userModel.find().populate('settings');
+    return this.userModel.find().populate(['settings', 'investStrategies']);
   }
 
   getById(id: string): Promise<User> {

@@ -12,4 +12,8 @@ export class CreateInvestStrategyDto {
   @IsArray()
   @IsString({ each: true })
   tickers: string[];
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 }
