@@ -38,7 +38,7 @@ export class AuthService {
     const user = await this.userService.findUserByName(input.username);
     if (user && user.password === input.password)
       return {
-        userId: user.userId,
+        userId: user._id,
         username: user.username,
       };
     return null;
@@ -50,8 +50,7 @@ export class AuthService {
       sub: input.userId,
       username,
     };
-
-    console.log('good until here')
+    
     try {
       const accessToken = await this.jwtService.signAsync(tokenPayload);
       return { accessToken, userId, username };

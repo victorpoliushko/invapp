@@ -4,7 +4,6 @@ import { User } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdareUser.dto';
-import { CreateUserSettingsDto } from 'src/userSettings/dto/CreateUserSettings.dto';
 import { UserSettings } from 'src/schemas/userSettings.schema';
 
 export type MockUser = {
@@ -13,19 +12,6 @@ export type MockUser = {
   password: string;
 };
 
-const users = [
-  {
-    userId: '123',
-    username: 'viktor',
-    password: '123',
-  },
-  {
-    userId: '1234',
-    username: 'viktor2',
-    password: '1234',
-  },
-];
-
 @Injectable()
 export class UsersService {
   constructor(
@@ -33,8 +19,8 @@ export class UsersService {
     @InjectModel(UserSettings.name) private userSettingsModel: Model<UserSettings>,
   ) {}
 
-  async findUserByName(username: string): Promise<MockUser | undefined> {
-    return users.find((user) => user.username === username);
+  async findUserByName(username: string): Promise<User> {
+    return this.userModel.findOne((user) => user.username === username);
   }
 
   async create({
@@ -52,7 +38,6 @@ export class UsersService {
           _id: savedNewSettings.id,
           ...settings
         }
-        // settings: savedNewSettings.id
       });
       console.log(`newUser: ${newUser}`);
       return newUser.save();
