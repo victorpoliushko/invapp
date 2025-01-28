@@ -6,12 +6,6 @@ import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdareUser.dto';
 import { UserSettings } from 'src/schemas/userSettings.schema';
 
-export type MockUser = {
-  userId: string;
-  username: string;
-  password: string;
-};
-
 @Injectable()
 export class UsersService {
   constructor(
@@ -20,7 +14,7 @@ export class UsersService {
   ) {}
 
   async findUserByName(username: string): Promise<User> {
-    return this.userModel.findOne((user) => user.username === username);
+    return this.userModel.findOne({ username });
   }
 
   async create({

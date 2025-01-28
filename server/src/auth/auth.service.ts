@@ -36,6 +36,7 @@ export class AuthService {
 
   async validateUser(input: AuthInput): Promise<SingInData | null> {
     const user = await this.userService.findUserByName(input.username);
+    console.log('user: ', user)
     if (user && user.password === input.password)
       return {
         userId: user._id,
