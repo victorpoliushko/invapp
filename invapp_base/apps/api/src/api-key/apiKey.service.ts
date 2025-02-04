@@ -1,5 +1,5 @@
 import { pbkdf2Sync } from 'crypto';
-import { getRandomString } from '../../helpers/generateString';
+import { getRandomString } from '../helpers/generateString';
 import { PrismaClient } from '@prisma/client';
 
 export interface ApiKeyResponse {
