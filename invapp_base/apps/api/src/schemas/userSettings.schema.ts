@@ -1,11 +1,13 @@
-import { Prop, SchemaFactory } from "@nestjs/mongoose";
+// mongoDB implementation
 
-export class UserSettings {
-  @Prop({ required: false })
-  receiveSMS?: boolean;
+// import { Prop, SchemaFactory } from "@nestjs/mongoose";
 
-  @Prop({ required: false })
-  publicPortfolio?: boolean;
-}
+// export class UserSettings {
+//   @Prop({ required: false })
+//   receiveSMS?: boolean;
 
-export const UserSettingsSchema = SchemaFactory.createForClass(UserSettings);
+//   @Prop({ required: false })
+//   publicPortfolio?: boolean;
+// }
+
+// export const UserSettingsSchema = SchemaFactory.createForClass(UserSettings);

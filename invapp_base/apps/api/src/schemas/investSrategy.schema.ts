@@ -1,12 +1,14 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+// mongoDB implementation
 
-@Schema()
-export class InvestStrategy {
-  @Prop({ required: true })
-  title: string;
+// import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-  @Prop({ required: true })
-  tickers: string[];
-}
+// @Schema()
+// export class InvestStrategy {
+//   @Prop({ required: true })
+//   title: string;
 
-export const InvestStrategySchema = SchemaFactory.createForClass(InvestStrategy);
+//   @Prop({ required: true })
+//   tickers: string[];
+// }
+
+// export const InvestStrategySchema = SchemaFactory.createForClass(InvestStrategy);

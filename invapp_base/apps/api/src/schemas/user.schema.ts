@@ -1,26 +1,28 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { UserSettings } from './userSettings.schema';
-import { InvestStrategy } from './investSrategy.schema';
+// monogDB implementation
 
-export type UserDocument = HydratedDocument<User>;
+// import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+// import mongoose, { HydratedDocument } from 'mongoose';
+// import { UserSettings } from './userSettings.schema';
+// import { InvestStrategy } from './investSrategy.schema';
 
-@Schema()
-export class User {
-  @Prop({ required: true, unique: true })
-  username: string;
+// export type UserDocument = HydratedDocument<User>;
 
-  @Prop({ required: true })
-  password: string;
+// @Schema()
+// export class User {
+//   @Prop({ required: true, unique: true })
+//   username: string;
 
-  @Prop()
-  phoneNumber?: string;
+//   @Prop({ required: true })
+//   password: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: UserSettings.name })
-  settings?: UserSettings;
+//   @Prop()
+//   phoneNumber?: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: InvestStrategy.name}] })
-  investStrategies: InvestStrategy[];
-}
+//   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: UserSettings.name })
+//   settings?: UserSettings;
 
-export const UserSchema = SchemaFactory.createForClass(User);
+//   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: InvestStrategy.name}] })
+//   investStrategies: InvestStrategy[];
+// }
+
+// export const UserSchema = SchemaFactory.createForClass(User);

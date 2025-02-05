@@ -4,7 +4,6 @@ import { User } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdareUser.dto';
-import { UserSettings } from 'src/schemas/userSettings.schema';
 
 @Injectable()
 export class UsersService {

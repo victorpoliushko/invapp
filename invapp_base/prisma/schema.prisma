@@ -8,12 +8,32 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  login    String @unique
-  password String
+  id          String @id @default(uuid())
+  login       String @unique
+  password    String 
+  phoneNumber String?
+
+  settings UserSettings?
+
+  investStrategies InvestStrategy[]
 
   // TODO
   // ApiKey ApiKey[]
+}
+
+model UserSettings {
+  id              String @id @default(uuid())
+  receiveSMS      Boolean?
+  publicPortfolio Boolean?
+
+  user User? @relation(fields: [userId], references: [id])
+  userId String @unique
+}
+
+model InvestStrategy {
+  id      String @id @default(uuid())
+  title   String
+  tickers String[]
 }
 
 // TODO
