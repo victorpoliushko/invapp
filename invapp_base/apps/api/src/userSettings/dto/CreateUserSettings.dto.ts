@@ -1,11 +1,11 @@
-import { IsBoolean, IsOptional } from "class-validator";
+// import { IsBoolean, IsOptional } from "class-validator";
 
-export class CreateUserSettingsDto {
-  @IsOptional()
-  @IsBoolean()
-  receiveSMS?: boolean;
+// export class CreateUserSettingsDto {
+//   @IsOptional()
+//   @IsBoolean()
+//   receiveSMS?: boolean;
 
-  @IsOptional()
-  @IsBoolean()
-  publicPortfolio?: boolean;
-}
+//   @IsOptional()
+//   @IsBoolean()
+//   publicPortfolio?: boolean;
+// }

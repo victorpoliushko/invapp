@@ -12,8 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import configuration from './config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersSettingsModule } from './userSettings/userSettings.module';
-import { InvestStrategiesModule } from './investStrategies/investStrategies.module';
 import { UsersModule } from './users/users.module';
+// import { InvestStrategiesModule } from './investStrategies/investStrategies.module';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     UsersSettingsModule,
     AuthModule,
-    InvestStrategiesModule,
+    // InvestStrategiesModule,
     // MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],
   controllers: [AppController, StockController, AuthController],
