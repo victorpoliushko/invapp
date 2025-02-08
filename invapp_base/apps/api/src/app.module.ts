@@ -11,8 +11,9 @@ import { AuthController } from './auth/auth.controller';
 import { JwtService } from '@nestjs/jwt';
 import configuration from './config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersSettingsModule } from './userSettings/userSettings.module';
 import { UsersModule } from './users/users.module';
+import { UsersService } from './users/users.service';
+import { PrismaService } from './prisma/prisma.service';
 // import { InvestStrategiesModule } from './investStrategies/investStrategies.module';
 
 @Module({
@@ -20,12 +21,12 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     HttpModule,
     UsersModule,
-    UsersSettingsModule,
+    // UsersSettingsModule,
     AuthModule,
     // InvestStrategiesModule,
     // MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],
   controllers: [AppController, StockController, AuthController],
-  providers: [AppService, StockService, AuthService, JwtService],
+  providers: [AppService, StockService, AuthService, JwtService, UsersService, PrismaService],
 })
 export class AppModule {}
