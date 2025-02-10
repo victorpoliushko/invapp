@@ -16,14 +16,17 @@ import { omit } from '../helpers/omit';
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
-  async getUser(id: string): Promise<User> {
-    return await this.prismaService.user.findUniqueOrThrow({ where: { id } });
+  async getUser(id: string): Promise<Omit<User, 'password'>> {
+    const user = await this.prismaService.user.findUnique({ where: { id } });
+    return omit(user, 'password');
   }
 
   async getUserByName(username: string): Promise<User> {
-    return await this.prismaService.user.findUniqueOrThrow({
+    const user =  await this.prismaService.user.findUnique({
       where: { username },
     });
+    console.log(`USer: ${user}`);
+    return user;
   }
 
   async create(input: CreateUserDto): Promise<Omit<User, 'password'>> {
