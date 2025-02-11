@@ -1,4 +1,4 @@
-import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -28,14 +28,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async authenticate(input: AuthInput): Promise<AuthResult> {
-    const user = await this.validateUser(input);
-    if (!user) {
-      throw new UnauthorizedException('Unauthorized');
-    }
+  // async authenticate(input: AuthInput): Promise<AuthResult> {
+  //   const user = await this.validateUser(input);
+  //   if (!user) {
+  //     throw new UnauthorizedException('Unauthorized');
+  //   }
 
-    return this.signIn(user);
-  }
+  //   return this.signIn(user);
+  // }
 
   async validateUser(input: AuthInput): Promise<SingInData | null> {
     const user = await this.userService.getUserByName(input.username);
@@ -56,7 +56,7 @@ export class AuthService {
   async signIn(input: SingInData): Promise<AuthResult> {
     const { username, userId } = input;
     const tokenPayload = {
-      sub: input.userId,
+      userId,
       username,
     };
     
@@ -64,8 +64,8 @@ export class AuthService {
       const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: '24h' });
       return { accessToken, userId, username, expiresIn: '24h' };
     } catch (e) {
-      console.log('Error during token generation: ', e.message, e.stack);
-      throw new Error('Failed to generate token');
+      console.error('JWT Error:', e);
+      throw new InternalServerErrorException('Token generation failed');
     }
   }
 }

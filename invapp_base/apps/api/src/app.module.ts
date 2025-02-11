@@ -7,7 +7,6 @@ import { HttpModule } from '@nestjs/axios';
 import { StockController } from './stock/stock.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
-import { AuthController } from './auth/auth.controller';
 import { JwtService } from '@nestjs/jwt';
 import configuration from './config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -26,7 +25,7 @@ import { PrismaService } from './prisma/prisma.service';
     // InvestStrategiesModule,
     // MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],
-  controllers: [AppController, StockController, AuthController],
+  controllers: [AppController, StockController],
   providers: [AppService, StockService, AuthService, JwtService, UsersService, PrismaService],
 })
 export class AppModule {}

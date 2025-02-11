@@ -1,20 +1,22 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, NotImplementedException, Post, Request, UseGuards } from '@nestjs/common';
-import { AuthInput, AuthService } from './auth.service';
-import { AuthGuard } from './guards/auth.guard';
+// deprecated, passport used instead
 
-@Controller('auth')
-export class AuthController {
-  constructor(private authService: AuthService) {}
+// import { Body, Controller, Get, HttpCode, HttpStatus, NotImplementedException, Post, Request, UseGuards } from '@nestjs/common';
+// import { AuthInput, AuthService } from './auth.service';
+// import { AuthGuard } from './guards/auth.guard';
 
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  login(@Body() input: AuthInput) {
-    return this.authService.authenticate(input);
-  }
+// @Controller('auth')
+// export class AuthController {
+//   constructor(private authService: AuthService) {}
 
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  getProfileInfo(@Request() request) {
-    return request.user;
-  }
-}
+//   @HttpCode(HttpStatus.OK)
+//   @Post('login')
+//   login(@Body() input: AuthInput) {
+//     return this.authService.authenticate(input);
+//   }
+
+//   @UseGuards(AuthGuard)
+//   @Get('profile')
+//   getProfileInfo(@Request() request) {
+//     return request.user;
+//   }
+// }
