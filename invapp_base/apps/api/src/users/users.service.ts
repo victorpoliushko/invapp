@@ -22,11 +22,9 @@ export class UsersService {
   }
 
   async getUserByName(username: string): Promise<User> {
-    const user =  await this.prismaService.user.findUnique({
+    return await this.prismaService.user.findUnique({
       where: { username },
     });
-    console.log(`USer: ${user}`);
-    return user;
   }
 
   async create(input: CreateUserDto): Promise<Omit<User, 'password'>> {
