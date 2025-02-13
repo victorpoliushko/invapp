@@ -4,6 +4,9 @@ import { User } from '@prisma/client';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import * as bcrypt from 'bcrypt';
 import { omit } from '../helpers/omit';
+import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { UserDto } from './dto/User.dto';
+import { plainToInstance } from 'class-transformer';
 
 // interface IUser {
 //   id: string;
@@ -16,18 +19,19 @@ import { omit } from '../helpers/omit';
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
-  async getUser(id: string): Promise<Omit<User, 'password'>> {
+  async getUser(id: string): Promise<UserDto> {
     const user = await this.prismaService.user.findUnique({ where: { id } });
-    return omit(user, 'password');
+    return plainToInstance(UserDto, user);
   }
 
-  async getUserByName(username: string): Promise<User> {
-    return await this.prismaService.user.findUnique({
+  async getUserByName(username: string): Promise<UserDto> {
+    const user = await this.prismaService.user.findUnique({
       where: { username },
     });
+    return plainToInstance(UserDto, user);
   }
 
-  async create(input: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async create(input: CreateUserDto): Promise<UserDto> {
     const { username, password, phoneNumber } = input;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -40,6 +44,19 @@ export class UsersService {
       },
     });
 
-    return omit(createdUser, 'password');
+    return plainToInstance(UserDto, createdUser);
+  }
+
+  async update(id: string, input: UpdateUserDto): Promise<UserDto> {
+    const user = this.prismaService.user.update({
+      where: {
+        id
+      },
+      data: {
+        phoneNumber: input.phoneNumber
+      }
+    });
+
+    return plainToInstance(UserDto, user);
   }
 }
