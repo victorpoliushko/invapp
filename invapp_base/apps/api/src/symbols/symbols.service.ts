@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
-export class StockService {
+export class SymbolsService {
   constructor(
     private configService: ConfigService,
     private httpService: HttpService,
@@ -32,6 +32,8 @@ export class StockService {
       throw new HttpException('Error fetching data', 500);
     }
   }
+
+  // async getPortfolioPrice(symbols: string[]): Promise<>
 
   testGetPort() {
     console.log(`PORT: ${this.configService.get<string>('TEST_PORT')}`);

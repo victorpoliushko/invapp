@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { StockService } from './stocks/stocks.service';
+import { SymbolsService } from './symbols/symbols.service';
 import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
-import { StockController } from './stocks/stocks.controller';
+import { SymbolsController } from './symbols/symbols.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
@@ -25,7 +25,7 @@ import { PrismaService } from './prisma/prisma.service';
     // InvestStrategiesModule,
     // MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],
-  controllers: [AppController, StockController],
-  providers: [AppService, StockService, AuthService, JwtService, UsersService, PrismaService],
+  controllers: [AppController, SymbolsController],
+  providers: [AppService, SymbolsService, AuthService, JwtService, UsersService, PrismaService],
 })
 export class AppModule {}
