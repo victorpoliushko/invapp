@@ -11,6 +11,11 @@ export class SymbolsController {
     return { price };
   }
 
+  @Get('all-symbols')
+  async getAndStoreSymbols(): Promise<any> {
+    return await this.symbolsService.fetchAndStoreSymbols();
+  }
+
   @Get('test')
   testGetPort() {
     return this.symbolsService.testGetPort();
