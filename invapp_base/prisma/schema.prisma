@@ -34,23 +34,27 @@ model Symbol {
   id         String     @id @default(uuid())
   name       String
   symbol     String
-  type       SymbolType
+  exchange   String
+  // TODO: fix stock type that comes from CSV
+  // type       SymbolType
+  type       String
   dataSource DataSource
 
   portfolios PortfolioSymbol[]
 }
 
-enum SymbolType {
-  BOND
-  CASH
-  COMMODITY
-  CRYPTOCURRENCY
-  ETF
-  MUTUALFUND
-  PRECIOUS_METAL
-  PRIVATE_EQUITY
-  STOCK
-}
+// TODO: fix stock type that comes from CSV
+// enum SymbolType {
+//   BOND
+//   CASH
+//   COMMODITY
+//   CRYPTOCURRENCY
+//   ETF
+//   MUTUALFUND
+//   PRECIOUS_METAL
+//   PRIVATE_EQUITY
+//   Stock
+// }
 
 enum DataSource {
   ALPHA_VANTAGE

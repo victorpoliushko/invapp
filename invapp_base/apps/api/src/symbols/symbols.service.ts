@@ -3,6 +3,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
+import { DataSource } from '@prisma/client';
 
 @Injectable()
 export class SymbolsService {
@@ -38,16 +39,27 @@ export class SymbolsService {
   // WIP
   async fetchAndStoreSymbols() {
     try {
+      const func = 'LISTING_STATUS';
       const apikey = this.configService.get<string>('API_KEY');
-      const url = `https://www.alphavantage.co/query`;
-      const response = this.httpService.get(url, {
-        params: {
-          function: 'LISTING_STATUS',
-          apikey
-        }
+      const url = `https://www.alphavantage.co/query?function=${func}&apikey=${apikey}`;
+      const response = await lastValueFrom(this.httpService.get(url));
+
+      const data = response.data.split('\n').slice(1);
+      const alphavantageData = data.map(line => {
+        const [symbol, name, exchange, type] = line.split(',');
+        return { symbol, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE };
       });
 
-      console.log(JSON.stringify(response));
+      alphavantageData.pop();
+
+      await this.prismaService.symbol.createMany({
+        data: alphavantageData,
+        skipDuplicates: true
+      });
+
+      // console.log('data: ', data);
+      // console.log(JSON.stringify(response));
+      console.log(`Fetched and stored ${alphavantageData.length} symbols.`);
     } catch (error) {
       console.error('Error fetching symbols', error);
     } finally {
