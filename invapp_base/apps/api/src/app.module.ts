@@ -13,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { PrismaService } from './prisma/prisma.service';
+import { PortfoliosModule } from './portfolios/portfolios.module';
 // import { InvestStrategiesModule } from './investStrategies/investStrategies.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { PrismaService } from './prisma/prisma.service';
     UsersModule,
     // UsersSettingsModule,
     AuthModule,
+    PortfoliosModule
     // InvestStrategiesModule,
     // MongooseModule.forRoot('mongodb://admin:password@localhost:27017/invapp?authSource=admin')
   ],

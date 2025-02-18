@@ -24,11 +24,10 @@ export class UsersService {
     return plainToInstance(UserDto, user);
   }
 
-  async getUserByName(username: string): Promise<UserDto> {
-    const user = await this.prismaService.user.findUnique({
+  async getUserByName(username: string): Promise<User>{
+    return await this.prismaService.user.findUnique({
       where: { username },
     });
-    return plainToInstance(UserDto, user);
   }
 
   async create(input: CreateUserDto): Promise<UserDto> {
