@@ -36,7 +36,6 @@ export class SymbolsService {
     }
   }
 
-  // WIP
   async fetchAndStoreSymbols() {
     try {
       const func = 'LISTING_STATUS';
@@ -57,8 +56,6 @@ export class SymbolsService {
         skipDuplicates: true
       });
 
-      // console.log('data: ', data);
-      // console.log(JSON.stringify(response));
       console.log(`Fetched and stored ${alphavantageData.length} symbols.`);
     } catch (error) {
       console.error('Error fetching symbols', error);

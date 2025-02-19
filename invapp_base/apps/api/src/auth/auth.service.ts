@@ -52,8 +52,8 @@ export class AuthService {
     };
     
     try {
-      const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: '24h' });
-      return { accessToken, userId, username, expiresIn: '24h' };
+      const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: '3h' });
+      return { accessToken, userId, username, expiresIn: '3h' };
     } catch (e) {
       console.error('JWT Error:', e);
       throw new InternalServerErrorException('Token generation failed');
