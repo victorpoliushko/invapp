@@ -14,7 +14,7 @@ model User {
   phoneNumber String?
 
   settings         UserSettings?
-  portfolio        Portfolio?
+  portfolios       Portfolio[]
   investStrategies InvestStrategy[]
 
   // TODO

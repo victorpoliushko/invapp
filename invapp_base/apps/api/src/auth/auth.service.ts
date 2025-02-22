@@ -41,11 +41,13 @@ export class AuthService {
         StatusCodes.FORBIDDEN
       );
     }
+
     return { userId: user.id, username: user.username};
   }
 
   async signIn(input: SingInData): Promise<AuthResult> {
     const { username, userId } = input;
+
     const tokenPayload = {
       userId,
       username,
