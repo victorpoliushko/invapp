@@ -20,11 +20,14 @@ export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
   async getUser(id: string): Promise<UserDto> {
-    const user = await this.prismaService.user.findUnique({ where: { id } });
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+      include: { portfolios: true },
+    });
     return plainToInstance(UserDto, user);
   }
 
-  async getUserByName(username: string): Promise<User>{
+  async getUserByName(username: string): Promise<User> {
     return await this.prismaService.user.findUnique({
       where: { username },
     });
@@ -49,11 +52,11 @@ export class UsersService {
   async update(id: string, input: UpdateUserDto): Promise<UserDto> {
     const user = this.prismaService.user.update({
       where: {
-        id
+        id,
       },
       data: {
-        phoneNumber: input.phoneNumber
-      }
+        phoneNumber: input.phoneNumber,
+      },
     });
 
     return plainToInstance(UserDto, user);

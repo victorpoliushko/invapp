@@ -25,8 +25,6 @@ export class PortfoliosController {
     @Body() createPortfolioDto: CreatePortfolioDto,
     @GetUser() user: User,
   ) {
-    console.log(`createPortfolioDto.userId: ${createPortfolioDto.userId}`)
-    console.log(`user: ${JSON.stringify(user)}`)
     if (createPortfolioDto.userId !== user.id) {
       throw new HttpException(
         getReasonPhrase(StatusCodes.FORBIDDEN),
