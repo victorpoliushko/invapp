@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
+  Param,
   Post,
   UseGuards,
   UsePipes,
@@ -32,5 +34,12 @@ export class PortfoliosController {
       );
     }
     return this.portfoliosService.create(createPortfolioDto);
+  }
+
+  @Get(':userId')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  getPortfoliosByUserId(@Param('userId') userId: string) {
+    return this.portfoliosService.getByUserId(userId);
   }
 }
