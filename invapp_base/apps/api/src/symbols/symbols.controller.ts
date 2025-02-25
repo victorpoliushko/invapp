@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { SymbolsService } from './symbols.service';
+import { SymbolDto } from './dto/Symbol.dto';
 
 @Controller('symbols')
 export class SymbolsController {
@@ -11,7 +12,13 @@ export class SymbolsController {
     return { price };
   }
 
-  @Get('all-symbols')
+  @Get()
+  async getAllSymbols(@Query('limit') limit: number): Promise<SymbolDto[]> {
+    console.log(`Limit: ${limit}, type: ${typeof limit}`)
+    return await this.symbolsService.getSymbols(limit);
+  }
+
+  @Get('save-symbols')
   async getAndStoreSymbols(): Promise<any> {
     return await this.symbolsService.fetchAndStoreSymbols();
   }

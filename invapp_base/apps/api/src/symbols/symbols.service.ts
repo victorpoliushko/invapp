@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { DataSource } from '@prisma/client';
+import { SymbolDto } from './dto/Symbol.dto';
 
 @Injectable()
 export class SymbolsService {
@@ -34,6 +35,10 @@ export class SymbolsService {
       console.error('API error:', error.response?.data);
       throw new HttpException('Error fetching data', 500);
     }
+  }
+
+  async getSymbols(limit: number): Promise<SymbolDto[]> {
+    return await this.prismaService.symbol.findMany({ take: limit });
   }
 
   async fetchAndStoreSymbols() {
