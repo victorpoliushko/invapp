@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { SymbolsService } from './symbols.service';
 import { SymbolDto } from './dto/Symbol.dto';
 
@@ -13,8 +13,7 @@ export class SymbolsController {
   }
 
   @Get()
-  async getAllSymbols(@Query('limit') limit: number): Promise<SymbolDto[]> {
-    console.log(`Limit: ${limit}, type: ${typeof limit}`)
+  async getAllSymbols(@Query('limit', new ParseIntPipe()) limit: number): Promise<SymbolDto[]> {
     return await this.symbolsService.getSymbols(limit);
   }
 
