@@ -36,9 +36,12 @@ export class PortfoliosService {
       where: { userId, id },
       data: {
         symbols: {
-          create: input.symbols.map(({symbolId, quantity}) => ({
-            symbolId,
-            quantity
+          upsert: input.symbols.map(({ symbolId, quantity }) => ({
+            where: {
+              portfolioId_symbolId: { portfolioId: id, symbolId }
+            },
+            update: { quantity },
+            create: { portfolioId: id, symbolId, quantity }
           }))
         }
       }, include: { symbols: true }
