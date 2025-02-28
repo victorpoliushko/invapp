@@ -26,6 +26,7 @@ export class PortfoliosService {
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
+      include: { symbols: { include: { symbols: true } } }
     });
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
