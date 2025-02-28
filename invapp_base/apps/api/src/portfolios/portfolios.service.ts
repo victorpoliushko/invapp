@@ -4,8 +4,9 @@ import { SymbolsService } from '../symbols/symbols.service';
 import { UsersService } from '../users/users.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { AddSymbolToPortfolioDto } from './dto/AddSymbolsToPortfolio.dto';
+import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 
 @Injectable()
 export class PortfoliosService {
@@ -30,26 +31,29 @@ export class PortfoliosService {
   }
 
   async addSymbols(input: AddSymbolToPortfolioDto): Promise<PortfolioDto> {
-    const { id, userId } = input;
+    const { id: portfolioId, userId, symbols } = input;
 
-    const updatedPortfolio = await this.prismaService.portfolio.update({
-      where: { userId, id },
-      data: {
-        symbols: {
-          // upsert: input.symbols.map(({ symbolId, quantity }) => ({
-          //   where: {
-          //     portfolioId_symbolId: { portfolioId: id, symbolId }
-          //   },
-          //   update: { quantity },
-          //   create: { portfolioId: id, symbolId, quantity }
-          // }))
-          create: input.symbols.map(({ symbolId, quantity }) => ({
-            portfolioId: id,
-            symbolId,
-            quantity,
-          }))
-        }
-      }, include: { symbols: true }
+    const exsitingPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({ where: { id: portfolioId }});
+
+    if (!exsitingPortfolio) {
+      throw new HttpException(
+        getReasonPhrase(StatusCodes.NOT_FOUND),
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    await this.prismaService.portfolioSymbol.createMany({
+      data: symbols.map(({ symbolId, quantity }) => ({
+        portfolioId,
+        symbolId,
+        quantity
+      })),
+      skipDuplicates: true
+    });
+
+    const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
+      where: { id: portfolioId },
+      include: { symbols: true },
     });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);

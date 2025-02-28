@@ -44,7 +44,7 @@ export class PortfoliosController {
     return this.portfoliosService.getByUserId(userId);
   }
 
-  @Post()
+  @Post('/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   addSymbols(@Body() addSymbolToPortfolioDto: AddSymbolToPortfolioDto) {
