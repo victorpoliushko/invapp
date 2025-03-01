@@ -10,16 +10,11 @@ class SymbolQuantityDto {
   quantity: number;
 }
 
-export class AddSymbolToPortfolioDto {
+export class SymbolToPortfolioDto {
   @IsUUID()
   @IsDefined()
   @IsNotEmpty()
   id: string;
-
-  @IsUUID()
-  @IsDefined()
-  @IsNotEmpty()
-  userId: string;
 
   @IsArray()
   @ValidateNested({ each: true })

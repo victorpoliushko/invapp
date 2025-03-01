@@ -5,13 +5,12 @@ import { UsersService } from '../users/users.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
 import { HttpException, Injectable } from '@nestjs/common';
-import { AddSymbolToPortfolioDto } from './dto/AddSymbolsToPortfolio.dto';
+import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 
 @Injectable()
 export class PortfoliosService {
   constructor(
-    private usersService: UsersService,
     private prismaService: PrismaService,
   ) {}
 
@@ -31,8 +30,8 @@ export class PortfoliosService {
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
-  async addSymbols(input: AddSymbolToPortfolioDto): Promise<PortfolioDto> {
-    const { id: portfolioId, userId, symbols } = input;
+  async addSymbols(input: SymbolToPortfolioDto): Promise<PortfolioDto> {
+    const { id: portfolioId, symbols } = input;
 
     const exsitingPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({ where: { id: portfolioId }});
 
@@ -59,4 +58,35 @@ export class PortfoliosService {
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
+
+  async updateSymbols(input: SymbolToPortfolioDto): Promise<PortfolioDto> {
+    const { id: portfolioId, symbols } = input;
+
+    const updates = symbols.map(({ symbolId, quantity }) => 
+      this.prismaService.portfolioSymbol.update({
+        where: { portfolioId_symbolId: { portfolioId, symbolId } },
+        data: {
+          portfolioId,
+          symbolId,
+          quantity
+        }
+      })
+    );
+
+    await Promise.all(updates);
+
+
+    const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
+      where: { id: portfolioId },
+      include: { symbols: true },
+    });
+
+    return plainToInstance(PortfolioDto, updatedPortfolio);
+  }
+
+  // removeSymbols(input: SymbolToPortfolioDto): Promise<PortfolioDto> {
+  //   const { symbolsToDelete, symbolsToUpdate } = input.symbols.reduce((acc, item) => {
+  //     if (item.quantity === 0)
+  //   });
+  // }
 }

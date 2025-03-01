@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   Param,
+  Patch,
   Post,
   UseGuards,
   UsePipes,
@@ -15,7 +16,7 @@ import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
-import { AddSymbolToPortfolioDto } from './dto/AddSymbolsToPortfolio.dto';
+import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
 
 @Controller('portfolios')
 export class PortfoliosController {
@@ -47,7 +48,14 @@ export class PortfoliosController {
   @Post('/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addSymbols(@Body() addSymbolToPortfolioDto: AddSymbolToPortfolioDto) {
+  addSymbols(@Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
     return this.portfoliosService.addSymbols(addSymbolToPortfolioDto);
+  }
+
+  @Patch('/symbols')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  updateSymbols(@Body() updateSymbolsToPortfolioDto: SymbolToPortfolioDto) {
+    return this.portfoliosService.updateSymbols(updateSymbolsToPortfolioDto);
   }
 }
