@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Param,
@@ -17,6 +18,7 @@ import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
+import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
 
 @Controller('portfolios')
 export class PortfoliosController {
@@ -57,5 +59,12 @@ export class PortfoliosController {
   @UsePipes(new ValidationPipe())
   updateSymbols(@Body() updateSymbolsToPortfolioDto: SymbolToPortfolioDto) {
     return this.portfoliosService.updateSymbols(updateSymbolsToPortfolioDto);
+  }
+
+  @Delete('/symbols')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  deleteSymbols(@Body() deleteSymbolsDto: DeleteSymbolsFromPortfolioDto) {
+    return this.portfoliosService.deleteSymbols(deleteSymbolsDto);
   }
 }

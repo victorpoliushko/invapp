@@ -7,6 +7,7 @@ import { PortfolioDto } from './dto/Portfolio.dto';
 import { HttpException, Injectable } from '@nestjs/common';
 import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
+import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
 
 @Injectable()
 export class PortfoliosService {
@@ -84,9 +85,16 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  // removeSymbols(input: SymbolToPortfolioDto): Promise<PortfolioDto> {
-  //   const { symbolsToDelete, symbolsToUpdate } = input.symbols.reduce((acc, item) => {
-  //     if (item.quantity === 0)
-  //   });
-  // }
+  async deleteSymbols(input: DeleteSymbolsFromPortfolioDto): Promise<PortfolioDto> {
+    await this.prismaService.portfolioSymbol.deleteMany({
+      where: { portfolioId: input.id, symbolId: { in: input.symbolIds } }
+    });
+
+    const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
+      where: { id: input.id },
+      include: { symbols: true },
+    });
+
+    return plainToInstance(PortfolioDto, updatedPortfolio);
+  }
 }
