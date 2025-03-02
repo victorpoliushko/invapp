@@ -1,7 +1,5 @@
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { PrismaService } from '../prisma/prisma.service';
-import { SymbolsService } from '../symbols/symbols.service';
-import { UsersService } from '../users/users.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
 import { HttpException, Injectable } from '@nestjs/common';
@@ -31,10 +29,8 @@ export class PortfoliosService {
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
-  async addSymbols(input: SymbolToPortfolioDto): Promise<PortfolioDto> {
-    const { id: portfolioId, symbols } = input;
-
-    const exsitingPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({ where: { id: portfolioId }});
+  async addSymbols(id: string, input: SymbolToPortfolioDto): Promise<PortfolioDto> {
+    const exsitingPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({ where: { id }});
 
     if (!exsitingPortfolio) {
       throw new HttpException(
@@ -44,8 +40,8 @@ export class PortfoliosService {
     }
 
     await this.prismaService.portfolioSymbol.createMany({
-      data: symbols.map(({ symbolId, quantity }) => ({
-        portfolioId,
+      data: input.symbols.map(({ symbolId, quantity }) => ({
+        portfolioId: id,
         symbolId,
         quantity
       })),
@@ -53,21 +49,19 @@ export class PortfoliosService {
     });
 
     const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
-      where: { id: portfolioId },
+      where: { id },
       include: { symbols: true },
     });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async updateSymbols(input: SymbolToPortfolioDto): Promise<PortfolioDto> {
-    const { id: portfolioId, symbols } = input;
-
-    const updates = symbols.map(({ symbolId, quantity }) => 
+  async updateSymbols(id: string, input: SymbolToPortfolioDto): Promise<PortfolioDto> {
+    const updates = input.symbols.map(({ symbolId, quantity }) => 
       this.prismaService.portfolioSymbol.update({
-        where: { portfolioId_symbolId: { portfolioId, symbolId } },
+        where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
         data: {
-          portfolioId,
+          portfolioId: id,
           symbolId,
           quantity
         }
@@ -76,22 +70,21 @@ export class PortfoliosService {
 
     await Promise.all(updates);
 
-
     const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
-      where: { id: portfolioId },
+      where: { id },
       include: { symbols: true },
     });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async deleteSymbols(input: DeleteSymbolsFromPortfolioDto): Promise<PortfolioDto> {
+  async deleteSymbols(id: string, input: DeleteSymbolsFromPortfolioDto): Promise<PortfolioDto> {
     await this.prismaService.portfolioSymbol.deleteMany({
-      where: { portfolioId: input.id, symbolId: { in: input.symbolIds } }
+      where: { portfolioId: id, symbolId: { in: input.symbolIds } }
     });
 
     const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
-      where: { id: input.id },
+      where: { id },
       include: { symbols: true },
     });
 

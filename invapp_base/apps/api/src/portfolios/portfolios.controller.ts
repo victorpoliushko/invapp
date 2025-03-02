@@ -47,24 +47,24 @@ export class PortfoliosController {
     return this.portfoliosService.getByUserId(userId);
   }
 
-  @Post('/symbols')
+  @Post(':id/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addSymbols(@Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
-    return this.portfoliosService.addSymbols(addSymbolToPortfolioDto);
+  addSymbols(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
+    return this.portfoliosService.addSymbols(id, addSymbolToPortfolioDto);
   }
 
-  @Patch('/symbols')
+  @Patch(':id/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  updateSymbols(@Body() updateSymbolsToPortfolioDto: SymbolToPortfolioDto) {
-    return this.portfoliosService.updateSymbols(updateSymbolsToPortfolioDto);
+  updateSymbols(@Param('id') id: string, @Body() updateSymbolsToPortfolioDto: SymbolToPortfolioDto) {
+    return this.portfoliosService.updateSymbols(id, updateSymbolsToPortfolioDto);
   }
 
-  @Delete('/symbols')
+  @Delete(':id/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  deleteSymbols(@Body() deleteSymbolsDto: DeleteSymbolsFromPortfolioDto) {
-    return this.portfoliosService.deleteSymbols(deleteSymbolsDto);
+  deleteSymbols(@Param('id') id: string, @Body() deleteSymbolsDto: DeleteSymbolsFromPortfolioDto) {
+    return this.portfoliosService.deleteSymbols(id, deleteSymbolsDto);
   }
 }

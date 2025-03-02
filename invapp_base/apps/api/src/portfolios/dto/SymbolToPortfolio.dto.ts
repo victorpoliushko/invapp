@@ -11,11 +11,6 @@ class SymbolQuantityDto {
 }
 
 export class SymbolToPortfolioDto {
-  @IsUUID()
-  @IsDefined()
-  @IsNotEmpty()
-  id: string;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SymbolQuantityDto)
