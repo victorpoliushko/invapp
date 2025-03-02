@@ -39,14 +39,15 @@ export class PortfoliosService {
       );
     }
 
-    await this.prismaService.portfolioSymbol.createMany({
-      data: input.symbols.map(({ symbolId, quantity }) => ({
-        portfolioId: id,
-        symbolId,
-        quantity
-      })),
-      skipDuplicates: true
+    const portfolioSymbols = input.symbols.map(({ symbolId, quantity }) => {
+      return this.prismaService.portfolioSymbol.upsert({
+        where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
+        update: { quantity },
+        create: { portfolioId: id, symbolId: symbolId, quantity }
+      })
     });
+
+    await Promise.all(portfolioSymbols);
 
     const updatedPortfolio = await this.prismaService.portfolio.findUniqueOrThrow({
       where: { id },
