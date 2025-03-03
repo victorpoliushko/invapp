@@ -68,11 +68,4 @@ export class SymbolsService {
       await this.prismaService.$disconnect();
     }
   }
-
-  // async getPortfolioPrice(symbols: string[]): Promise<>
-
-  testGetPort() {
-    console.log(`PORT: ${this.configService.get<string>('TEST_PORT')}`);
-    console.log(`config port: ${this.configService.get<string>('test_port_configuration')}`);
-  }
 }

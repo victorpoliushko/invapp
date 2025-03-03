@@ -1,5 +1,4 @@
-import { Type } from "class-transformer";
-import { IsDefined, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateUserDto {
   @IsDefined()
@@ -13,9 +12,4 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   phoneNumber?: string;
-
-  // @IsOptional()
-  // @ValidateNested()
-  // @Type(() => CreateUserSettingsDto)
-  // settings?: CreateUserSettingsDto;
 }

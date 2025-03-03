@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsArray, IsDefined, IsInt, IsNotEmpty, IsString, IsUUID, Min, ValidateNested } from "class-validator";
+import { IsArray, IsInt, IsUUID, Min, ValidateNested } from "class-validator";
 
 class SymbolQuantityDto {
   @IsUUID()

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { SymbolsService } from './symbols.service';
 import { SymbolDto } from './dto/Symbol.dto';
 
@@ -20,10 +20,5 @@ export class SymbolsController {
   @Get('save-symbols')
   async getAndStoreSymbols(): Promise<any> {
     return await this.symbolsService.fetchAndStoreSymbols();
-  }
-
-  @Get('test')
-  testGetPort() {
-    return this.symbolsService.testGetPort();
   }
 }

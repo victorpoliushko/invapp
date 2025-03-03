@@ -15,6 +15,4 @@ export class PortfolioDto {
   @ValidateNested()
   @Type(() => UserDto)
   user: UserDto;
-
-  // symbols: SymbolDto
 }
