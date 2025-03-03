@@ -6,6 +6,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
+import { PortfolioTotalPriceDto } from './dto/PortfolioTotalPrice.dto';
 
 @Injectable()
 export class PortfoliosService {
@@ -90,5 +91,12 @@ export class PortfoliosService {
     });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
+  }
+
+  async getTotalPrice(id: string): Promise<any>
+  // : Promise<PortfolioTotalPriceDto>
+  {
+    const allSymbolsQuantity = await this.prismaService.portfolio.findMany({where: {id}, select: { symbols: { select: { quantity: true } } }});
+    console.log(JSON.stringify(`allSymbolsQuantity: ${allSymbolsQuantity}`));
   }
 }

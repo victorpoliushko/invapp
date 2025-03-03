@@ -25,3 +25,5 @@
 //   providers: [InvestStrategiesService],
 // })
 // export class InvestStrategiesModule {}
+
+
