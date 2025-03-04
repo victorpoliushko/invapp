@@ -7,10 +7,11 @@ import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
+import { SymbolsService } from '../symbols/symbols.service';
 
 @Injectable()
 export class PortfoliosService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService, private symbolsService: SymbolsService) {}
 
   async create(input: CreatePortfolioDto): Promise<PortfolioDto> {
     const createdPortfolio = await this.prismaService.portfolio.create({
@@ -106,7 +107,7 @@ export class PortfoliosService {
 
   async getPortfolioBalance(id: string, currency: Currency): Promise<any> {
     // : Promise<PortfolioTotalPriceDto>
-    const allSymbolsQuantity = await this.prismaService.portfolio.findMany({
+    const portfolios = await this.prismaService.portfolio.findMany({
       where: { id },
       include: { 
         symbols: { 
@@ -116,12 +117,31 @@ export class PortfoliosService {
         } 
       },
     });
-    
-    allSymbolsQuantity.map((asq) =>
-      asq.symbols.map((asqs) => {
-        this.symbolService.getSharePrice(asqs.symbols.symbol);
-      }),
+
+    const portfoliosWithSymbolsPrice = await Promise.all(
+      portfolios.map(async (portfolio) => {
+        const symbolsWithprices = await Promise.all(
+          portfolio.symbols.map(async (portfolioSymbols) => {
+            const price = await this.symbolsService.getSharePrice(portfolioSymbols.symbols.symbol)
+            return (
+              {
+                symbol: portfolioSymbols.symbols.symbol,
+                price,
+                currency,
+                quantity: portfolioSymbols.quantity
+              }
+            )
+          }),
+        )
+        return {
+          ...portfolios,
+          symbols: symbolsWithprices
+        }
+      })
     );
-    console.log(`allSymbolsQuantity: ${JSON.stringify(allSymbolsQuantity)}`);
+
+    return portfoliosWithSymbolsPrice;
+    
+    // console.log(`q: ${JSON.stringify(portfolios)}`);
   }
 }
