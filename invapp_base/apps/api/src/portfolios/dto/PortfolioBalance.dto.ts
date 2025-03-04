@@ -1,11 +1,11 @@
 import { IsDefined, IsEnum, IsNotEmpty, ValidateNested } from "class-validator";
 
-enum Currency {
+export enum Currency {
   USD,
   EUR
 }
 
-export class PortfolioTotalPriceDto {
+export class PortfolioBalanceDto {
   @IsDefined()
   @IsNotEmpty()
   id: String;

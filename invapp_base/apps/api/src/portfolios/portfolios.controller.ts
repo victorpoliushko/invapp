@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -19,6 +20,7 @@ import { User } from '@prisma/client';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
 import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
+import { Currency } from './dto/PortfolioBalance.dto';
 
 @Controller('portfolios')
 export class PortfoliosController {
@@ -66,5 +68,10 @@ export class PortfoliosController {
   @UsePipes(new ValidationPipe())
   deleteSymbols(@Param('id') id: string, @Body() deleteSymbolsDto: DeleteSymbolsFromPortfolioDto) {
     return this.portfoliosService.deleteSymbols(id, deleteSymbolsDto);
+  }
+
+  @Get(':id/balance')
+  getBalance(@Param('id') id: string, @Query('currency') currency: Currency) {
+    return this.portfoliosService.getPortfolioBalance(id, currency);
   }
 }
