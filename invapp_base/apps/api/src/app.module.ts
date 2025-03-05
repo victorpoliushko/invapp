@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { PrismaService } from './prisma/prisma.service';
 import { PortfoliosModule } from './portfolios/portfolios.module';
+import { SymbolsModule } from './symbols/symbols.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { PortfoliosModule } from './portfolios/portfolios.module';
     HttpModule,
     UsersModule,
     AuthModule,
-    PortfoliosModule
+    PortfoliosModule,
+    SymbolsModule
   ],
   controllers: [AppController, SymbolsController],
   providers: [AppService, SymbolsService, AuthService, JwtService, UsersService, PrismaService],
