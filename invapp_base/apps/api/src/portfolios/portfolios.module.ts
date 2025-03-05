@@ -9,6 +9,6 @@ import { PrismaModule } from "../prisma/prisma.module";
 @Module({
   imports: [SymbolsModule, PrismaModule],
   controllers: [PortfoliosController],
-  providers: [PortfoliosService, UsersService, SymbolsService]
+  providers: [PortfoliosService]
 })
 export class PortfoliosModule {}
