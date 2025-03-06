@@ -5,6 +5,7 @@ import { lastValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { DataSource } from '@prisma/client';
 import { SymbolDto } from './dto/Symbol.dto';
+import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 
 @Injectable()
 export class SymbolsService {
@@ -17,10 +18,17 @@ export class SymbolsService {
   async getSharePrice(symbol: string): Promise<number> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
-      const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=${apikey}`;
+      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${apikey}`;
+      const matchingResponse = await lastValueFrom(this.httpService.get(matchingUrl));
+      const matches = matchingResponse.data?.bestMatches || [];
 
-      const response = await lastValueFrom(this.httpService.get(url));
-      console.log('Response data:', response.data);
+      if (!matches.some(match => match["1. symbol"] === symbol)) {
+        throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
+      }
+
+      const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=${apikey}`;
+
+      const response = await lastValueFrom(this.httpService.get(pricingUrl));
       const timeSeries = response.data['Time Series (5min)'];
 
       if (!timeSeries) {

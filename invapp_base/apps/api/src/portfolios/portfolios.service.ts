@@ -122,6 +122,7 @@ export class PortfoliosService {
       portfolios.map(async (portfolio) => {
         const symbolsWithprices = await Promise.all(
           portfolio.symbols.map(async (portfolioSymbols) => {
+            console.log(`Symbol: ${portfolioSymbols.symbols.symbol}`)
             const price = await this.symbolsService.getSharePrice(portfolioSymbols.symbols.symbol)
             return (
               {
@@ -139,9 +140,8 @@ export class PortfoliosService {
         }
       })
     );
+    console.log(`q: ${JSON.stringify(portfoliosWithSymbolsPrice)}`);
 
     return portfoliosWithSymbolsPrice;
-    
-    // console.log(`q: ${JSON.stringify(portfolios)}`);
   }
 }
