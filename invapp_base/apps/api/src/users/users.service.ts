@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import { CreateUserDto } from './dto/CreateUser.dto';
@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { UserDto } from './dto/User.dto';
 import { plainToInstance } from 'class-transformer';
+import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 
 
 @Injectable()
@@ -17,6 +18,9 @@ export class UsersService {
       where: { id },
       include: { portfolios: true },
     });
+    if (!user) {
+      throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
+    }
     return plainToInstance(UserDto, user);
   }
 
