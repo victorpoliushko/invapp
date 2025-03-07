@@ -9,6 +9,12 @@ import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.
 import { Currency } from './dto/PortfolioBalance.dto';
 import { SymbolsService } from '../symbols/symbols.service';
 
+interface SymbolsWithPrices {
+  symbol: string;
+  price: number;
+  currency: Currency;
+  quantity: number;
+}
 @Injectable()
 export class PortfoliosService {
   constructor(private prismaService: PrismaService, private symbolsService: SymbolsService) {}
@@ -106,7 +112,6 @@ export class PortfoliosService {
   }
 
   async getPortfolioBalance(id: string, currency: Currency): Promise<any> {
-    // : Promise<PortfolioTotalPriceDto>
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { id },
       include: { 
@@ -120,7 +125,7 @@ export class PortfoliosService {
 
     const portfoliosWithSymbolsPrice = await Promise.all(
       portfolios.map(async (portfolio) => {
-        const symbolsWithprices = await Promise.all(
+        const symbolsWithPrices = await Promise.all(
           portfolio.symbols.map(async (portfolioSymbols) => {
             console.log(`Symbol: ${portfolioSymbols.symbols.symbol}`)
             const price = await this.symbolsService.getSharePrice(portfolioSymbols.symbols.symbol)
@@ -136,12 +141,16 @@ export class PortfoliosService {
         )
         return {
           ...portfolios,
-          symbols: symbolsWithprices
+          symbols: symbolsWithPrices,
+          totalPrice: this.calculateSymbolsTotalPrice(symbolsWithPrices)
         }
       })
     );
-    console.log(`q: ${JSON.stringify(portfoliosWithSymbolsPrice)}`);
 
     return portfoliosWithSymbolsPrice;
+  }
+
+  calculateSymbolsTotalPrice(symbols: SymbolsWithPrices[]) {
+    return symbols.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
   }
 }

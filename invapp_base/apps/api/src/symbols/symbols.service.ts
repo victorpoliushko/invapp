@@ -19,16 +19,11 @@ export class SymbolsService {
     try {
       const apikey = this.configService.get<string>('API_KEY');
       
-      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${apikey}`;
-      // error drops when matchingUrl does not find the symbol
+      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol.trim().toUpperCase()}&apikey=${apikey}`;
       const matchingResponse = await lastValueFrom(this.httpService.get(matchingUrl));
       const matches = matchingResponse.data?.bestMatches || [];
 
-      console.log(`matches: ${JSON.stringify(matches)}`)
-      const somes = matches.some(match => match["1. symbol"] === symbol)
-      console.log(`some: ${JSON.stringify(somes)}`)
-
-      if (!matches.some(match => match["1. symbol"] === symbol)) {
+      if (matches.length <= 0 || !matches.some(match => match["1. symbol"].trim().toUpperCase() === symbol.trim().toUpperCase())) {
         throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
       }
 
