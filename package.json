@@ -4,7 +4,8 @@
     "turbo": "^2.4.4"
   },
   "scripts": {
-    "dev": "turbo run dev"
+    "dev": "turbo run dev",
+    "build": "turbo run build"
   },
   "workspaces": [
     "apps/*"
