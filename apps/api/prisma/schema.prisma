@@ -89,6 +89,19 @@ model InvestStrategy {
   userId String
 }
 
+enum MixedAssetType {
+  REAL_ESTATE
+  APPS
+}
+
+model MixedAssets {
+  id       String         @id @default(uuid())
+  title    String
+  type     MixedAssetType
+  quantity Int
+  price    Float
+}
+
 // TODO
 // model ApiKey {
 //   createdAt DateTime @default(now())
