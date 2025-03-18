@@ -1,4 +1,4 @@
-import { IsDefined, IsEnum, IsNotEmpty, ValidateNested } from "class-validator";
+import { IsDefined, IsNotEmpty, ValidateNested } from "class-validator";
 import { UserDto } from "../../users/dto/User.dto";
 import { Type } from "class-transformer";
 

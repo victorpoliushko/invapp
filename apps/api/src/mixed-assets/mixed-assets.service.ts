@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMixedAssetDto } from './dto/create-mixed-asset.dto';
 import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { MixedAssetsDto } from './dto/mixed-assets.dto';
 
 @Injectable()
 export class MixedAssetsService {
-  create(createMixedAssetDto: CreateMixedAssetDto) {
-    return 'This action adds a new mixedAsset';
+  constructor(private prismaService: PrismaService) {}
+
+  async create(createMixedAssetDto: CreateMixedAssetDto): Promise<MixedAssetsDto> {
+    const createdAsset = await this.prismaService.mixedAssets.create({
+      data: createMixedAssetDto
+    });
   }
 
   findAll() {

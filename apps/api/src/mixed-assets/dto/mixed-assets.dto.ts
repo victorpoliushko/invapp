@@ -1,10 +1,11 @@
-import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator";
-import { MixedAssetsType } from "./mixed-assets.dto";
+import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class CreateMixedAssetDto {
-  @IsUUID()
-  id: string;
+export enum MixedAssetsType {
+  REAL_ESTATE,
+  APPS
+}
 
+export class MixedAssetsDto {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
@@ -23,3 +24,5 @@ export class CreateMixedAssetDto {
   @IsNotEmpty()
   price: number;
 }
+
+
