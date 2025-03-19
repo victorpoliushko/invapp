@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MixedAssetsService } from './mixed-assets.service';
 import { CreateMixedAssetDto } from './dto/create-mixed-asset.dto';
 import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('mixed-assets')
 export class MixedAssetsController {
   constructor(private readonly mixedAssetsService: MixedAssetsService) {}
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
   create(@Body() createMixedAssetDto: CreateMixedAssetDto) {
     return this.mixedAssetsService.create(createMixedAssetDto);
   }

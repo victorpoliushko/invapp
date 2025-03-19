@@ -3,6 +3,7 @@ import { CreateMixedAssetDto } from './dto/create-mixed-asset.dto';
 import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MixedAssetsDto } from './dto/mixed-assets.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class MixedAssetsService {
@@ -12,6 +13,7 @@ export class MixedAssetsService {
     const createdAsset = await this.prismaService.mixedAssets.create({
       data: createMixedAssetDto
     });
+    return plainToInstance(MixedAssetsDto, createdAsset);
   }
 
   findAll() {
