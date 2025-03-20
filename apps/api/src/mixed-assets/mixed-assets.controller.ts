@@ -16,6 +16,8 @@ export class MixedAssetsController {
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
   findAll() {
     return this.mixedAssetsService.findAll();
   }

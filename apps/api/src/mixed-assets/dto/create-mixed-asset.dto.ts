@@ -1,4 +1,4 @@
-import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID } from "class-validator";
+import { IsDefined, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { MixedAssetType } from "./mixed-assets.dto";
 
 export class CreateMixedAssetDto {

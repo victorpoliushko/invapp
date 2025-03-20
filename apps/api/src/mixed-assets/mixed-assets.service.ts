@@ -16,8 +16,9 @@ export class MixedAssetsService {
     return plainToInstance(MixedAssetsDto, createdAsset);
   }
 
-  findAll() {
-    return `This action returns all mixedAssets`;
+  async findAll(): Promise<MixedAssetsDto[]> {
+    const foundAssets = await this.prismaService.mixedAssets.findMany();
+    return foundAssets.map(asset => plainToInstance(MixedAssetsDto, asset));
   }
 
   findOne(id: number) {
