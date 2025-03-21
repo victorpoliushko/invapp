@@ -3,6 +3,7 @@ import { MixedAssetsService } from './mixed-assets.service';
 import { CreateMixedAssetDto } from './dto/create-mixed-asset.dto';
 import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { IdParamDto } from './dto/id-param-dto';
 
 @Controller('mixed-assets')
 export class MixedAssetsController {
@@ -25,7 +26,7 @@ export class MixedAssetsController {
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  findOne(@Param('id') id: string) {
+  findOne(@Param() { id }: IdParamDto) {
     return this.mixedAssetsService.findOne(id);
   }
 
