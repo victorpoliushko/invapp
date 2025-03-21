@@ -23,8 +23,10 @@ export class MixedAssetsController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
   findOne(@Param('id') id: string) {
-    return this.mixedAssetsService.findOne(+id);
+    return this.mixedAssetsService.findOne(id);
   }
 
   @Patch(':id')

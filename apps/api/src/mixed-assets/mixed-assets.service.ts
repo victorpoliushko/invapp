@@ -21,8 +21,9 @@ export class MixedAssetsService {
     return foundAssets.map(asset => plainToInstance(MixedAssetsDto, asset));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} mixedAsset`;
+  async findOne(id: string): Promise<MixedAssetsDto> {
+    const foundAsset = await this.prismaService.mixedAssets.findFirstOrThrow({ where: { id } });
+    return plainToInstance(MixedAssetsDto, foundAsset);
   }
 
   update(id: number, updateMixedAssetDto: UpdateMixedAssetDto) {
