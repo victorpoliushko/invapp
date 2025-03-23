@@ -1,6 +1,4 @@
-import { ArgumentMetadata, BadRequestException, HttpException, PipeTransform } from "@nestjs/common";
-import { getReasonPhrase, StatusCodes } from "http-status-codes";
-
+import { ArgumentMetadata, BadRequestException, PipeTransform } from "@nestjs/common";
 
 export class ParseLimitPipe implements PipeTransform<string, number> {
   transform(value: string, metadata: ArgumentMetadata): number {

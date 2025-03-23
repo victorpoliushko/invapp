@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe, Query, Headers } from '@nestjs/common';
 import { MixedAssetsService } from './mixed-assets.service';
 import { CreateMixedAssetDto } from './dto/create-mixed-asset.dto';
 import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { IdParamDto } from './dto/id-param-dto';
 import { ParseLimitPipe } from './pipes/parseLimitPipe';
+import { HeadersDto } from './dto/headers.dto';
+import { RequestHeader } from './pipes/request-header';
 
 @Controller('mixed-assets')
 export class MixedAssetsController {
@@ -39,5 +41,16 @@ export class MixedAssetsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.mixedAssetsService.remove(+id);
+  }
+
+  @Patch('/test/:id')
+  test(
+    @Param('id') id: string,
+    @RequestHeader(new ValidationPipe({ 
+      // to return only dto related data
+      // whitelist: true, 
+      validateCustomDecorators: true })) headers: HeadersDto
+  ) {
+    return headers;
   }
 }
