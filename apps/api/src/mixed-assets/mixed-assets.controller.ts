@@ -34,8 +34,10 @@ export class MixedAssetsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
   update(@Param('id') id: string, @Body() updateMixedAssetDto: UpdateMixedAssetDto) {
-    return this.mixedAssetsService.update(+id, updateMixedAssetDto);
+    return this.mixedAssetsService.update(id, updateMixedAssetDto);
   }
 
   @Delete(':id')

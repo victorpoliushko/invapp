@@ -4,30 +4,29 @@ import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MixedAssetsDto } from './dto/mixed-assets.dto';
 import { plainToInstance } from 'class-transformer';
+import { MixedAssets } from '@prisma/client';
 
 @Injectable()
 export class MixedAssetsService {
   constructor(private prismaService: PrismaService) {}
 
-  async create(createMixedAssetDto: CreateMixedAssetDto): Promise<MixedAssetsDto> {
-    const createdAsset = await this.prismaService.mixedAssets.create({
+  async create(createMixedAssetDto: CreateMixedAssetDto): Promise<MixedAssets> {
+    return await this.prismaService.mixedAssets.create({
       data: createMixedAssetDto
     });
-    return plainToInstance(MixedAssetsDto, createdAsset);
+    // return plainToInstance(MixedAssetsDto, createdAsset);
   }
 
-  async findAll(limit: number): Promise<MixedAssetsDto[]> {
-    const foundAssets = await this.prismaService.mixedAssets.findMany({ take: limit });
-    return foundAssets.map(asset => plainToInstance(MixedAssetsDto, asset));
+  async findAll(limit: number): Promise<MixedAssets[]> {
+    return await this.prismaService.mixedAssets.findMany({ take: limit });
   }
 
-  async findOne(id: string): Promise<MixedAssetsDto> {
-    const foundAsset = await this.prismaService.mixedAssets.findFirstOrThrow({ where: { id } });
-    return plainToInstance(MixedAssetsDto, foundAsset);
+  async findOne(id: string): Promise<MixedAssets> {
+    return await this.prismaService.mixedAssets.findFirstOrThrow({ where: { id } });
   }
 
-  update(id: number, updateMixedAssetDto: UpdateMixedAssetDto) {
-    return `This action updates a #${id} mixedAsset`;
+  async update(id: string, updateMixedAssetDto: UpdateMixedAssetDto): Promise<MixedAssets> {
+    return await this.prismaService.mixedAssets.update({ where: { id }, data: updateMixedAssetDto });
   }
 
   remove(id: number) {
