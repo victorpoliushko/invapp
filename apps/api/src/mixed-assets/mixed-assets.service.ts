@@ -29,7 +29,8 @@ export class MixedAssetsService {
     return await this.prismaService.mixedAssets.update({ where: { id }, data: updateMixedAssetDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} mixedAsset`;
+  async remove(id: string): Promise<MixedAssets[]> {
+    await this.prismaService.mixedAssets.delete({ where: { id } });
+    return await this.prismaService.mixedAssets.findMany();
   }
 }

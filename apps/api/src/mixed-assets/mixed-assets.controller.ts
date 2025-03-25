@@ -41,18 +41,9 @@ export class MixedAssetsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
   remove(@Param('id') id: string) {
-    return this.mixedAssetsService.remove(+id);
-  }
-
-  @Patch('/test/:id')
-  test(
-    @Param('id') id: string,
-    @RequestHeader(new ValidationPipe({ 
-      // to return only dto related data
-      // whitelist: true, 
-      validateCustomDecorators: true })) headers: HeadersDto
-  ) {
-    return headers;
+    return this.mixedAssetsService.remove(id);
   }
 }
