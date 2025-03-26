@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-import "./App.css";
+import { Header } from "./Header";
 
 function App() {
   const [greeting, setGreeting] = useState("");
@@ -12,9 +12,13 @@ function App() {
       .then(setGreeting);
   }, []);
 
+
+
   return (
     <>
+      <Header />
       <div>
+        {/* <p>TEST</p> */}
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>

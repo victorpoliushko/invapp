@@ -5,8 +5,6 @@ import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { IdParamDto } from './dto/id-param-dto';
 import { ParseLimitPipe } from './pipes/parseLimitPipe';
-import { HeadersDto } from './dto/headers.dto';
-import { RequestHeader } from './pipes/request-header';
 
 @Controller('mixed-assets')
 export class MixedAssetsController {
