@@ -1,0 +1,19 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+}
+
+.welcome {
+  font-size: 48px;
+}
+
+.app-name {
+  font-size: 64px;
+  font-weight: bold;
+}
