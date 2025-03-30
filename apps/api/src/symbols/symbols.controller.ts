@@ -1,6 +1,7 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { SymbolsService } from './symbols.service';
 import { SymbolDto } from './dto/Symbol.dto';
+import { PaginationDTO } from './dto/pagination.dto';
 
 @Controller('symbols')
 export class SymbolsController {
@@ -13,8 +14,8 @@ export class SymbolsController {
   }
 
   @Get()
-  async getAllSymbols(@Query('limit', new ParseIntPipe()) limit: number): Promise<SymbolDto[]> {
-    return await this.symbolsService.getSymbols(limit);
+  async getAllSymbols(@Query() paginationDTO: PaginationDTO): Promise<SymbolDto[]> {
+    return await this.symbolsService.getSymbols(paginationDTO);
   }
 
   @Get('save-symbols')

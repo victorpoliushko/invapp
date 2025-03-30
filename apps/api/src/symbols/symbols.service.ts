@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { DataSource } from '@prisma/client';
 import { SymbolDto } from './dto/Symbol.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
+import { PaginationDTO } from './dto/pagination.dto';
 
 @Injectable()
 export class SymbolsService {
@@ -46,8 +47,8 @@ export class SymbolsService {
     }
   }
 
-  async getSymbols(limit: number): Promise<SymbolDto[]> {
-    return await this.prismaService.symbol.findMany({ take: limit });
+  async getSymbols(paginationDTO: PaginationDTO): Promise<SymbolDto[]> {
+    return await this.prismaService.symbol.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
   }
 
   async fetchAndStoreSymbols() {
