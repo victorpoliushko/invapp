@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer";
-import { IsDefined, IsNotEmpty, IsString } from "class-validator";
+import { IsDefined, IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class UserDto {
   @IsDefined()
@@ -13,6 +13,9 @@ export class UserDto {
   @IsString()
   @IsNotEmpty()
   phoneNumber?: string;
+
+  @IsEmail()
+  email: string;
 
   @Exclude()
   password: string;

@@ -14,6 +14,13 @@ export class UsersController {
     return this.usersService.getUser(id);
   }
 
+  @Get()
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'))
+  async getUserByEmail() {
+    
+  }
+
   @Post()
   @UsePipes(new ValidationPipe())
   createUser(@Body() createUserDto: CreateUserDto) {
