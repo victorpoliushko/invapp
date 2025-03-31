@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "./Header";
-import "./App.css"
-import { Navbar } from "./components/Navbar";
+import "./App.css";
+import { Navbar } from "./components/navbar/Navbar";
 import { Main } from "./components/Main";
 
 function App() {
@@ -13,21 +13,19 @@ function App() {
       .then(setGreeting);
   }, []);
 
-
-
   return (
-    <body>
-      <>
-        <Header />
+    <>
+      <body>
+        {/* <Header /> */}
         <Navbar />
-        <Main />
+        {/* <Main /> */}
         <div className="container">
           <p className="welcome">Welcome to</p>
           <p className="app-name">Invapp</p>
         </div>
         {/* <h1>{greeting}</h1> */}
-      </>
-    </body>
+      </body>
+    </>
   );
 }
 
