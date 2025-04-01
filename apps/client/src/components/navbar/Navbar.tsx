@@ -1,4 +1,4 @@
-import invappLogo from "../../assets/invapp.png"
+import invappLogo from "../../assets/invapp2.png"
 import "./navbar.css";
 
 export function Navbar() {
@@ -6,7 +6,7 @@ export function Navbar() {
     <header>
       <nav className="navbar">
         <img className="navbar-logo" src={invappLogo} alt="invapp logo" />
-        <h1>Nav</h1>
+        <span className="profile-text">Your profile</span>
       </nav>
     </header>
   )

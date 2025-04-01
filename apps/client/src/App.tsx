@@ -15,14 +15,16 @@ function App() {
 
   return (
     <>
+      
       <body>
+      <Navbar />
         {/* <Header /> */}
-        <Navbar />
+        
         {/* <Main /> */}
-        <div className="container">
+        {/* <div className="container">
           <p className="welcome">Welcome to</p>
           <p className="app-name">Invapp</p>
-        </div>
+        </div> */}
         {/* <h1>{greeting}</h1> */}
       </body>
     </>
