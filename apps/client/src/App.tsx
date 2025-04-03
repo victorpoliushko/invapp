@@ -15,10 +15,12 @@ function App() {
 
   return (
     <>
-      <body>
-        <Navbar />
-        <Main />
-      </body>
+      <div className="container">
+        <body>
+          <Navbar />
+          <Main />
+        </body>
+      </div>
     </>
   );
 }

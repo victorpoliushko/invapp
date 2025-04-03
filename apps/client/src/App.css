@@ -3,11 +3,18 @@
   box-sizing: border-box;
 }
 
+.container {
+  width: 100vh;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
   background-color: #3f3f44;
   color: white;
+  padding: 0;
+  box-sizing: border-box;
+  background: none;
   /* display: flex;
   justify-content: center;
   align-items: center;
