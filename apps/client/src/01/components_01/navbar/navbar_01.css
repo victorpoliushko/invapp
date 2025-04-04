@@ -1,0 +1,21 @@
+.navbar-logo {
+  width: 160px;
+  margin-right: 10px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+header {
+  height: 200px;
+  background-color: #110f0f;
+  padding: 30px;
+}
+
+.profile-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
