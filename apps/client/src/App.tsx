@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { Header } from "./Header";
 import "./App.css";
-import { Navbar } from "./components/navbar/Navbar";
-import { Main } from "./components/main/Main";
+import { Header } from "./components/header/header";
 
 function App() {
   const [greeting, setGreeting] = useState("");
@@ -17,8 +15,7 @@ function App() {
     <>
       <div className="container">
         <body>
-          <Navbar />
-          <Main />
+          <Header />
         </body>
       </div>
     </>
