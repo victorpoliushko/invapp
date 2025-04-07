@@ -1,5 +1,6 @@
 import "./AssetsDashboard.css";
 import assetLogo from "../../assets/apple_logo.png"
+import vanguardLogo from "../../assets/vanguard-logo-wide.png"
 
 export function AssetsDashboard() {
   return (
@@ -15,13 +16,21 @@ export function AssetsDashboard() {
               <img src={assetLogo} alt="asset logo" />
             </div>
             <div className="asset-card-internal-right">
-              <div className="asset-name">
-                <h2>Apple AAPL</h2>
-              </div>
-              <div className="asset-price">
-                <p>$340</p>
-                <p>+3.2%</p>
-              </div>
+              <h2>Apple - AAPL</h2>
+              <h3>Some DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSomeSome DescriptionSome DescriptionSomeSome DescriptionSome DescriptionSomeSome DescriptionSome DescriptionSomeSome DescriptionSome DescriptionSomeSome DescriptionSome DescriptionSomeSome DescriptionSome DescriptionSome</h3>
+              <p>$340</p>
+              <p>+3.2%</p>
+            </div>
+          </div>
+          <div className="asset-card-internal">
+            <div className="asset-card-internal-left">
+              <img src={vanguardLogo} alt="asset logo" />
+            </div>
+            <div className="asset-card-internal-right">
+              <h2>S&P 500 - VOO</h2>
+              <h3>Some DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome Description</h3>
+              <p>$500</p>
+              <p>+1.5%</p>
             </div>
           </div>
         </div>
