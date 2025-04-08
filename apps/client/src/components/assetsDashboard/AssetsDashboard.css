@@ -16,3 +16,7 @@
   height: 100%;
   object-fit: cover;
 }
+
+.asset-card-internal-right > h2 {
+  margin-top: 0;
+}
