@@ -9,6 +9,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { ConfigModule } from '@nestjs/config';
+import refreshJwtConfig from './config/refresh-jwt-config';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { PrismaService } from '../prisma/prisma.service';
       signOptions: { expiresIn: '24h' },
     }),
     PassportModule,
+    ConfigModule.forFeature(refreshJwtConfig)
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, UsersService, PrismaService],
   controllers: [PassportAuthController]
