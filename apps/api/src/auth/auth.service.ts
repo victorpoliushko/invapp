@@ -1,8 +1,10 @@
-import { HttpException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
+import refreshJwtConfig from '../config/refresh-jwt-config';
+import { ConfigType } from '@nestjs/config';
 
 export type AuthInput = {
   username: string;
@@ -19,6 +21,7 @@ type AuthResult = {
   userId: string;
   username: string;
   expiresIn: string;
+  refreshToken: string;
 };
 
 @Injectable()
@@ -26,6 +29,7 @@ export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    @Inject(refreshJwtConfig.KEY) private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>
   ) {}
 
   async validateUser(input: AuthInput): Promise<SingInData | null> {
@@ -55,7 +59,8 @@ export class AuthService {
     
     try {
       const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: '3h' });
-      return { accessToken, userId, username, expiresIn: '3h' };
+      const refreshToken = await this.jwtService.signAsync(tokenPayload, this.refreshTokenConfig);
+      return { accessToken, refreshToken, userId, username, expiresIn: '3h' };
     } catch (e) {
       console.error('JWT Error:', e);
       throw new InternalServerErrorException('Token generation failed');

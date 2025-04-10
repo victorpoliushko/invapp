@@ -10,7 +10,7 @@ import { UsersModule } from '../users/users.module';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigModule } from '@nestjs/config';
-import refreshJwtConfig from './config/refresh-jwt-config';
+import refreshJwtConfig from '../config/refresh-jwt-config';
 
 @Module({
   imports: [

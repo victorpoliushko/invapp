@@ -15,10 +15,11 @@ import { PrismaService } from './prisma/prisma.service';
 import { PortfoliosModule } from './portfolios/portfolios.module';
 import { SymbolsModule } from './symbols/symbols.module';
 import { MixedAssetsModule } from './mixed-assets/mixed-assets.module';
+import refreshJwtConfig from './config/refresh-jwt-config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration, refreshJwtConfig] }),
     HttpModule,
     UsersModule,
     AuthModule,
