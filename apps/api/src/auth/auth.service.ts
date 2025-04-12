@@ -66,4 +66,15 @@ export class AuthService {
       throw new InternalServerErrorException('Token generation failed');
     }
   }
+
+  refreshToken(userId: number) {
+    const tokenPayload = {
+      userId
+    };
+    const token = this.jwtService.sign(tokenPayload);
+    return {
+      id: userId,
+      token
+    };
+  }
 }
