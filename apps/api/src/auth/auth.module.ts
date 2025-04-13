@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 import refreshJwtConfig from '../config/refresh-jwt-config';
+import { RefreshStrategy } from './strategies/refresh.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import refreshJwtConfig from '../config/refresh-jwt-config';
     PassportModule,
     ConfigModule.forFeature(refreshJwtConfig)
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, UsersService, PrismaService],
-  controllers: [PassportAuthController]
+  providers: [AuthService, LocalStrategy, JwtStrategy, UsersService, PrismaService, RefreshStrategy],
+  controllers: [PassportAuthController],
+  exports: [RefreshStrategy]
 })
 export class AuthModule {}

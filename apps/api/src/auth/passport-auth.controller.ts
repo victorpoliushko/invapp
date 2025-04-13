@@ -25,9 +25,9 @@ export class PassportAuthController {
     return request.user;
   }
 
-  @UseGuards(RefreshAuthGuard)
   @Post('refresh')
+  @UseGuards(RefreshAuthGuard)
   refreshToken(@Req() request) {
-    return this.authService.refreshToken()request.user.id;
+    return this.authService.refreshToken(request.user.id);
   }
 }
