@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id          String  @id @default(uuid())
-  username    String  @unique
-  password    String
-  phoneNumber String?
-  email       String
+  id                 String  @id @default(uuid())
+  username           String  @unique
+  password           String
+  phoneNumber        String?
+  email              String
+  hashedRefreshToken String
 
   settings         UserSettings?
   portfolios       Portfolio[]

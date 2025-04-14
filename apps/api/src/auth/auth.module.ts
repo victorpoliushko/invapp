@@ -19,7 +19,7 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: jwtConstants.expireIn },
     }),
     PassportModule,
     ConfigModule.forFeature(refreshJwtConfig)

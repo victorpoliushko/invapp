@@ -5,13 +5,14 @@ import * as bcrypt from 'bcrypt';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import refreshJwtConfig from '../config/refresh-jwt-config';
 import { ConfigType } from '@nestjs/config';
+import { jwtConstants } from './constants';
 
 export type AuthInput = {
   username: string;
   password: string;
 };
 
-type SingInData = {
+type SignInData = {
   userId: string;
   username: string;
 };
@@ -29,10 +30,11 @@ export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+
     @Inject(refreshJwtConfig.KEY) private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>
   ) {}
 
-  async validateUser(input: AuthInput): Promise<SingInData | null> {
+  async validateUser(input: AuthInput): Promise<SignInData | null> {
     const user = await this.userService.getUserByName(input.username);
     if (!user) {
       throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
@@ -49,7 +51,7 @@ export class AuthService {
     return { userId: user.id, username: user.username};
   }
 
-  async signIn(input: SingInData): Promise<AuthResult> {
+  async signIn(input: SignInData): Promise<AuthResult> {
     const { username, userId } = input;
 
     const tokenPayload = {
@@ -58,13 +60,29 @@ export class AuthService {
     };
     
     try {
-      const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: '60s' });
+      const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: jwtConstants.expireIn });
       const refreshToken = await this.jwtService.signAsync(tokenPayload, this.refreshTokenConfig);
-      return { accessToken, refreshToken, userId, username, expiresIn: '60s' };
+      return { accessToken, refreshToken, userId, username, expiresIn: jwtConstants.expireIn };
     } catch (e) {
       console.error('JWT Error:', e);
       throw new InternalServerErrorException('Token generation failed');
     }
+  }
+
+  async generateToken(input: SignInData) {
+    const { username, userId } = input;
+
+    const tokenPayload = {
+      userId,
+      username
+    }
+
+    const [ accessToken, refreshToken ] = await Promise.all([
+      await this.jwtService.signAsync(tokenPayload, { expiresIn: jwtConstants.expireIn }),
+      await this.jwtService.signAsync(tokenPayload, this.refreshTokenConfig)
+    ]);
+
+    return { accessToken, refreshToken };
   }
 
   refreshToken(userId: number) {
