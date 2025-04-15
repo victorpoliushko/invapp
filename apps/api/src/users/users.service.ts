@@ -53,7 +53,7 @@ export class UsersService {
   }
 
   async update(id: string, input: UpdateUserDto): Promise<UserDto> {
-    const user = this.prismaService.user.update({
+    const user = await this.prismaService.user.update({
       where: {
         id,
       },
@@ -63,5 +63,9 @@ export class UsersService {
     });
 
     return plainToInstance(UserDto, user);
+  }
+
+  async updateHashedResfreshToken(userId: string, hashedRefreshToken: string) {
+    return await this.prismaService.user.update({ where: { id: userId }, data: { hashedRefreshToken } });
   }
 }

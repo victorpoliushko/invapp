@@ -13,7 +13,7 @@ model User {
   password           String
   phoneNumber        String?
   email              String
-  hashedRefreshToken String
+  hashedRefreshToken String?
 
   settings         UserSettings?
   portfolios       Portfolio[]

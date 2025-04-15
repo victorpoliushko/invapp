@@ -7,4 +7,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   phoneNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  hashedRefreshToken?: string;
 }

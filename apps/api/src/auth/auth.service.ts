@@ -6,6 +6,7 @@ import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import refreshJwtConfig from '../config/refresh-jwt-config';
 import { ConfigType } from '@nestjs/config';
 import { jwtConstants } from './constants';
+import * as argon2 from 'argon2';
 
 export type AuthInput = {
   username: string;
@@ -53,15 +54,11 @@ export class AuthService {
 
   async signIn(input: SignInData): Promise<AuthResult> {
     const { username, userId } = input;
-
-    const tokenPayload = {
-      userId,
-      username,
-    };
     
     try {
-      const accessToken = await this.jwtService.signAsync(tokenPayload, { expiresIn: jwtConstants.expireIn });
-      const refreshToken = await this.jwtService.signAsync(tokenPayload, this.refreshTokenConfig);
+      const { accessToken, refreshToken } = await this.generateToken(input);
+      const hashedRefreshToken = await argon2.hash(refreshToken);
+      await this.userService.updateHashedResfreshToken(userId, hashedRefreshToken);
       return { accessToken, refreshToken, userId, username, expiresIn: jwtConstants.expireIn };
     } catch (e) {
       console.error('JWT Error:', e);

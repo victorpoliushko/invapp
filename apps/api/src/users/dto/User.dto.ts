@@ -17,6 +17,9 @@ export class UserDto {
   @IsEmail()
   email: string;
 
+  @IsString()
+  hashedRefreshToken?: string;
+
   @Exclude()
   password: string;
 }
