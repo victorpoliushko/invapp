@@ -92,4 +92,15 @@ export class AuthService {
       token
     };
   }
+
+  async validateRefreshToken(userId: string, token: string) {
+    const user = await this.userService.getUser(userId);
+
+    if (!user || !user.hashedRefreshToken) throw new UnauthorizedException("Invalid refresh token");
+
+    const refreshTokenMatches = await argon2.verify(user.hashedRefreshToken, token);
+    if (!refreshTokenMatches) throw new UnauthorizedException("Invalid refresh token");
+
+    return { id: userId, username: user.username };
+  }
 }
