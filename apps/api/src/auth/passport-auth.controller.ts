@@ -22,12 +22,18 @@ export class PassportAuthController {
   @Get('profile')
   @UseGuards(PassportJwtAuthGuard)
   getProfileInfo(@Request() request) {
-    return request.user;
+    return request.user.hashedRefreshToken;
   }
 
   @Post('refresh')
   @UseGuards(RefreshAuthGuard)
   refreshToken(@Req() request) {
-    return this.authService.refreshToken(request.user.id);
+    return this.authService.refreshToken({ userId: request.user.id, username: request.user.username });
+  }
+
+  @UseGuards(PassportJwtAuthGuard)
+  @Post('signout')
+  signOut(@Req() request) {
+    this.authService.signOut(request.user.id);
   }
 }

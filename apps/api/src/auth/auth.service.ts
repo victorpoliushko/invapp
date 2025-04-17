@@ -82,15 +82,13 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  refreshToken(userId: number) {
-    const tokenPayload = {
-      userId
-    };
-    const token = this.jwtService.sign(tokenPayload);
-    return {
-      id: userId,
-      token
-    };
+  async refreshToken(input: SignInData) {
+    const { username, userId } = input;
+
+    const { accessToken, refreshToken } = await this.generateToken(input);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    await this.userService.updateHashedResfreshToken(userId, hashedRefreshToken);
+    return { accessToken, refreshToken, userId, username, expiresIn: jwtConstants.expireIn };
   }
 
   async validateRefreshToken(userId: string, token: string) {
@@ -102,5 +100,9 @@ export class AuthService {
     if (!refreshTokenMatches) throw new UnauthorizedException("Invalid refresh token");
 
     return { id: userId, username: user.username };
+  }
+
+  async signOut(userId: string): Promise<void> {
+    await this.userService.updateHashedResfreshToken(userId, null);
   }
 }
