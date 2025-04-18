@@ -19,12 +19,6 @@ export class PassportAuthController {
     return this.authService.signIn(request.user);
   }
 
-  @Get('profile')
-  @UseGuards(PassportJwtAuthGuard)
-  getProfileInfo(@Request() request) {
-    return request.user.hashedRefreshToken;
-  }
-
   @Post('refresh')
   @UseGuards(RefreshAuthGuard)
   refreshToken(@Req() request) {
