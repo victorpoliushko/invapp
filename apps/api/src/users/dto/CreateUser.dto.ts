@@ -1,4 +1,5 @@
-import { IsDefined, IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { Role } from "@prisma/client";
+import { IsDefined, IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateUserDto {
   @IsString()
@@ -18,4 +19,9 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   phoneNumber?: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role;
 }

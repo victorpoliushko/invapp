@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  EDITOR
+  USER
+}
+
 model User {
   id                 String  @id @default(uuid())
   username           String  @unique
@@ -14,6 +20,7 @@ model User {
   phoneNumber        String?
   email              String
   hashedRefreshToken String?
+  role               Role    @default(USER)
 
   settings         UserSettings?
   portfolios       Portfolio[]

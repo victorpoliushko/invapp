@@ -1,5 +1,6 @@
+import { Role } from "@prisma/client";
 import { Exclude } from "class-transformer";
-import { IsDefined, IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsDefined, IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class UserDto {
   @IsDefined()
@@ -22,4 +23,9 @@ export class UserDto {
 
   @Exclude()
   password: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role;
 }

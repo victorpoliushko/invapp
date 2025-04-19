@@ -36,7 +36,7 @@ export class UsersService {
   }
 
   async create(input: CreateUserDto): Promise<UserDto> {
-    const { username, password, email, phoneNumber } = input;
+    const { username, password, email, phoneNumber, role } = input;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -46,6 +46,7 @@ export class UsersService {
         phoneNumber,
         email,
         password: hashedPassword,
+        role
       },
     });
 
@@ -59,6 +60,7 @@ export class UsersService {
       },
       data: {
         phoneNumber: input.phoneNumber,
+        role: input.role
       },
     });
 
