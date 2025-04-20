@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/CreateUser.dto";
@@ -10,7 +10,7 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
-  async getUser(@Param('id') id: string) {
+  getUser(@Param('id') id: string) {
     return this.usersService.getUser(id);
   }
 
@@ -32,4 +32,12 @@ export class UsersController {
   updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe)
+  deleteUser(@Param('id') id: string) {
+    this.usersService.delete(id);
+  }
+
 }

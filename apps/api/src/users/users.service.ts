@@ -70,4 +70,8 @@ export class UsersService {
   async updateHashedResfreshToken(userId: string, hashedRefreshToken: string) {
     return await this.prismaService.user.update({ where: { id: userId }, data: { hashedRefreshToken } });
   }
+
+  async delete(id: string) {
+    await this.prismaService.user.delete({ where: { id } });
+  }
 }
