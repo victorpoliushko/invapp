@@ -5,6 +5,7 @@ import { CreateUserDto } from "./dto/CreateUser.dto";
 import { UpdateUserDto } from "./dto/UpdateUser.dto";
 import { Role } from "@prisma/client";
 import { Roles } from "src/auth/decorators/roles.decorator";
+import { RolesGuard } from "src/auth/guards/roles/roles.guard";
 
 @Controller('users')
 export class UsersController {
@@ -36,9 +37,10 @@ export class UsersController {
   }
 
   @Roles(Role.ADMIN, Role.EDITOR)
-  @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
   deleteUser(@Param('id') id: string) {
     this.usersService.delete(id);
   }
