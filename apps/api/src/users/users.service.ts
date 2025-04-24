@@ -35,6 +35,10 @@ export class UsersService {
     return plainToInstance(UserDto, foundUser)
   }
 
+  async findOne(id: string): Promise<UserDto> {
+    return this.prismaService.user.findUniqueOrThrow({ where: { id }});
+  }
+
   async create(input: CreateUserDto): Promise<UserDto> {
     const { username, password, email, phoneNumber, role } = input;
 

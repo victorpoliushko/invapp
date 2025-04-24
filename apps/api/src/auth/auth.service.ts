@@ -7,6 +7,7 @@ import refreshJwtConfig from '../config/refresh-jwt-config';
 import { ConfigType } from '@nestjs/config';
 import { jwtConstants } from './constants';
 import * as argon2 from 'argon2';
+import { CurrentUser } from './types/current-user';
 
 export type AuthInput = {
   username: string;
@@ -104,5 +105,15 @@ export class AuthService {
 
   async signOut(userId: string): Promise<void> {
     await this.userService.updateHashedResfreshToken(userId, null);
+  }
+
+  async validateJwtUser(userId: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user) throw new HttpException(
+      getReasonPhrase(StatusCodes.NOT_FOUND),
+      StatusCodes.NOT_FOUND
+    );
+    const currentUser: CurrentUser = { id: user.id, name: user.username, role: user.role };
+    return currentUser; 
   }
 }
