@@ -12,6 +12,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 import refreshJwtConfig from '../config/refresh-jwt-config';
 import { RefreshStrategy } from './strategies/refresh.strategy';
+import { APP_GUARD } from '@nestjs/core';
+import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
+import { RolesGuard } from './guards/roles/roles.guard';
 
 @Module({
   imports: [
@@ -22,10 +25,25 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
       signOptions: { expiresIn: jwtConstants.expireIn },
     }),
     PassportModule,
-    ConfigModule.forFeature(refreshJwtConfig)
+    ConfigModule.forFeature(refreshJwtConfig),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, UsersService, PrismaService, RefreshStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    UsersService,
+    PrismaService,
+    RefreshStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: PassportJwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
   controllers: [PassportAuthController],
-  exports: [RefreshStrategy]
+  exports: [RefreshStrategy],
 })
 export class AuthModule {}
