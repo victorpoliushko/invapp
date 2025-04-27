@@ -4,11 +4,13 @@ import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 import { StatusCodes } from 'http-status-codes';
 import { RefreshAuthGuard } from './guards/refresh-auth/refresh-auth.guard';
+import { Public } from './decorators/public.decorator';
 
 @Controller('auth-v2')
 export class PassportAuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @UseGuards(PassportLocalGuard)
