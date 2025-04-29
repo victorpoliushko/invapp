@@ -15,6 +15,7 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 import { RolesGuard } from './guards/roles/roles.guard';
+import googleOauthConfig from './config/google-oauth.config';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RolesGuard } from './guards/roles/roles.guard';
     }),
     PassportModule,
     ConfigModule.forFeature(refreshJwtConfig),
+    ConfigModule.forFeature(googleOauthConfig)
   ],
   providers: [
     AuthService,
