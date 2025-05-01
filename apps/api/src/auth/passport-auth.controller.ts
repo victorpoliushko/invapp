@@ -5,6 +5,7 @@ import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 import { StatusCodes } from 'http-status-codes';
 import { RefreshAuthGuard } from './guards/refresh-auth/refresh-auth.guard';
 import { Public } from './decorators/public.decorator';
+import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 
 @Controller('auth-v2')
 export class PassportAuthController {
@@ -31,5 +32,19 @@ export class PassportAuthController {
   @Post('signout')
   signOut(@Req() request) {
     this.authService.signOut(request.user.id);
+  }
+
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/login')
+  googleLogin() {
+
+  }
+
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/callback')
+  googleCallback() {
+
   }
 }

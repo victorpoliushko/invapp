@@ -16,6 +16,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 import { RolesGuard } from './guards/roles/roles.guard';
 import googleOauthConfig from './config/google-oauth.config';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import googleOauthConfig from './config/google-oauth.config';
     UsersService,
     PrismaService,
     RefreshStrategy,
+    GoogleStrategy,
     {
       provide: APP_GUARD,
       useClass: PassportJwtAuthGuard,
