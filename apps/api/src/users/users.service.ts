@@ -30,6 +30,12 @@ export class UsersService {
     });
   }
 
+  async getUserByEmail(email: string): Promise<User> {
+    return await this.prismaService.user.findFirst({
+      where: { email },
+    });
+  }
+
   async findByEmail(email: string): Promise<UserDto> {
     const foundUser = await this.prismaService.user.findFirst({ where: { email } });
     return plainToInstance(UserDto, foundUser)

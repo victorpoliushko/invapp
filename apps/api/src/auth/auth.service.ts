@@ -8,6 +8,7 @@ import { ConfigType } from '@nestjs/config';
 import { jwtConstants } from './constants';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
+import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 
 export type AuthInput = {
   username: string;
@@ -115,5 +116,11 @@ export class AuthService {
     );
     const currentUser: CurrentUser = { id: user.id, name: user.username, role: user.role };
     return currentUser; 
+  }
+
+  async validateGoogleUser(googleUser: CreateUserDto) {
+    const user = await this.userService.getUserByEmail(googleUser.email)
+    if (user) return user;
+    return await this.userService.create(googleUser);
   }
 }
