@@ -8,14 +8,17 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
+      "name": "Debug API",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "-r",
+        "tsconfig-paths/register"
       ],
-      "program": "${workspaceFolder}/apps/api/src/main.ts",
-      "outFiles": [
-        "${workspaceFolder}/**/*.js"
-      ]
+      "args": ["${workspaceFolder}/apps/api/src/main.ts"],
+      "cwd": "${workspaceFolder}/apps/api",
+      "internalConsoleOptions": "openOnSessionStart",
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }
