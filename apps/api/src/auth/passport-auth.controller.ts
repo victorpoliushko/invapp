@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
@@ -44,7 +44,8 @@ export class PassportAuthController {
   @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
-  googleCallback() {
-
+  async googleCallback(@Req() req, @Res() res) {
+    const response = await this.authService.signIn(req.user.id);
+    res.redirect(`http://localhost:5173?token=${response.accessToken}`);
   }
 }

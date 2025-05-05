@@ -36,8 +36,25 @@ function App() {
       .then(setGreeting);
   }, []);
 
+  const handeGoogleLogin = () => {
+    window.location.href = "http://localhost:5173/api/auth-v2/google/login";
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+
+    if (token) {
+      localStorage.setItem("jwtToken", token);
+      window.location.href = "http://localhost:5173";
+    }
+  }, []);
+
   return (
     <>
+    <div className="">
+      <button onClick={handeGoogleLogin}>Login with Google</button>
+    </div>
     <Header />
       <div className="container">
           <AssetsDashboard asset={mockAsset} />
