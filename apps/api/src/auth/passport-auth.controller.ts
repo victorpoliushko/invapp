@@ -45,6 +45,7 @@ export class PassportAuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
   async googleCallback(@Req() req, @Res() res) {
+    console.log(`USER: ${req.user}`)
     const response = await this.authService.signIn(req.user.id);
     res.redirect(`http://localhost:5173?token=${response.accessToken}`);
   }
