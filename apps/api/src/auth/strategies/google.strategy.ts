@@ -22,14 +22,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
-    console.log("aaaa");
+    // console.log("aaaa");
     console.log({ profile });
-    // const user = await this.authService.validateGoogleUser({
-    //     username: profile.name.givenName,
-    //     email: profile.emails[0].value,
-    //     role: Role.USER,
-    //     password: ""
-    // });
-    // done(null ,user);
+    const user = await this.authService.validateGoogleUser({
+        username: profile.name.givenName,
+        email: profile.emails[0].value,
+        role: Role.USER,
+        password: ""
+    });
+    done(null ,user);
   }
 }
