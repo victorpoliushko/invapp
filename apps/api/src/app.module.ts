@@ -16,6 +16,9 @@ import { PortfoliosModule } from './portfolios/portfolios.module';
 import { SymbolsModule } from './symbols/symbols.module';
 import { MixedAssetsModule } from './mixed-assets/mixed-assets.module';
 import refreshJwtConfig from './config/refresh-jwt-config';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -25,9 +28,13 @@ import refreshJwtConfig from './config/refresh-jwt-config';
     AuthModule,
     PortfoliosModule,
     SymbolsModule,
-    MixedAssetsModule
+    MixedAssetsModule,
+    PrometheusModule.register()
   ],
   controllers: [AppController, SymbolsController],
-  providers: [AppService, SymbolsService, AuthService, JwtService, UsersService, PrismaService],
+  providers: [AppService, SymbolsService, AuthService, JwtService, UsersService, PrismaService, {
+    provide: APP_INTERCEPTOR,
+    useClass: LoggingInterceptor
+  }],
 })
 export class AppModule {}
