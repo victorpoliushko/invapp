@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: invapp-metrics
+  name: invapp-metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: invapp-metrics
+  template:
+    metadata:
+      labels:
+        app: invapp-metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "3000"
+    spec:
+      containers:
+      - image: victorpoliushko/invapp-api
+        name: invapp-api
+        ports:
+        - containerPort: 3000
+        resources: {}
