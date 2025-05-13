@@ -24,3 +24,55 @@ spec:
         ports:
         - containerPort: 3000
         resources: {}
+        env:
+          - name: API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: auth-secrets
+                key: api-key
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: auth-secrets
+                key: jwt-key
+          - name: JWT_EXPIRE_IN
+            valueFrom:
+              secretKeyRef:
+                name: auth-secrets
+                key: jwt-expiration-time
+          - name: REFRESH_JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: auth-secrets
+                key: refresh-key
+          - name: REFRESH_JWT_EXPIRE_IN
+            valueFrom:
+              secretKeyRef:
+                name: auth-secrets
+                key: refresh-expiration-time
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: database-credentials
+                key: url
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: database-credentials
+                key: db-user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-credentials
+                key: db-password
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: database-credentials
+                key: db-name
+          - name: POSTGRES_PORT
+            valueFrom:
+              secretKeyRef:
+                name: database-credentials
+                key: db-port
+
