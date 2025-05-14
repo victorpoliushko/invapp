@@ -75,4 +75,19 @@ spec:
               secretKeyRef:
                 name: database-credentials
                 key: db-port
+          - name: GOOGLE_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: google-credentials
+                key: client-id
+          - name: GOOGLE_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: google-credentials
+                key: client-secret
+          - name: GOOGLE_CALLBACK_URL
+            valueFrom:
+              secretKeyRef:
+                name: google-credentials
+                key: callback-url
 

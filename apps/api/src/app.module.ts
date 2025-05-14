@@ -19,8 +19,9 @@ import refreshJwtConfig from './config/refresh-jwt-config';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
-import { GoogleAnalyticsService } from './ga4/googleAnalyticsApi.service';
-import { GoogleAnalyticsController } from './ga4/googleAnalyticsApi.controller';
+// tmp remove
+// import { GoogleAnalyticsService } from './ga4/googleAnalyticsApi.service';
+// import { GoogleAnalyticsController } from './ga4/googleAnalyticsApi.controller';
 
 @Module({
   imports: [
@@ -33,8 +34,12 @@ import { GoogleAnalyticsController } from './ga4/googleAnalyticsApi.controller';
     MixedAssetsModule,
     PrometheusModule.register()
   ],
-  controllers: [AppController, SymbolsController, GoogleAnalyticsController],
-  providers: [AppService, SymbolsService, AuthService, JwtService, UsersService, PrismaService, GoogleAnalyticsService, {
+  controllers: [AppController, SymbolsController, 
+    // GoogleAnalyticsController
+  ],
+  providers: [AppService, SymbolsService, AuthService, JwtService, UsersService, PrismaService, 
+    // GoogleAnalyticsService,
+     {
     provide: APP_INTERCEPTOR,
     useClass: LoggingInterceptor
   }],

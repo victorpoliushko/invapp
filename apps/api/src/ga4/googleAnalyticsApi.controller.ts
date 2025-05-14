@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
-import { GoogleAnalyticsService } from './googleAnalyticsApi.service';
+// tmp remove
 
-@Controller('analytics')
-export class GoogleAnalyticsController {
-  constructor(private readonly ga4Service: GoogleAnalyticsService) {}
+// import { Controller, Get } from '@nestjs/common';
+// import { GoogleAnalyticsService } from './googleAnalyticsApi.service';
 
-  @Get('realtime')
-  async getRealtimeData(): Promise<any> {
-    return this.ga4Service.getReport();
-  }
-}
+// @Controller('analytics')
+// export class GoogleAnalyticsController {
+//   constructor(private readonly ga4Service: GoogleAnalyticsService) {}
+
+//   @Get('realtime')
+//   async getRealtimeData(): Promise<any> {
+//     return this.ga4Service.getReport();
+//   }
+// }
