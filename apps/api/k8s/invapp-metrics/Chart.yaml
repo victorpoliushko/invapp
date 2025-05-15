@@ -22,10 +22,10 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
-dependenclies:
+dependencies:
   - name: prometheus
     version: "27.13.0"
     repository: "https://prometheus-community.github.io/helm-charts"
   - name: grafana
     version: "9.0.0"
-    repositiry: "https://grafana.github.io/helm-charts"
+    repository: "https://grafana.github.io/helm-charts"
