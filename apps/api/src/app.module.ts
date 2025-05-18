@@ -22,6 +22,7 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 // tmp remove
 // import { GoogleAnalyticsService } from './ga4/googleAnalyticsApi.service';
 // import { GoogleAnalyticsController } from './ga4/googleAnalyticsApi.controller';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
     PortfoliosModule,
     SymbolsModule,
     MixedAssetsModule,
-    PrometheusModule.register()
+    PrometheusModule.register(),
+    UploadModule
   ],
   controllers: [AppController, SymbolsController, 
     // GoogleAnalyticsController
