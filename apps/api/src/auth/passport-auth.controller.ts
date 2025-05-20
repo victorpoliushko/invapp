@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { RefreshAuthGuard } from './guards/refresh-auth/refresh-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
+import { jwtConstants } from './constants';
 
 @Controller('auth-v2')
 export class PassportAuthController {
@@ -46,8 +47,14 @@ export class PassportAuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
   async googleCallback(@Req() req, @Res() res) {
-    console.log(`USER: ${req.user}`)
     const response = await this.authService.signIn({ userId: req.user.id, username: req.user.givenName});
+    res.cookie('access_token', response.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: 'lax',
+      expires: jwtConstants.expireIn
+    });
+    
     res.redirect(`http://localhost:5173?token=${response.accessToken}`);
   }
 }

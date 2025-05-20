@@ -4,5 +4,5 @@ dotenv.config();
 
 export const jwtConstants = {
   secret: process.env.JWT_SECRET || 'fallback-secret',
-  expireIn: process.env.JWT_EXPIRE_IN || '1h'
+  expireIn: process.env.JWT_EXPIRE_IN || '15m'
 };

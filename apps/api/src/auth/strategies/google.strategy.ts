@@ -17,13 +17,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       clientID: googleConfiguration.clientID,
       clientSecret: googleConfiguration.clientSecret,
       callbackURL: googleConfiguration.callbackURL,
-      scope: ["email", "profile"]
+      scope: ["email", "profile"],
+      prompt: "select_account"
     })
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
-    // console.log("aaaa");
-    console.log({ profile });
     const user = await this.authService.validateGoogleUser({
         username: profile.name.givenName,
         email: profile.emails[0].value,
