@@ -52,9 +52,9 @@ export class PassportAuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: 'lax',
-      expires: jwtConstants.expireIn
+      expires: new Date(Date.now() + 1000 * 60 * 15)
     });
     
-    res.redirect(`http://localhost:5173?token=${response.accessToken}`);
+    res.redirect(`http://localhost:5173`);
   }
 }
