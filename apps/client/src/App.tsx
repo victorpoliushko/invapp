@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import "./App.css";
 import { Header } from "./components/header/header";
 import { AssetsDashboard } from "./components/assetsDashboard/AssetsDashboard";
@@ -28,27 +27,9 @@ const mockAssetTwo = {
 }
 
 function App() {
-  const [greeting, setGreeting] = useState("");
-
-  useEffect(() => {
-    fetch("/api")
-      .then((res) => res.text())
-      .then(setGreeting);
-  }, []);
-
   const handeGoogleLogin = () => {
     window.location.href = "http://localhost:5173/api/auth-v2/google/login";
   };
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-
-    if (token) {
-      localStorage.setItem("jwtToken", token);
-      window.location.href = "http://localhost:5173";
-    }
-  }, []);
 
   return (
     <>
