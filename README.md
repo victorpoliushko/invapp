@@ -3,7 +3,7 @@
   <h3>Fresh tool to monitor your money</h3>
 </p>
 
-[mock-main-page](<img src="./apps/client/src/assets/mock-main-page.png" alt="Preview main page of the Invapp">)
+<img src="./apps/client/src/assets/mock-main-page.png" alt="Preview main page of the Invapp">
 
 
 ## Description
