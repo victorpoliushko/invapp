@@ -1,17 +1,26 @@
-export default function RealEstate() {
+export default function RealEstate(props: {
+  title: string;
+  imageSrc: string;
+  info: string;
+  price: string;
+}) {
   return (
     <div className="real-estate">
       <article className="real-estate-card">
-        <img src="../../assets/house1.jpeg" alt="house one" />
-        <h3>One bedroom flat, Lviv, Dodik str.</h3>
+        <img src="{props.imageSrc}" alt="house one" />
+        <h3>{props.title}</h3>
         <div className="info-group">
-          <p>New house with some stuff</p>
-          <p>$65000</p>
+          <p>{props.info}</p>
+          <p>{props.price}</p>
         </div>
       </article>
       <article className="real-estate-card">
         <img src="../../assets/house2.jpeg" alt="house one" />
         <h3>Two bedroom flat, Kyiv, Bobik str.</h3>
+        <div className="info-group">
+          <p>Used house with some stuff</p>
+          <p>$95000</p>
+        </div>
         <div className="info-group">
           <p>Used house with some stuff</p>
           <p>$95000</p>
