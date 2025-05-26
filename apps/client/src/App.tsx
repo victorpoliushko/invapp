@@ -40,30 +40,32 @@ function App() {
       <div className="container">
         <AssetsDashboard asset={mockAsset} />
         <AssetsDashboard asset={mockAssetTwo} />
-        <RealEstate
-          title="One bedroom flat, Lviv, Dodik str."
-          imageSrc="../src/assets/house1.jpeg"
-          info="New house with some stuff"
-          price="$65000"
-        />
-        <RealEstate
-          title="Two bedroom flat, Kyiv, Bobik str."
-          imageSrc="../src/assets/house2.jpeg"
-          info="Used house with some stuf"
-          price="$95000"
-        />
-        <RealEstate
-          title="Three bedroom flat, Rivne, Boobik str."
-          imageSrc="../src/assets/house3.jpeg"
-          info="New house with some stuff"
-          price=">$235000"
-        />
-        <RealEstate
-          title="No bedroom house, Odesa, Valik str."
-          imageSrc="../src/assets/house1.jpeg"
-          info="No stuff, just walls"
-          price="$15000"
-        />
+        <div className="real-estate">
+          <RealEstate
+            title="One bedroom flat, Lviv, Dodik str."
+            imageSrc="../src/assets/house1.jpeg"
+            info="New house with some stuff"
+            price="$65000"
+          />
+          <RealEstate
+            title="Two bedroom flat, Kyiv, Bobik str."
+            imageSrc="../src/assets/house2.jpeg"
+            info="Used house with some stuf"
+            price="$95000"
+          />
+          <RealEstate
+            title="Three bedroom flat, Rivne, Boobik str."
+            imageSrc="../src/assets/house3.jpeg"
+            info="New house with some stuff"
+            price=">$235000"
+          />
+          <RealEstate
+            title="No bedroom house, Odesa, Valik str."
+            imageSrc="../src/assets/house1.jpeg"
+            info="No stuff, just walls"
+            price="$15000"
+          />
+        </div>
       </div>
     </>
   );
