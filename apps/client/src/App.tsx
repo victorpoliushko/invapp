@@ -49,7 +49,7 @@ function App() {
           />
           <RealEstate
             title="Two bedroom flat, Kyiv, Bobik str."
-            imageSrc="../src/assets/house2.jpeg"
+            imageSrc="../src/assets/house2.jpg"
             info="Used house with some stuf"
             price="$95000"
           />
@@ -62,6 +62,17 @@ function App() {
           <RealEstate
             title="No bedroom house, Odesa, Valik str."
             imageSrc="../src/assets/house1.jpeg"
+            info="No stuff, just walls"
+            price="$15000"
+          />
+          <RealEstate
+            title="No bedroom house, Odesa, Valik str."
+            imageSrc="./assets/house-placeholder.jpg"
+            info="No stuff, just walls"
+            price="$15000"
+          />
+          <RealEstate
+            title="No bedroom house, Odesa, Valik str."
             info="No stuff, just walls"
             price="$15000"
           />
