@@ -1,30 +1,8 @@
 import "./App.css";
-import { Header } from "./components/header/header";
-import { AssetsDashboard } from "./components/assetsDashboard/AssetsDashboard";
-
-import assetLogo from "./assets/apple_logo.png";
-import assetLogoTwo from "./assets/vanguard-logo-wide.png";
-import RealEstate from "./components/realEstate/RealEstate";
-
-const mockAsset = {
-  assetType: "STOCK",
-  assetLogo: assetLogo,
-  name: "Apple",
-  ticker: "AAPL",
-  description: "Nice company, good phones",
-  price: "$320",
-  percents: "+2.5%",
-};
-
-const mockAssetTwo = {
-  assetType: "ETF",
-  assetLogo: assetLogoTwo,
-  name: "S&P 500",
-  ticker: "VOO",
-  description: "Nice ETF",
-  price: "$420",
-  percents: "+1.2%",
-};
+import { Header } from "./pages/header/header";
+import RealEstate from "./pages/realEstate/RealEstate";
+import { Stocks } from "./pages/stocks/Stocks";
+import { News } from "./pages/news/News";
 
 function App() {
   const handeGoogleLogin = () => {
@@ -38,8 +16,8 @@ function App() {
       </div>
       <Header />
       <div className="container">
-        <AssetsDashboard asset={mockAsset} />
-        <AssetsDashboard asset={mockAssetTwo} />
+        <News />
+        <Stocks />
         <div className="real-estate">
           <RealEstate
             title="One bedroom flat, Lviv, Dodik str."
@@ -67,7 +45,6 @@ function App() {
           />
           <RealEstate
             title="No bedroom house, Odesa, Valik str."
-            imageSrc="./assets/house-placeholder.jpg"
             info="No stuff, just walls"
             price="$15000"
           />

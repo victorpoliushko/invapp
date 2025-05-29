@@ -1,12 +1,8 @@
 import "./AssetsDashboard.css";
-import assetLogo from "../../assets/apple_logo.png"
-import vanguardLogo from "../../assets/vanguard-logo-wide.png"
 
 // export function AssetsDashboard({ assetType, name, ticker, description, price, percents }) {
   export function AssetsDashboard({ asset }: { asset: any }) {
 
-
-  
   return (
     <div className="">
       <div className="dashboard-header">
