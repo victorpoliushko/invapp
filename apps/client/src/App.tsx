@@ -1,8 +1,8 @@
 import "./App.css";
 import { Header } from "./pages/header/header";
 import RealEstate from "./pages/realEstate/RealEstate";
-import { Stocks } from "./pages/stocks/Stocks";
 import { News } from "./pages/news/News";
+import { AssetsDashboard } from "./pages/assetsDashboard/AssetsDashboard";
 
 function App() {
   const handeGoogleLogin = () => {
@@ -17,7 +17,7 @@ function App() {
       <Header />
       <div className="container">
         <News />
-        <Stocks />
+        <AssetsDashboard />
         <div className="real-estate">
           <RealEstate
             title="One bedroom flat, Lviv, Dodik str."

@@ -1,40 +1,45 @@
-import "./AssetsDashboard.css";
+import { Asset } from "./components/Asset/Asset";
+import assetLogo from "../../assets/apple_logo.png";
+import assetLogoTwo from "../../assets/vanguard-logo-wide.png";
 
-// export function AssetsDashboard({ assetType, name, ticker, description, price, percents }) {
-  export function AssetsDashboard({ asset }: { asset: any }) {
+const mockAssets = [
+  {
+    assetType: "STOCK",
+    assetLogo: assetLogo,
+    name: "Apple",
+    ticker: "AAPL",
+    description: "Nice company, good phones",
+    price: "$320",
+    percents: "+2.5%",
+  },
+  {
+    assetType: "ETF",
+    assetLogo: assetLogoTwo,
+    name: "S&P 500",
+    ticker: "VOO",
+    description: "Nice ETF",
+    price: "$420",
+    percents: "+1.2%",
+  },
+  {
+    assetType: "Crypto",
+    name: "Cardano",
+    ticker: "ADA",
+    description: "Decent crypto",
+    price: "$20",
+    percents: "+11.2%",
+  },
+];
+
+export function AssetsDashboard() {
+  const assets = mockAssets.map((asset) => <Asset props={asset} />);
 
   return (
-    <div className="">
+    <div className="stocks">
       <div className="dashboard-header">
         <h1>Investment Dashboard</h1>
       </div>
-      <div className="dashboard-assets-cards">
-        <div className="asset-card">
-          <h3>{asset.assetType}</h3>
-          <div className="asset-card-internal">
-            <div className="asset-card-internal-left">
-              <img src={asset.assetLogo} alt="asset logo" />
-            </div>
-            <div className="asset-card-internal-right">
-              <h2>{asset.name} - {asset.ticker}</h2>
-              <h3>{asset.description}</h3>
-              <p>{asset.price}</p>
-              <p>{asset.percents}</p>
-            </div>
-          </div>
-          {/* <div className="asset-card-internal">
-            <div className="asset-card-internal-left">
-              <img src={vanguardLogo} alt="asset logo" />
-            </div>
-            <div className="asset-card-internal-right">
-              <h2>S&P 500 - VOO</h2>
-              <h3>Some DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome DescriptionSome Description</h3>
-              <p>$500</p>
-              <p>+1.5%</p>
-            </div>
-          </div> */}
-        </div>
-      </div>
+      {assets}
     </div>
-  )
+  );
 }
