@@ -1,5 +1,4 @@
-import "./RealEstate.css";
-import genericHouse from "../../assets/house-placeholder.jpg"
+import RealEstateAsset from "./components/realEstateAsset";
 
 const realEstateMocks = [
   {
@@ -33,25 +32,17 @@ const realEstateMocks = [
   },
     {
     title: "No bedroom house, Odesa, Valik str.",
-    imageSrc: "./src/assets/house1.jpeg",
-    price: "$15000"
+    info: "No stuff, just walls",
+    price: "$13000"
   }
-]
+];
 
-export default function RealEstate({ title, imageSrc, info, price }: {
-  title: string;
-  imageSrc?: string;
-  info: string;
-  price: string;
-}) {
+export default function RealEstate() {
+  const realEstates = realEstateMocks.map(rem => (<RealEstateAsset props={rem} />))
+
   return (
-    <article className="real-estate-card">
-      <img src={imageSrc ?? genericHouse} alt="house" />
-      <h3>{title}</h3>
-      <div className="info-group">
-        <p>{info}</p>
-        <p>{price}</p>
-      </div>
-    </article>
+    <div className="real-estate">
+      {realEstates}
+    </div>
   );
 }
