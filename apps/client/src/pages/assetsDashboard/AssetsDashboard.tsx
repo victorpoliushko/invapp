@@ -4,6 +4,7 @@ import assetLogoTwo from "../../assets/vanguard-logo-wide.png";
 
 const mockAssets = [
   {
+    id: 1,
     assetType: "STOCK",
     assetLogo: assetLogo,
     name: "Apple",
@@ -13,6 +14,7 @@ const mockAssets = [
     percents: "+2.5%",
   },
   {
+    id: 2,
     assetType: "ETF",
     assetLogo: assetLogoTwo,
     name: "S&P 500",
@@ -22,6 +24,7 @@ const mockAssets = [
     percents: "+1.2%",
   },
   {
+    id: 3,
     assetType: "Crypto",
     name: "Cardano",
     ticker: "ADA",
@@ -32,7 +35,7 @@ const mockAssets = [
 ];
 
 export function AssetsDashboard() {
-  const assets = mockAssets.map((asset) => <Asset props={asset} />);
+  const assets = mockAssets.map((asset) => <Asset props={asset} key={asset.id} />);
 
   return (
     <div className="stocks">
