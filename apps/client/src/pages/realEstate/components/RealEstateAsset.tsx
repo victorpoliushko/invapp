@@ -1,16 +1,24 @@
 import "./RealEstateAsset.css";
 import genericHouse from "../../../assets/house-placeholder.jpg"
 
-interface IRealEstate {
+// interface IRealEstate {
+//   title: string;
+//   imageSrc?: string;
+//   info: string;
+//   price: string;
+// }
+
+export default function RealEstateAsset({
+  title,
+  imageSrc,
+  info,
+  price
+}: {
   title: string;
   imageSrc?: string;
   info: string;
   price: string;
-}
-
-export default function RealEstateAsset({ props }: { props: IRealEstate }) {
-  const { title, imageSrc, info, price } = props;
-
+}) {
   return (
     <article className="real-estate-card">
       <img src={imageSrc ?? genericHouse} alt="house" />

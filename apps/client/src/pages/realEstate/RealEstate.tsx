@@ -44,7 +44,7 @@ const realEstateMocks = [
 ];
 
 export default function RealEstate() {
-  const realEstates = realEstateMocks.map(rem => (<RealEstateAsset props={rem} key={rem.id} />))
+  const realEstates = realEstateMocks.map(rem => (<RealEstateAsset key={rem.id} {...rem} />))
 
   return (
     <div className="real-estate">
