@@ -5,11 +5,8 @@ import { News } from "./pages/news/News";
 import { AssetsDashboard } from "./pages/assetsDashboard/AssetsDashboard";
 
 function App() {
-
-
   return (
     <>
-
       <Header />
       <div className="container">
         <News />
