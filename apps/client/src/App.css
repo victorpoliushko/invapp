@@ -3,6 +3,18 @@
   box-sizing: border-box;
 }
 
+a {
+  color: inherit; 
+  text-decoration: none; 
+}
+
+a:hover,
+a:focus,
+a:active {
+  color: inherit;
+  text-decoration: none; 
+}
+
 .container {
   width: 100vh;
   margin: 45px 40px;
@@ -32,6 +44,12 @@ body {
 }
 
 .error {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.portfolio {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

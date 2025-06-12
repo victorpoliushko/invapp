@@ -1,7 +1,15 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 
-export const Profile = () => {
+export default function Profile() {
+  const profiles = [1, 2, 3, 4, 5]
+
   return (
-    <div>Profile</div>
-  )
+    <div>
+      {profiles.map(p => (
+        <Link key={p} to={`/profiles/${p}`}>
+          Profile {p}
+          </Link>
+      ))}
+    </div>
+  );
 }

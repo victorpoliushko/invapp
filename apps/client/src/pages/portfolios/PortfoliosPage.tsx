@@ -1,7 +1,15 @@
-import React from 'react'
+import { Link } from "react-router-dom";
 
-export const PortfoliosPage = () => {
+export default function PortfoliosPage() {
+  const portfolios = [1, 2, 3, 4, 5]
+
   return (
-    <h1>PortfoliosPage</h1>
-  )
+    <div className='portfolio'>
+      {portfolios.map(p => (
+        <Link key={p} to={`/portfolios/${p}`}>
+          Portfolio {p}
+        </Link>
+      ))}
+    </div>
+  );
 }
