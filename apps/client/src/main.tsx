@@ -4,6 +4,7 @@ import App from './App.tsx'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from './pages/NotFoundPage.tsx';
 import PortfoliosPage from './pages/portfolios/PortfoliosPage.tsx';
+import PortfolioPage from './pages/PortfolioPage.tsx';
 
 const router = createBrowserRouter([{
   path: "/",
@@ -13,6 +14,10 @@ const router = createBrowserRouter([{
 {
   path: "/portfolios",
   element: <PortfoliosPage />
+},
+{
+  path: "/portfolios/:portfolioId",
+  element: <PortfolioPage />
 }]);
 
 createRoot(document.getElementById('root')!).render(
