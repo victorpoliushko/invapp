@@ -1,5 +1,5 @@
-import "./AiSuggestions.css";
 import { Header } from "./components/Header";
+import "../../index.css";
 
 export function AiSuggestions() {
   return (

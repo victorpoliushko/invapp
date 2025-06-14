@@ -1,0 +1,9 @@
+.ai-suggestions img {
+  width: 100px;
+  height: 100px;
+}
+
+.ai-suggestions header {
+  display: flex;
+  gap: 20px;
+}

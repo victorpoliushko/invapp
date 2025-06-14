@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from './pages/NotFoundPage.tsx';
 import PortfoliosPage from './pages/portfolios/PortfoliosPage.tsx';
 import PortfolioPage from './pages/PortfolioPage.tsx';
+import { AiSuggestions } from './pages/aiSuggestions/AiSuggestions.tsx';
 
 const router = createBrowserRouter([{
   path: "/",
@@ -18,6 +19,10 @@ const router = createBrowserRouter([{
 {
   path: "/portfolios/:portfolioId",
   element: <PortfolioPage />
+},
+{
+  path: "/portfolios/:portfolioId/ai-suggestions",
+  element: <AiSuggestions />
 }]);
 
 createRoot(document.getElementById('root')!).render(
