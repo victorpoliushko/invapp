@@ -1,0 +1,24 @@
+.ai-suggestions img {
+  width: 100px;
+  height: 100px;
+}
+
+.ai-suggestions header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  gap: 20px;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+}
+
+.add-rule-main {
+  padding: 10px 30px;
+}
+
+.add-rule-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}

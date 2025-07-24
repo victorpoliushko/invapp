@@ -6,6 +6,8 @@ import NotFoundPage from './pages/NotFoundPage.tsx';
 import PortfoliosPage from './pages/portfolios/PortfoliosPage.tsx';
 import PortfolioPage from './pages/PortfolioPage.tsx';
 import { AiSuggestions } from './pages/aiSuggestions/AiSuggestions.tsx';
+import { LoginPage } from './pages/auth/LoginPage.tsx';
+import { Header } from './components/header/header.tsx';
 
 const router = createBrowserRouter([{
   path: "/",
@@ -32,7 +34,7 @@ const router = createBrowserRouter([{
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* <App /> */}
+    <Header />
     <RouterProvider router={router} />
   </StrictMode>,
 );

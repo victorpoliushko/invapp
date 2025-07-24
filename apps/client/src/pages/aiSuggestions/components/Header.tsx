@@ -1,9 +1,9 @@
-import robotLogo from "../../../assets/robot.jpg";
+import aiLogo from "../../../../public/brain.svg";
 
 export function Header() {
   return (
     <header>
-      <img src={robotLogo} alt="" />
+      <img src={aiLogo} alt="" />
       <h1>AI Assistant</h1>
     </header>
   )

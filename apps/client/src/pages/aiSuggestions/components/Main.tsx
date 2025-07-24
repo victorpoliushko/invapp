@@ -1,7 +1,9 @@
+
+
 export default function Main() {
   return (
-    <main>
-      <form action="">
+    <main className="add-rule-main">
+      <form className="add-rule-form">
         <input
           type="text"
           placeholder="e.g. reduce risk"
