@@ -11,7 +11,7 @@ export default function Main() {
           name=""
           id=""
         />
-        <button>Add rule</button>
+        <button>+ Add rule</button>
       </form>
     </main>
   );
