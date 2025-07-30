@@ -7,7 +7,7 @@ import { AssetsDashboard } from "./pages/assetsDashboard/AssetsDashboard";
 function App() {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <div className="container">
         <News />
         <AssetsDashboard />

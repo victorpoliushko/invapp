@@ -11,6 +11,9 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 1440px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 nav > span {

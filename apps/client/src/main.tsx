@@ -8,9 +8,16 @@ import PortfolioPage from './pages/PortfolioPage.tsx';
 import { AiSuggestions } from './pages/aiSuggestions/AiSuggestions.tsx';
 import { LoginPage } from './pages/auth/LoginPage.tsx';
 import { Header } from './components/header/header.tsx';
+import { HomePage } from './pages/HomePage.tsx';
 
-const router = createBrowserRouter([{
+const router = createBrowserRouter([
+  {
   path: "/",
+  element: <HomePage />,
+  errorElement: <NotFoundPage />
+},
+{
+  path: "/home",
   element: <App />,
   errorElement: <NotFoundPage />
 },
