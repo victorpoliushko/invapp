@@ -1,4 +1,4 @@
-import aiLogo from "../../../../public/brain.svg";
+import aiLogo from "../../../assets/brain.svg";
 
 export function Header() {
   return (

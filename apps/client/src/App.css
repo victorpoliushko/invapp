@@ -58,4 +58,17 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+  flex-direction: column;
+}
+
+.home-container-1-p {
+  max-width: 640px;
+  text-align: center;
+  /* padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  flex-direction: column; */
 }
