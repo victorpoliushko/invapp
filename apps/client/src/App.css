@@ -98,3 +98,21 @@ body {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+
+.pros-section-1 {
+  max-width: 1440px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 9rem;
+  padding-bottom: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  flex-direction: column;
+}
+
+.pros-section-cols {
+  display: flex;
+  flex-direction: row;
+}

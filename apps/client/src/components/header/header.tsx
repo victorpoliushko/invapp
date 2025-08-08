@@ -10,7 +10,6 @@ export function Header() {
     <header className="header">
       <nav>
         <img className="navbar-logo" src={invappLogo} alt="invapp-logo" />
-        {/* <span>My investments</span> */}
         <button onClick={handeGoogleLogin}>Login with Google</button>
       </nav>
     </header>
