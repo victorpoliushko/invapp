@@ -18,23 +18,37 @@ export const HomePage = () => {
       </section>
       <section className="try-section-1">
         <button className="try-section-1-btn">Give it a try. It's free!</button>
-        <img src="/invapp-placeholder.png" height={500} width={800} alt="placeholder" />
+        <img
+          src="/invapp-placeholder.png"
+          height={500}
+          width={800}
+          alt="placeholder"
+        />
       </section>
       <section className="pros-section-1">
         <h1 className="pros-section-1-h1">A single tool to track your gains</h1>
         <div className="pros-section-cols">
-        <div className="pros-section-div">
-          <h3>Easy to use</h3>
-          <p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum </p>
-        </div>
-        <div className="pros-section-div">
-          <h3>Easy to use</h3>
-          <p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum </p>
-        </div>
-                <div className="pros-section-div">
-          <h3>Easy to use</h3>
-          <p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum </p>
-        </div>
+          <div className="pros-section-div">
+            <h3>Easy to use</h3>
+            <p>
+              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
+              ipsum Lorem ipsum{" "}
+            </p>
+          </div>
+          <div className="pros-section-div">
+            <h3>Easy to use</h3>
+            <p>
+              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
+              ipsum Lorem ipsum{" "}
+            </p>
+          </div>
+          <div className="pros-section-div">
+            <h3>Easy to use</h3>
+            <p>
+              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
+              ipsum Lorem ipsum{" "}
+            </p>
+          </div>
         </div>
       </section>
     </>

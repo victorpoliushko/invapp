@@ -116,3 +116,20 @@ body {
   display: flex;
   flex-direction: row;
 }
+
+.pros-section-div {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.pros-section-div > h3 {
+  display: flex;
+  justify-content: center;
+}
+
+.pros-section-div > p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
