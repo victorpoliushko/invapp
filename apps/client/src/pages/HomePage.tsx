@@ -51,6 +51,14 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
+      <section className="advanced-section">
+        <h1>Advanced techniques</h1>
+        <div className="top-advanced">A</div>
+        <div className="botton-advanced">
+          <div className="botton-left">B</div>
+          <div className="botton-right">C</div>
+        </div>
+      </section>
     </>
   );
 };
