@@ -3,7 +3,7 @@ import "../App.css";
 export const HomePage = () => {
   return (
     <>
-      <section className="intro-section-1">
+      <section className="section-container section-flex-container intro-section-1">
         <h1 className="intro-section-1-h1">
           Application to track your investments from multiple sources
         </h1>
@@ -16,7 +16,7 @@ export const HomePage = () => {
           informed financial decisions with confidence.
         </p>
       </section>
-      <section className="try-section-1">
+      <section className="section-container section-flex-container try-section-1">
         <button className="try-section-1-btn">Give it a try. It's free!</button>
         <img
           src="/invapp-placeholder.png"
@@ -25,7 +25,7 @@ export const HomePage = () => {
           alt="placeholder"
         />
       </section>
-      <section className="pros-section-1">
+      <section className="section-container section-flex-container pros-section-1">
         <h1 className="pros-section-1-h1">A single tool to track your gains</h1>
         <div className="pros-section-cols">
           <div className="pros-section-div">
@@ -51,7 +51,7 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
-      <section className="advanced-section">
+      <section className="section-container section-flex-container advanced-section">
         <h1>Advanced techniques</h1>
         <div className="top-advanced">A</div>
         <div className="botton-advanced">
