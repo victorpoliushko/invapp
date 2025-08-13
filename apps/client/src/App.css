@@ -69,8 +69,7 @@ body {
 }
 
 .intro-section-1 {
-  padding-top: 9rem;
-  padding-bottom: 8rem;
+  padding: 8rem 0;
   flex-direction: column;
 }
 
@@ -86,8 +85,7 @@ body {
 }
 
 .try-section-1 {
-  padding-top: 9rem;
-  padding-bottom: 8rem;
+  padding: 8rem 0;
   flex-direction: column;
 }
 
@@ -97,8 +95,7 @@ body {
 }
 
 .pros-section-1 {
-  padding-top: 9rem;
-  padding-bottom: 8rem;
+  padding: 8rem 0;
   flex-direction: column;
 }
 
@@ -125,6 +122,35 @@ body {
 }
 
 .advanced-section {
-  padding-top: 9rem;
-  padding-bottom: 8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 2rem;
+}
+
+.advanced-section > h1 {
+  margin: 0 auto;
+}
+
+.top-advanced {
+  background: lightblue;
+  padding: 1rem;
+}
+
+.bottom-advanced {
+  display: flex;
+  gap: 1rem;
+}
+
+.bottom-left {
+  flex: 1;
+  background: lightgreen;
+  padding: 1rem;
+}
+
+.bottom-right {
+  flex: 1;
+  background: lightcoral;
+  padding: 1rem;
 }
