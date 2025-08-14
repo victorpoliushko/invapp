@@ -133,24 +133,47 @@ body {
   margin: 0 auto;
 }
 
-.top-advanced {
+.advanced-level-1 {
   background: lightblue;
   padding: 1rem;
 }
 
-.bottom-advanced {
+.advanced-level-2 {
   display: flex;
   gap: 1rem;
 }
 
-.bottom-left {
+.advanced-level-2-left {
   flex: 1;
   background: lightgreen;
   padding: 1rem;
 }
 
-.bottom-right {
+.advanced-level-2-right {
   flex: 1;
   background: lightcoral;
+  padding: 1rem;
+}
+
+.advanced-level-3 {
+  display: flex;
+  gap: 1rem;
+}
+
+.advanced-level-3-left {
+  flex: 0 0 20%;
+  background: lightyellow;
+  padding: 1rem;
+}
+
+.advanced-level-3-center {
+  flex: 0 0 50%;
+  background: lightpink;
+  padding: 1rem;
+}
+
+.advanced-level-3-right {
+  flex: 0 0 30%;
+  background: lightgray;
   padding: 1rem;
 }

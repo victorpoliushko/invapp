@@ -53,10 +53,15 @@ export const HomePage = () => {
       </section>
       <section className="section-container advanced-section">
         <h1>Advanced techniques</h1>
-        <div className="top-advanced">A</div>
-        <div className="bottom-advanced">
-          <div className="bottom-left">B</div>
-          <div className="bottom-right">C</div>
+        <div className="advanced-level-1">11</div>
+        <div className="advanced-level-2">
+          <div className="advanced-level-2-left">21</div>
+          <div className="advanced-level-2-right">22</div>
+        </div>
+        <div className="advanced-level-3">
+          <div className="advanced-level-3-left">31</div>
+          <div className="advanced-level-3-center">32</div>
+          <div className="advanced-level-3-right">33</div>
         </div>
       </section>
     </>
