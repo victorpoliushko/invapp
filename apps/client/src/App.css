@@ -136,6 +136,10 @@ body {
 .advanced-level-1 {
   background: lightblue;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .advanced-level-2 {
@@ -158,6 +162,7 @@ body {
 .advanced-level-3 {
   display: flex;
   gap: 1rem;
+  padding-bottom: 8rem;
 }
 
 .advanced-level-3-left {
