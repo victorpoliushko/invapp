@@ -55,16 +55,61 @@ export const HomePage = () => {
         <h1>Advanced techniques</h1>
         <div className="advanced-level-1">
           <h1>Some real info</h1>
-          <p>A lot of good stuff we were working on for years A lot of good stuff we were working on for years A lot of good stuff we were working on for years A lot of good stuff we were working on for years A lot of good stuff we were working on for years</p>
+          <p>
+            A lot of good stuff we were working on for years A lot of good stuff
+            we were working on for years A lot of good stuff we were working on
+            for years A lot of good stuff we were working on for years A lot of
+            good stuff we were working on for years
+          </p>
         </div>
         <div className="advanced-level-2">
-          <div className="advanced-level-2-left">21</div>
-          <div className="advanced-level-2-right">22</div>
+          <div className="advanced-level-2-left">
+            <h1>Some real info</h1>
+            <p>
+              A lot of good stuff we were working on for years A lot of good
+              stuff we were working on for years A lot of good stuff we were
+              working on for years A lot of good stuff we were working on for
+              years A lot of good stuff we were working on for years
+            </p>
+          </div>
+          <div className="advanced-level-2-right">
+            <h1>Some real info</h1>
+            <p>
+              A lot of good stuff we were working on for years A lot of good
+              stuff we were working on for years A lot of good stuff we were
+              working on for years A lot of good stuff we were working on for
+              years A lot of good stuff we were working on for years
+            </p>
+          </div>
         </div>
         <div className="advanced-level-3">
-          <div className="advanced-level-3-left">31</div>
-          <div className="advanced-level-3-center">32</div>
-          <div className="advanced-level-3-right">33</div>
+          <div className="advanced-level-3-left">
+            <h1>Some real info</h1>
+            <p>
+              A lot of good stuff we were working on for years A lot of good
+              stuff we were working on for years A lot of good stuff we were
+              working on for years A lot of good stuff we were working on for
+              years A lot of good stuff we were working on for years
+            </p>
+          </div>
+          <div className="advanced-level-3-center">
+            <h1>Some real info</h1>
+            <p>
+              A lot of good stuff we were working on for years A lot of good
+              stuff we were working on for years A lot of good stuff we were
+              working on for years A lot of good stuff we were working on for
+              years A lot of good stuff we were working on for years
+            </p>
+          </div>
+          <div className="advanced-level-3-right">
+            <h1>Some real info</h1>
+            <p>
+              A lot of good stuff we were working on for years A lot of good
+              stuff we were working on for years A lot of good stuff we were
+              working on for years A lot of good stuff we were working on for
+              years A lot of good stuff we were working on for years
+            </p>
+          </div>
         </div>
       </section>
     </>
