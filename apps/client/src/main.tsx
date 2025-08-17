@@ -9,6 +9,7 @@ import { AiSuggestions } from './pages/aiSuggestions/AiSuggestions.tsx';
 import { LoginPage } from './pages/auth/LoginPage.tsx';
 import { Header } from './components/header/header.tsx';
 import { HomePage } from './pages/HomePage.tsx';
+import { MainPage } from './pages/main/Main.tsx';
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,12 @@ const router = createBrowserRouter([
   errorElement: <NotFoundPage />
 },
 {
-  path: "/home",
+  path: "/main",
+  element: <MainPage />,
+  errorElement: <NotFoundPage />
+},
+{
+  path: "/app",
   element: <App />,
   errorElement: <NotFoundPage />
 },
