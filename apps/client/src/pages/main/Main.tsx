@@ -27,6 +27,19 @@ export const MainPage = () => {
           </div>
         </div>
       </section>
+
+      <section className="stocks-section section-container">
+        <h1>Stocks</h1>
+        <div className="stocks-div flex-container">
+          <div className="stock-item">
+            <span>VOO</span>
+            <span>500</span>
+          </div>
+          <div className="stock-item"></div>
+          <div className="stock-item"></div>
+        </div>
+      </section>
+
       <section className="section-container section-flex-container try-section-1">
         <button className="try-section-1-btn">Give it a try. It's free!</button>
         <img

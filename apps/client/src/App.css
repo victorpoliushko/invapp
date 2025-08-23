@@ -204,6 +204,40 @@ body {
 }
 
 .news-section {
+  margin: 8rem auto;
   display: flex;
   flex-direction: column;
+  background-color: #424242;
+  border-radius: 20px;
+}
+
+.news-section h1 {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.stocks-section {
+  margin: 8rem auto;
+  background-color: #424242;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stocks-section h1 {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.stock-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }
