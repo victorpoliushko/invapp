@@ -30,14 +30,62 @@ export const MainPage = () => {
 
       <section className="stocks-section section-container">
         <h1>Stocks</h1>
+        <div className="stocks-wrapper">
         <div className="stocks-div flex-container">
           <div className="stock-item">
             <span>VOO</span>
             <span>500</span>
+            <span>+3%</span>
           </div>
-          <div className="stock-item"></div>
-          <div className="stock-item"></div>
+          <div className="stock-item">
+            <span>SPY</span>
+            <span>300</span>
+            <span>+5%</span>
+          </div>
+          <div className="stock-item">
+            <span>SCHD</span>
+            <span>50</span>
+            <span>-2%</span>
+          </div>
         </div>
+
+        <div className="stocks-div flex-container">
+          <div className="stock-item">
+            <span>VOO</span>
+            <span>500</span>
+            <span>+3%</span>
+          </div>
+          <div className="stock-item">
+            <span>SPY</span>
+            <span>300</span>
+            <span>+5%</span>
+          </div>
+          <div className="stock-item">
+            <span>SCHD</span>
+            <span>50</span>
+            <span>-2%</span>
+          </div>
+        </div>
+
+        <div className="stocks-div flex-container">
+          <div className="stock-item">
+            <span>VOO</span>
+            <span>500</span>
+            <span>+3%</span>
+          </div>
+          <div className="stock-item">
+            <span>SPY</span>
+            <span>300</span>
+            <span>+5%</span>
+          </div>
+          <div className="stock-item">
+            <span>SCHD</span>
+            <span>50</span>
+            <span>-2%</span>
+          </div>
+        </div>
+        </div>
+
       </section>
 
       <section className="section-container section-flex-container try-section-1">
