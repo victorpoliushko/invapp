@@ -31,156 +31,105 @@ export const MainPage = () => {
       <section className="stocks-section section-container">
         <h1>Stocks</h1>
         <div className="stocks-wrapper">
-        <div className="stocks-div flex-container">
-          <div className="stock-item">
-            <span>VOO</span>
-            <span>500</span>
-            <span>+3%</span>
+          <div className="stocks-div flex-container">
+            <div className="stock-item">
+              <span>VOO</span>
+              <span>500</span>
+              <span>+3%</span>
+            </div>
+            <div className="stock-item">
+              <span>SPY</span>
+              <span>300</span>
+              <span>+5%</span>
+            </div>
+            <div className="stock-item">
+              <span>SCHD</span>
+              <span>50</span>
+              <span>-2%</span>
+            </div>
           </div>
-          <div className="stock-item">
-            <span>SPY</span>
-            <span>300</span>
-            <span>+5%</span>
-          </div>
-          <div className="stock-item">
-            <span>SCHD</span>
-            <span>50</span>
-            <span>-2%</span>
-          </div>
-        </div>
 
-        <div className="stocks-div flex-container">
-          <div className="stock-item">
-            <span>VOO</span>
-            <span>500</span>
-            <span>+3%</span>
+          <div className="stocks-div flex-container">
+            <div className="stock-item">
+              <span>VOO</span>
+              <span>500</span>
+              <span>+3%</span>
+            </div>
+            <div className="stock-item">
+              <span>SPY</span>
+              <span>300</span>
+              <span>+5%</span>
+            </div>
+            <div className="stock-item">
+              <span>SCHD</span>
+              <span>50</span>
+              <span>-2%</span>
+            </div>
           </div>
-          <div className="stock-item">
-            <span>SPY</span>
-            <span>300</span>
-            <span>+5%</span>
-          </div>
-          <div className="stock-item">
-            <span>SCHD</span>
-            <span>50</span>
-            <span>-2%</span>
-          </div>
-        </div>
 
-        <div className="stocks-div flex-container">
-          <div className="stock-item">
-            <span>VOO</span>
-            <span>500</span>
-            <span>+3%</span>
-          </div>
-          <div className="stock-item">
-            <span>SPY</span>
-            <span>300</span>
-            <span>+5%</span>
-          </div>
-          <div className="stock-item">
-            <span>SCHD</span>
-            <span>50</span>
-            <span>-2%</span>
-          </div>
-        </div>
-        </div>
-
-      </section>
-
-      <section className="section-container section-flex-container try-section-1">
-        <button className="try-section-1-btn">Give it a try. It's free!</button>
-        <img
-          src="/invapp-placeholder.png"
-          height={500}
-          width={800}
-          alt="placeholder"
-        />
-      </section>
-      <section className="section-container section-flex-container pros-section-1">
-        <h1 className="pros-section-1-h1">A single tool to track your gains</h1>
-        <div className="pros-section-cols">
-          <div className="pros-section-div">
-            <h3>Easy to use</h3>
-            <p>
-              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
-              ipsum Lorem ipsum{" "}
-            </p>
-          </div>
-          <div className="pros-section-div">
-            <h3>Easy to use</h3>
-            <p>
-              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
-              ipsum Lorem ipsum{" "}
-            </p>
-          </div>
-          <div className="pros-section-div">
-            <h3>Easy to use</h3>
-            <p>
-              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
-              ipsum Lorem ipsum{" "}
-            </p>
+          <div className="stocks-div flex-container">
+            <div className="stock-item">
+              <span>VOO</span>
+              <span>500</span>
+              <span>+3%</span>
+            </div>
+            <div className="stock-item">
+              <span>SPY</span>
+              <span>300</span>
+              <span>+5%</span>
+            </div>
+            <div className="stock-item">
+              <span>SCHD</span>
+              <span>50</span>
+              <span>-2%</span>
+            </div>
           </div>
         </div>
       </section>
-      <section className="section-container advanced-section">
-        <h1>Advanced techniques</h1>
-        <div className="advanced-level-1">
-          <h1>Some real info</h1>
-          <p>
-            A lot of good stuff we were working on for years A lot of good stuff
-            we were working on for years A lot of good stuff we were working on
-            for years A lot of good stuff we were working on for years A lot of
-            good stuff we were working on for years
-          </p>
-        </div>
-        <div className="advanced-level-2">
-          <div className="advanced-level-2-left">
-            <h1>Some real info</h1>
-            <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
-            </p>
+
+      <section className="realestate-section section-container section-flex-container">
+        <h1>Real estate</h1>
+        <div className="realestate-city">
+          <h2>Lviv</h2>
+          <div className="realestate-city-col">
+            <div className="realestate-city-item">
+              <div className="realestate-city-item-top">
+                <p>Yaneva 23 50</p>
+              </div>
+              <div className="realestate-city-item-bottom">
+                <p>1 bedroom</p>
+                <p>$75k</p>
+              </div>
+            </div>
+            <div className="realestate-city-item">
+              <div className="realestate-city-item-top">
+                <p>Yaneva 23 50</p>
+              </div>
+              <div className="realestate-city-item-bottom">
+                <p>1 bedroom</p>
+                <p>$75k</p>
+              </div>
+            </div>
           </div>
-          <div className="advanced-level-2-right">
-            <h1>Some real info</h1>
-            <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
-            </p>
-          </div>
-        </div>
-        <div className="advanced-level-3">
-          <div className="advanced-level-3-left">
-            <h1>Some real info</h1>
-            <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
-            </p>
-          </div>
-          <div className="advanced-level-3-center">
-            <h1>Some real info</h1>
-            <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
-            </p>
-          </div>
-          <div className="advanced-level-3-right">
-            <h1>Some real info</h1>
-            <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
-            </p>
+          <div className="-city-col">
+            <div className="realestate-city-item">
+              <div className="realestate-city-item-top">
+                <p>Yaneva 23 50</p>
+              </div>
+              <div className="realestate-city-item-bottom">
+                <p>1 bedroom</p>
+                <p>$75k</p>
+              </div>
+            </div>
+            <div className="realestate-city-item">
+              <div className="realestate-city-item-top">
+                <p>Yaneva 23 50</p>
+              </div>
+              <div className="realestate-city-item-bottom">
+                <p>1 bedroom</p>
+                <p>$75k</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

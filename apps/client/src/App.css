@@ -255,3 +255,25 @@ body {
   flex: 1;
   gap: 1rem;
 }
+
+.realestate-section {
+  margin: 8rem auto;
+  background-color: #424242;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.realestate-section h1 {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.realestate-city {
+
+}
+
+.realestate-city h2 {
+  align-self: flex-start;
+  text-align: left;
+}
