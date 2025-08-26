@@ -270,10 +270,20 @@ body {
 }
 
 .realestate-city {
-
+  align-self: flex-start;
+  text-align: left;
+  align-items: center;
+  justify-content: center;
 }
 
 .realestate-city h2 {
   align-self: flex-start;
   text-align: left;
+}
+
+.realestate-city-col {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  /* justify-content: center; */
 }

@@ -91,6 +91,7 @@ export const MainPage = () => {
         <h1>Real estate</h1>
         <div className="realestate-city">
           <h2>Lviv</h2>
+          <div className="realestate-city-cols">
           <div className="realestate-city-col">
             <div className="realestate-city-item">
               <div className="realestate-city-item-top">
@@ -111,7 +112,7 @@ export const MainPage = () => {
               </div>
             </div>
           </div>
-          <div className="-city-col">
+          <div className="realestate-city-col">
             <div className="realestate-city-item">
               <div className="realestate-city-item-top">
                 <p>Yaneva 23 50</p>
@@ -130,6 +131,7 @@ export const MainPage = () => {
                 <p>$75k</p>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>
