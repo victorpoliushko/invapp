@@ -276,14 +276,22 @@ body {
   justify-content: center;
 }
 
-.realestate-city h2 {
-  align-self: flex-start;
-  text-align: left;
-}
-
 .realestate-city-col {
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  /* justify-content: center; */
+}
+
+.realestate-city-item {
+  margin: 1rem;
+  padding: 1rem;
+  background-color: #262626;
+  border-radius: 20px;
+  min-width: 200px;
+}
+
+.realestate-city-item-bottom {
+    display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }

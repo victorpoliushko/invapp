@@ -90,12 +90,11 @@ export const MainPage = () => {
       <section className="realestate-section section-container section-flex-container">
         <h1>Real estate</h1>
         <div className="realestate-city">
-          <h2>Lviv</h2>
           <div className="realestate-city-cols">
           <div className="realestate-city-col">
             <div className="realestate-city-item">
               <div className="realestate-city-item-top">
-                <p>Yaneva 23 50</p>
+                <p>Lviv, Yaneva 23 50</p>
               </div>
               <div className="realestate-city-item-bottom">
                 <p>1 bedroom</p>
@@ -104,7 +103,7 @@ export const MainPage = () => {
             </div>
             <div className="realestate-city-item">
               <div className="realestate-city-item-top">
-                <p>Yaneva 23 50</p>
+                <p>Lviv, Yaneva 23 50</p>
               </div>
               <div className="realestate-city-item-bottom">
                 <p>1 bedroom</p>
@@ -115,7 +114,7 @@ export const MainPage = () => {
           <div className="realestate-city-col">
             <div className="realestate-city-item">
               <div className="realestate-city-item-top">
-                <p>Yaneva 23 50</p>
+                <p>Lviv, Yaneva 23 50</p>
               </div>
               <div className="realestate-city-item-bottom">
                 <p>1 bedroom</p>
@@ -124,7 +123,7 @@ export const MainPage = () => {
             </div>
             <div className="realestate-city-item">
               <div className="realestate-city-item-top">
-                <p>Yaneva 23 50</p>
+                <p>Lviv, Yaneva 23 50</p>
               </div>
               <div className="realestate-city-item-bottom">
                 <p>1 bedroom</p>
