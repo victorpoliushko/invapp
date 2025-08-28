@@ -291,7 +291,7 @@ body {
 }
 
 .realestate-city-item-bottom {
-    display: flex;
+  display: flex;
   flex-direction: row;
   gap: 1rem;
 }

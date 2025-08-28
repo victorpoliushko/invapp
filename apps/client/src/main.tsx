@@ -4,7 +4,7 @@ import App from './App.tsx'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from './pages/NotFoundPage.tsx';
 import PortfoliosPage from './pages/portfolios/PortfoliosPage.tsx';
-import PortfolioPage from './pages/PortfolioPage.tsx';
+import PortfolioPage from './pages/portfolio/PortfolioPage.tsx';
 import { AiSuggestions } from './pages/aiSuggestions/AiSuggestions.tsx';
 import { LoginPage } from './pages/auth/LoginPage.tsx';
 import { Header } from './components/header/header.tsx';
