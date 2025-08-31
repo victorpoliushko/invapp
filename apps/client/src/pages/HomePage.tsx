@@ -19,7 +19,7 @@ export const HomePage = () => {
       <section className="section-container section-flex-container try-section-1">
         <button className="try-section-1-btn">Give it a try. It's free!</button>
         <img
-          src="/invapp-placeholder.png"
+          src="/invapp-preview.png"
           height={500}
           width={800}
           alt="placeholder"

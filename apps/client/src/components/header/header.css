@@ -3,7 +3,6 @@ header {
 }
 
 .navbar-logo {
-  width: 200px;
   margin-left: 20px;
 }
 
@@ -12,6 +11,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   max-width: 1440px;
+  height: 150px;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   margin: 0 auto;
@@ -21,4 +21,20 @@ nav > span {
   font-weight: 700;
   font-size: 26px;
   margin-right: 20px;
+}
+
+.signin-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.signin-button:hover {
+  background-color: #45a049;
 }

@@ -69,29 +69,42 @@ body {
 }
 
 .intro-section-1 {
-  padding: 8rem 0;
+  padding: 2rem 0;
   flex-direction: column;
 }
 
 .intro-section-1-h1 {
-  font-size: 40px;
+  font-size: 36px;
   font-weight: 700;
   line-height: 120%;
 }
 
 .intro-section-1-p {
+  font-size: 18px;
   max-width: 800px;
   text-align: center;
 }
 
 .try-section-1 {
-  padding: 8rem 0;
+  padding: 2rem 0;
   flex-direction: column;
 }
 
 .try-section-1-btn {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin: 2rem 0;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.try-section-1-btn {
+  background-color: #45a049;
 }
 
 .pros-section-1 {
