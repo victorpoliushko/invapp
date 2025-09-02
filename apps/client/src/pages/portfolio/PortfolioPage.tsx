@@ -100,6 +100,80 @@ export default function PortfolioPage() {
               </tbody>
             </table>
           </div>
+
+          <input
+            type="radio"
+            name="tabs"
+            id="tab-realestate"
+            onChange={() => setSelectedTab("tab-realestate")}
+            checked={selectedTab === "tab-realestate"}
+          />
+          <label htmlFor="tab-realestate">Real estate</label>
+          <div className="tab">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Account</th>
+                  <th scope="col">Due Date</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Period</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Account">Real estate - 3412</td>
+                  <td data-label="Due Date">04/01/2016</td>
+                  <td data-label="Amount">$1,190</td>
+                  <td data-label="Period">03/01/2016 - 03/31/2016</td>
+                </tr>
+                <tr>
+                  <td scope="row" data-label="Account">
+                    Real estate - 6076
+                  </td>
+                  <td data-label="Due Date">03/01/2016</td>
+                  <td data-label="Amount">$2,443</td>
+                  <td data-label="Period">02/01/2016 - 02/29/2016</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+           <input
+            type="radio"
+            name="tabs"
+            id="tab-crypto"
+            onChange={() => setSelectedTab("tab-crypto")}
+            checked={selectedTab === "tab-crypto"}
+          />
+          <label htmlFor="tab-crypto">Crypto</label>
+          <div className="tab">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Account</th>
+                  <th scope="col">Due Date</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Period</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Account">Crypto - 3412</td>
+                  <td data-label="Due Date">04/01/2016</td>
+                  <td data-label="Amount">$1,190</td>
+                  <td data-label="Period">03/01/2016 - 03/31/2016</td>
+                </tr>
+                <tr>
+                  <td scope="row" data-label="Account">
+                    Crypto - 6076
+                  </td>
+                  <td data-label="Due Date">03/01/2016</td>
+                  <td data-label="Amount">$2,443</td>
+                  <td data-label="Period">02/01/2016 - 02/29/2016</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
       <section className="gains-section section-container"></section>
