@@ -5,13 +5,13 @@
   justify-content: space-around;
   background-color: #424242;
   border-radius: 20px;
-  padding: 2rem 1rem;
+  padding: 2rem;
 }
 
 .portfolio-min-cols {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 100%;
 }
 
