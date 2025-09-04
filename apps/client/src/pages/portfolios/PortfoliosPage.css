@@ -17,6 +17,11 @@
 
 .portfolio-min-col {
   display: flex;
-  flex-direction: column;
-  /* gap: 0.5rem;  */
+  flex-direction: column; 
+  gap: 0.5rem;
+}
+
+.portfolio-min-col h4,
+.portfolio-min-col p {
+  margin: 0;
 }
