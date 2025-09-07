@@ -1,7 +1,36 @@
+import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 
 export default function PortfoliosPage() {
-  const portfolios = [1, 2, 3, 4, 5];
+  // const portfolios = [1, 2, 3, 4, 5];
+
+  const [portfolios, setPortfolios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPortfolios = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/portfolios/${userId}`); 
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setPortfolios(data);
+      } catch (e: Error) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolios();
+  }, [userId]);
+
+  return { portfolios, loading, error };
+}
 
   return (
     <section className="portfolios-section section-container">
