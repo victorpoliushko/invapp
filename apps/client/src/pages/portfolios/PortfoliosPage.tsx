@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 
+const userId = 'c150f2e3-475a-49ee-aacb-c7bc9e413538';
+const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMTUwZjJlMy00NzVhLTQ5ZWUtYWFjYi1jN2JjOWU0MTM1MzgiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzU3MzQxMzUwLCJleHAiOjE3NTczNDIyNTB9.bDxgfRawFfunzEiFymNU2-EP54ArdhOdLKdNdeB_Uv0';
+
 export default function PortfoliosPage() {
   // const portfolios = [1, 2, 3, 4, 5];
 
@@ -11,26 +14,29 @@ export default function PortfoliosPage() {
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/portfolios/${userId}`); 
+        const response = await fetch(`http://localhost:5173/api/portfolios/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${jwt}`
+            }
+      });
+          
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        console.log('DATA: ', response)
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setPortfolios(data);
-      } catch (e: Error) {
+      } catch (e: any) {
         setError(e.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchPortfolios();
-  }, [userId]);
+  }, []);
 
-  return { portfolios, loading, error };
-}
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
 
   return (
     <section className="portfolios-section section-container">
@@ -41,6 +47,28 @@ export default function PortfoliosPage() {
           </Link>
         ))}
       </div> */}
+      {portfolios.map((p: any) => (
+          <div key={p.id} className="portfolio-min">
+            <h2>{p.name}</h2>
+            <div className="portfolio-min-cols">
+              <div className="portfolio-min-col">
+                <h4>Returns</h4>
+                <p>Goal: {p.goal}%</p>
+                <p>Actual: {p.actual}%</p>
+                <p>$: {p.value}</p>
+              </div>
+              <div className="portfolio-min-col">
+                <h4>Top performers</h4>
+                {/* map over top performers here */}
+              </div>
+              <div className="portfolio-min-col">
+                <h4>Losers</h4>
+                {/* map over losers here */}
+              </div>
+            </div>
+          </div>
+        ))}
+
       <div className="portfolio-min">
         <h2>Retirement</h2>
         <div className="portfolio-min-cols">
