@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Request, Res, Response, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
@@ -16,11 +16,28 @@ export class PassportAuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @UseGuards(PassportLocalGuard)
-  login(@Request() request) {
-    if (!request.user) {
+  async login(@Req() req, @Res({ passthrough: true }) res) {
+    if (!req.user) {
       throw new HttpException('invalid login credentials', StatusCodes.UNAUTHORIZED);
     }
-    return this.authService.signIn(request.user);
+
+    const { accessToken, refreshToken, expiresIn } = await this.authService.signIn(req.user);
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: 'lax',
+      maxAge: expiresIn * 1000,
+    });
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { userId: req.user.id, username: req.user.username };
   }
 
   @Public()
