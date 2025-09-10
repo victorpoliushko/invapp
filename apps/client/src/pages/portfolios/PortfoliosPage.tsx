@@ -14,10 +14,9 @@ export default function PortfoliosPage() {
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
-        const response = await fetch(`http://localhost:5173/api/portfolios/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${jwt}`
-            }
+      const response = await fetch(`http://localhost:3000/api/portfolios/${userId}`, {
+        method: "GET",
+        credentials: "include",
       });
           
 

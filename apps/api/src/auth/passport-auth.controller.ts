@@ -21,13 +21,13 @@ export class PassportAuthController {
       throw new HttpException('invalid login credentials', StatusCodes.UNAUTHORIZED);
     }
 
-    const { accessToken, refreshToken, expiresIn } = await this.authService.signIn(req.user);
+    const { accessToken, refreshToken } = await this.authService.signIn(req.user);
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: 'lax',
-      maxAge: expiresIn * 1000,
+      maxAge: 3600,
     });
 
     res.cookie('refresh_token', refreshToken, {
