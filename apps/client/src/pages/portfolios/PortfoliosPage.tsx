@@ -17,8 +17,7 @@ export default function PortfoliosPage() {
       const response = await fetch(`http://localhost:3000/api/portfolios/${userId}`, {
         method: "GET",
         credentials: "include",
-      });
-          
+      });  
 
         console.log('DATA: ', response)
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
