@@ -15,7 +15,7 @@ export default function LoginPage() {
       const response = await fetch("http://localhost:5173/api/auth-v2/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        // credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
@@ -25,6 +25,8 @@ export default function LoginPage() {
 
       const data = await response.json();
       console.log("Login successful", data);
+      localStorage.setItem("userId", data.userId);
+      console.log("data.userId", data.userId);
       // window.location.href = "/portfolios";
     } catch (err: any) {
       setError(err.message);

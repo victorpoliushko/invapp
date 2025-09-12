@@ -12,9 +12,13 @@ export default function PortfoliosPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+
+    console.log('storedUserId :', storedUserId)
+
     const fetchPortfolios = async () => {
       try {
-      const response = await fetch(`http://localhost:3000/api/portfolios/${userId}`, {
+      const response = await fetch(`http://localhost:5173/api/portfolios/${storedUserId}`, {
         method: "GET",
         credentials: "include",
       });  

@@ -20,12 +20,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         getReasonPhrase('Please provide the password'),
         StatusCodes.UNAUTHORIZED,
       );
-    const user = this.authServece.validateUser({ username, password });
+    const user = await this.authServece.validateUser({ username, password });
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    return user;
+    return { userId: user.userId, username: user.username };
   }
 }

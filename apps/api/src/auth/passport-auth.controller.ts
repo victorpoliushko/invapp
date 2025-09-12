@@ -20,14 +20,13 @@ export class PassportAuthController {
     if (!req.user) {
       throw new HttpException('invalid login credentials', StatusCodes.UNAUTHORIZED);
     }
-
     const { accessToken, refreshToken } = await this.authService.signIn(req.user);
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: 'lax',
-      maxAge: 3600,
+      maxAge: 3 * 60 * 60 * 1000,
     });
 
     res.cookie('refresh_token', refreshToken, {
@@ -37,7 +36,7 @@ export class PassportAuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { userId: req.user.id, username: req.user.username };
+    return { userId: req.user.userId, username: req.user.username };
   }
 
   @Public()
