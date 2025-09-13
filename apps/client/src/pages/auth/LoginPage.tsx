@@ -11,6 +11,8 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    const storedUserId = localStorage.getItem("userId");
+
     try {
       const response = await fetch("http://localhost:5173/api/auth-v2/login", {
         method: "POST",
@@ -27,7 +29,7 @@ export default function LoginPage() {
       console.log("Login successful", data);
       localStorage.setItem("userId", data.userId);
       console.log("data.userId", data.userId);
-      // window.location.href = "/portfolios";
+      window.location.href = `http://localhost:5173/portfolios/user/${storedUserId}`;
     } catch (err: any) {
       setError(err.message);
     } finally {

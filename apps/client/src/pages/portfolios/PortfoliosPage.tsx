@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 
-const userId = 'c150f2e3-475a-49ee-aacb-c7bc9e413538';
-const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjMTUwZjJlMy00NzVhLTQ5ZWUtYWFjYi1jN2JjOWU0MTM1MzgiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzU3MzQxMzUwLCJleHAiOjE3NTczNDIyNTB9.bDxgfRawFfunzEiFymNU2-EP54ArdhOdLKdNdeB_Uv0';
 
 export default function PortfoliosPage() {
   // const portfolios = [1, 2, 3, 4, 5];
@@ -18,7 +16,7 @@ export default function PortfoliosPage() {
 
     const fetchPortfolios = async () => {
       try {
-      const response = await fetch(`http://localhost:5173/api/portfolios/${storedUserId}`, {
+      const response = await fetch(`http://localhost:5173/api/portfolios/user/${storedUserId}`, {
         method: "GET",
         credentials: "include",
       });  

@@ -11,6 +11,8 @@ import { Header } from './components/header/header.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { MainPage } from './pages/main/Main.tsx';
 
+const storedUserId = localStorage.getItem("userId");
+
 const router = createBrowserRouter([
   {
   path: "/",
@@ -33,11 +35,11 @@ const router = createBrowserRouter([
   errorElement: <NotFoundPage />
 },
 {
-  path: "/portfolios",
+  path: `/portfolios/user/${storedUserId}`,
   element: <PortfoliosPage />
 },
 {
-  path: "/portfolios/:portfolioId",
+  path: "/portfolios/storedUserId",
   element: <PortfolioPage />
 },
 {
