@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Submitting login with", username, password);
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -17,9 +18,11 @@ export default function LoginPage() {
       const response = await fetch("http://localhost:5173/api/auth-v2/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // credentials: "include",
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
+
+      console.log('fe res :', response);
 
       if (!response.ok) {
         throw new Error(`Login failed: ${response.status}`);

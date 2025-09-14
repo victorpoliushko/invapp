@@ -21,6 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         StatusCodes.UNAUTHORIZED,
       );
     const user = await this.authServece.validateUser({ username, password });
+    console.log('user: ', user)
 
     if (!user) {
       throw new UnauthorizedException();
