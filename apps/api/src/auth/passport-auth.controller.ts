@@ -19,27 +19,11 @@ export class PassportAuthController {
   async login(@Req() req, @Res({ passthrough: true }) res) {
     if (!req.user) {
       throw new HttpException('invalid login credentials', StatusCodes.UNAUTHORIZED);
-    }  
-    console.log('req.body:', req.body);
-    console.log('req.user:', req.user);
+    }
+    
     const { accessToken, refreshToken } = await this.authService.signIn(req.user);
-    console.log('accessToken: ', accessToken)
 
-    res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: 'lax',
-      maxAge: 3 * 60 * 60 * 1000,
-    });
-
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    return { userId: req.user.userId, username: req.user.username };
+    return { userId: req.user.userId, username: req.user.username, accessToken, refreshToken };
   }
 
   @Public()

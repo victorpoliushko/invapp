@@ -5,14 +5,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("Submitting login with", username, password);
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    const storedUserId = localStorage.getItem("userId");
 
     try {
       const response = await fetch("http://localhost:5173/api/auth-v2/login", {
@@ -22,7 +22,7 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log('fe res :', response);
+      console.log("fe res :", response);
 
       if (!response.ok) {
         throw new Error(`Login failed: ${response.status}`);
@@ -31,8 +31,9 @@ export default function LoginPage() {
       const data = await response.json();
       console.log("Login successful", data);
       localStorage.setItem("userId", data.userId);
-      console.log("data.userId", data.userId);
-      window.location.href = `http://localhost:5173/portfolios/user/${storedUserId}`;
+      localStorage.setItem("accessToken", data.accessToken);
+      setUserId(data.userId);
+      setLoggedIn(true);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -65,6 +66,17 @@ export default function LoginPage() {
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        {loggedIn && userId && (
+          <button
+            style={{ marginTop: "20px" }}
+            onClick={() =>
+              (window.location.href = `http://localhost:5173/portfolios/user/${userId}`)
+            }
+          >
+            Go to my portfolios
+          </button>
+        )}
 
         {error && <p>{error}</p>}
       </form>

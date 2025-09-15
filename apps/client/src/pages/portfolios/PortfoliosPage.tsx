@@ -1,28 +1,32 @@
 import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 
-
 export default function PortfoliosPage() {
-  // const portfolios = [1, 2, 3, 4, 5];
-
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
+
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
-
-    console.log('storedUserId :', storedUserId)
+      const token = localStorage.getItem("accessToken");
 
     const fetchPortfolios = async () => {
       try {
-      const response = await fetch(`http://localhost:5173/api/portfolios/user/${storedUserId}`, {
-        method: "GET",
-        credentials: "include",
-      });  
+        const response = await fetch(
+          `http://localhost:5173/api/portfolios/user/${storedUserId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        console.log('DATA: ', response)
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        console.log("DATA: ", response);
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setPortfolios(data);
       } catch (e: any) {
@@ -37,7 +41,6 @@ export default function PortfoliosPage() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
-
   return (
     <section className="portfolios-section section-container">
       {/* <div className='portfolios'>
@@ -48,26 +51,26 @@ export default function PortfoliosPage() {
         ))}
       </div> */}
       {portfolios.map((p: any) => (
-          <div key={p.id} className="portfolio-min">
-            <h2>{p.name}</h2>
-            <div className="portfolio-min-cols">
-              <div className="portfolio-min-col">
-                <h4>Returns</h4>
-                <p>Goal: {p.goal}%</p>
-                <p>Actual: {p.actual}%</p>
-                <p>$: {p.value}</p>
-              </div>
-              <div className="portfolio-min-col">
-                <h4>Top performers</h4>
-                {/* map over top performers here */}
-              </div>
-              <div className="portfolio-min-col">
-                <h4>Losers</h4>
-                {/* map over losers here */}
-              </div>
+        <div key={p.id} className="portfolio-min">
+          <h2>{p.name}</h2>
+          <div className="portfolio-min-cols">
+            <div className="portfolio-min-col">
+              <h4>Returns</h4>
+              <p>Goal: {p.goal}%</p>
+              <p>Actual: {p.actual}%</p>
+              <p>$: {p.value}</p>
+            </div>
+            <div className="portfolio-min-col">
+              <h4>Top performers</h4>
+              {/* map over top performers here */}
+            </div>
+            <div className="portfolio-min-col">
+              <h4>Losers</h4>
+              {/* map over losers here */}
             </div>
           </div>
-        ))}
+        </div>
+      ))}
 
       <div className="portfolio-min">
         <h2>Retirement</h2>
@@ -117,7 +120,7 @@ export default function PortfoliosPage() {
         </div>
       </div>
 
-       <div className="portfolio-min">
+      <div className="portfolio-min">
         <h2>Gain</h2>
         <div className="portfolio-min-cols">
           <div className="portfolio-min-col">
@@ -141,7 +144,7 @@ export default function PortfoliosPage() {
         </div>
       </div>
 
-       <div className="portfolio-min">
+      <div className="portfolio-min">
         <h2>Gain</h2>
         <div className="portfolio-min-cols">
           <div className="portfolio-min-col">
