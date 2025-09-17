@@ -9,8 +9,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-   const navigate = useNavigate();
-     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("Submitting login with", username, password);
@@ -36,8 +36,10 @@ export default function LoginPage() {
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("accessToken", data.accessToken);
       setUserId(data.userId);
-      
-      setSuccessMessage("You are successfully logged in. Redirecting to the main page...");
+
+      setSuccessMessage(
+        "You are successfully logged in. Redirecting to the main page..."
+      );
 
       setTimeout(() => {
         navigate("/main", { replace: true });
