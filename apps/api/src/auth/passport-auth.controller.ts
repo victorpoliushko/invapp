@@ -34,7 +34,7 @@ export class PassportAuthController {
   }
 
   @UseGuards(PassportJwtAuthGuard)
-  @Post('signout')
+  @Post('logout')
   signOut(@Req() request) {
     this.authService.signOut(request.user.id);
   }
