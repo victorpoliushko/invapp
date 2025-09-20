@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import "../../App.css";
+import { useAuth } from "../../AuthContext";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -11,6 +12,8 @@ export default function LoginPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("Submitting login with", username, password);
@@ -33,9 +36,8 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
-      localStorage.setItem("userId", data.userId);
-      localStorage.setItem("accessToken", data.accessToken);
-      setUserId(data.userId);
+      
+      login(data.userId, data.accessToken);
 
       setSuccessMessage(
         "You are successfully logged in. Redirecting to the main page..."

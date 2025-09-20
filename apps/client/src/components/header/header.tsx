@@ -17,7 +17,6 @@ export function Header() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
   };
 
   return (
@@ -31,7 +30,7 @@ export function Header() {
           width={194}
         />
         {userId ? (
-          <button onClick={handleLogout}>Logout</button>
+          <button className="signin-button" onClick={handleLogout}>Logout</button>
         ) : (
           <>
             <button className="signin-button" onClick={handeGoogleLogin}>
