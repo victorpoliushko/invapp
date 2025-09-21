@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function PortfoliosPage() {
   const [portfolios, setPortfolios] = useState([]);
@@ -8,13 +8,13 @@ export default function PortfoliosPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
+    const { userId } = useParams();
       const token = localStorage.getItem("accessToken");
 
     const fetchPortfolios = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5173/api/portfolios/user/${storedUserId}`,
+          `http://localhost:5173/api/portfolios/user/${userId}`,
           {
             method: "GET",
             headers: {
