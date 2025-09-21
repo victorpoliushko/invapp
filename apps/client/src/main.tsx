@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         element: <PortfoliosPage />,
       },
       {
-        path: "/portfolios/storedUserId",
+        path: `/portfolios/:id`,
         element: <PortfolioPage />,
       },
       {

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import invappLogo from "../../assets/invapp-logo.png";
 import { useAuth } from "../../AuthContext";
 import "./header.css";
@@ -22,6 +22,7 @@ export function Header() {
   return (
     <header className="header">
       <nav>
+        <Link to="/">
         <img
           className="navbar-logo"
           src={invappLogo}
@@ -29,8 +30,16 @@ export function Header() {
           height={70}
           width={194}
         />
+        </Link>
         {userId ? (
+          <>
+            <ul className="navbar-ul">
+              <Link to={{ pathname: `/portfolios/user/${userId}`}} key={1}>
+                <h3>Portfolios</h3>
+              </Link>
+            </ul>
           <button className="signin-button" onClick={handleLogout}>Logout</button>
+          </>
         ) : (
           <>
             <button className="signin-button" onClick={handeGoogleLogin}>
@@ -45,3 +54,4 @@ export function Header() {
     </header>
   );
 }
+

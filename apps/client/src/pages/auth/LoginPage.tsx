@@ -29,8 +29,6 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log("fe res :", response);
-
       if (!response.ok) {
         throw new Error(`Login failed: ${response.status}`);
       }

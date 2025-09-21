@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
+import { Link } from "react-router-dom";
 
 export default function PortfoliosPage() {
   const [portfolios, setPortfolios] = useState([]);
@@ -41,25 +42,27 @@ export default function PortfoliosPage() {
   return (
     <section className="portfolios-section section-container">
       {portfolios.map((p: any) => (
-        <div key={p.id} className="portfolio-min">
-          <h2>{p.name}</h2>
-          <div className="portfolio-min-cols">
-            <div className="portfolio-min-col">
-              <h4>Returns</h4>
-              <p>Goal: {p.goal}%</p>
-              <p>Actual: {p.actual}%</p>
-              <p>$: {p.value}</p>
-            </div>
-            <div className="portfolio-min-col">
-              <h4>Top performers</h4>
-              {/* map over top performers here */}
-            </div>
-            <div className="portfolio-min-col">
-              <h4>Losers</h4>
-              {/* map over losers here */}
+        <Link to={{ pathname: `/portfolios/${p.id}`}} key={1}>
+          <div key={p.id} className="portfolio-min">
+            <h2>{p.name}</h2>
+            <div className="portfolio-min-cols">
+              <div className="portfolio-min-col">
+                <h4>Returns</h4>
+                <p>Goal: {p.goal}%</p>
+                <p>Actual: {p.actual}%</p>
+                <p>$: {p.value}</p>
+              </div>
+              <div className="portfolio-min-col">
+                <h4>Top performers</h4>
+                {/* map over top performers here */}
+              </div>
+              <div className="portfolio-min-col">
+                <h4>Losers</h4>
+                {/* map over losers here */}
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </section>
   );
