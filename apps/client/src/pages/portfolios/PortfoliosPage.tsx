@@ -7,9 +7,10 @@ export default function PortfoliosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
     const { userId } = useParams();
-      const token = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
 
     const fetchPortfolios = async () => {
       try {

@@ -38,7 +38,7 @@ const router = createBrowserRouter([
         element: <LoginPage />
       },
       {
-        path: `/portfolios/user/:userId}`,
+        path: `/portfolios/user/:userId`,
         element: <PortfoliosPage />,
       },
       {
