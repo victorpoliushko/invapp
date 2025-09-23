@@ -5,6 +5,7 @@ import "./header.css";
 
 export function Header() {
   const { userId, logout } = useAuth();
+  console.log('userid: ', userId)
   const navigate = useNavigate();
 
   const handeGoogleLogin = () => {

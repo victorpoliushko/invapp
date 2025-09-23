@@ -54,6 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const cleanup = () => {
+    setUserId(null);
+    setAccessToken(null);
+    localStorage.removeItem("userId");
+    localStorage.removeItem("accessToken");
+  };
+
   return (<AuthContext.Provider value={{ userId, accessToken, login, logout }}>
     {children}
   </AuthContext.Provider>)
