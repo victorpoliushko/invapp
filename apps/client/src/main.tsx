@@ -7,13 +7,10 @@ import PortfoliosPage from "./pages/portfolios/PortfoliosPage.tsx";
 import PortfolioPage from "./pages/portfolio/PortfolioPage.tsx";
 import { AiSuggestions } from "./pages/aiSuggestions/AiSuggestions.tsx";
 import LoginPage from "./pages/auth/LoginPage.tsx";
-import { Header } from "./components/header/header.tsx";
 import { HomePage } from "./pages/HomePage.tsx";
 import { MainPage } from "./pages/main/Main.tsx";
 import { AuthProvider } from "./AuthContext.tsx";
 import { Layout } from "./Layout.tsx";
-
-const storedUserId = localStorage.getItem("userId");
 
 const router = createBrowserRouter([
   {

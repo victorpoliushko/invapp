@@ -7,6 +7,42 @@ export default function PortfolioPage() {
   const params = useParams<{ portfolioId: string }>();
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
+  const [newAsset, setNewAsset] = useState({
+    account: "",
+    dueDate: "",
+    amount: "",
+    period: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewAsset({ ...newAsset, [e.target.name]: e.target.value });
+  };
+
+  const handleAddAsset = async () => {
+    const token = localStorage.getItem("accessToken");
+    try {
+      const res = await fetch(
+        `http://localhost:5173/api/portfolios/${params.portfolioId}/symbols`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newAsset),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to add stock");
+
+      alert("Asset added successfully!");
+      setNewAsset({ account: "", dueDate: "", amount: "", period: "" });
+    } catch (err) {
+      console.error(err);
+      alert("Error adding stock");
+    }
+  };
+
   return (
     <>
       <section className="assets-section section-container">
@@ -59,6 +95,44 @@ export default function PortfolioPage() {
                   <td data-label="Due Date">02/01/2016</td>
                   <td data-label="Amount">$842</td>
                   <td data-label="Period">01/01/2016 - 01/31/2016</td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      name="account"
+                      // what assed do I add?
+                      value={newAsset.name}
+                      onChange={handleChange}
+                      placeholder="Account"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={newAsset.dueDate}
+                      onChange={handleChange}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={newAsset.amount}
+                      onChange={handleChange}
+                      placeholder="Amount"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="period"
+                      value={newAsset.period}
+                      onChange={handleChange}
+                      placeholder="Period"
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>

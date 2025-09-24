@@ -5,6 +5,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { jwtDecode } from "jwt-decode";
 
 type AuthContextType = {
   userId: string | null;
@@ -12,6 +13,8 @@ type AuthContextType = {
   login: (userId: string, token: string) => void;
   logout: () => void;
 };
+
+type JwtPayload = { exp: number };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -60,6 +63,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("userId");
     localStorage.removeItem("accessToken");
   };
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("accessToken");
+
+    if (storedUserId && storedToken) {
+      try {
+        const { exp } = jwtDecode<JwtPayload>(storedToken);
+        const now = Date.now() / 1000;
+
+        if (exp < now) {
+          cleanup();
+        } else {
+          setUserId(storedUserId);
+          setAccessToken(storedToken);
+        }
+      } catch (e) {
+        cleanup();
+      }
+    }
+  }, []);
 
   return (<AuthContext.Provider value={{ userId, accessToken, login, logout }}>
     {children}
