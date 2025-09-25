@@ -102,7 +102,7 @@ export default function PortfolioPage() {
                       type="text"
                       name="account"
                       // what assed do I add?
-                      value={newAsset.name}
+                      // value={newAsset.name}
                       onChange={handleChange}
                       placeholder="Account"
                     />
