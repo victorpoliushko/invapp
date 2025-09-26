@@ -1,10 +1,18 @@
 import { useParams } from "react-router-dom";
 import "../../App.css";
 import "./PortfolioPage.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+type SymbolType = {
+  name: string,
+  symbol: string,
+  exchange: string,
+  type: string
+}
 
 export default function PortfolioPage() {
   const params = useParams<{ portfolioId: string }>();
+  const symbolsLimit = 10;
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState({
@@ -14,6 +22,36 @@ export default function PortfolioPage() {
     period: "",
   });
 
+const [symbols, setSymbols] = useState<SymbolType[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    const fetchSymbols = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5173/api/symbols?limit=${symbolsLimit}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        setSymbols(data);
+      } catch (err) {
+        console.error(err);
+        alert("Error adding stock");
+      }
+    };
+    fetchSymbols();
+  }, []);
+  console.log(JSON.stringify(symbols));
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewAsset({ ...newAsset, [e.target.name]: e.target.value });
   };
@@ -55,6 +93,7 @@ export default function PortfolioPage() {
             onChange={() => setSelectedTab("tab-stocks")}
           />
           <label htmlFor="tab-stocks">Stocks</label>
+
           <div className="tab">
             <table>
               <thead>
@@ -66,36 +105,16 @@ export default function PortfolioPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td data-label="Account">Visa - 3412</td>
-                  <td data-label="Due Date">04/01/2016</td>
-                  <td data-label="Amount">$1,190</td>
-                  <td data-label="Period">03/01/2016 - 03/31/2016</td>
-                </tr>
-                <tr>
-                  <td scope="row" data-label="Account">
-                    Visa - 6076
-                  </td>
-                  <td data-label="Due Date">03/01/2016</td>
-                  <td data-label="Amount">$2,443</td>
-                  <td data-label="Period">02/01/2016 - 02/29/2016</td>
-                </tr>
-                <tr>
-                  <td scope="row" data-label="Account">
-                    Corporate AMEX
-                  </td>
-                  <td data-label="Due Date">03/01/2016</td>
-                  <td data-label="Amount">$1,181</td>
-                  <td data-label="Period">02/01/2016 - 02/29/2016</td>
-                </tr>
-                <tr>
-                  <td scope="row" data-label="Acount">
-                    Visa - 3412
-                  </td>
-                  <td data-label="Due Date">02/01/2016</td>
-                  <td data-label="Amount">$842</td>
-                  <td data-label="Period">01/01/2016 - 01/31/2016</td>
-                </tr>
+                {symbols.map((s) => (
+                  <>
+                    <tr>
+                      <td data-label="Account">{s.symbol}</td>
+                      <td data-label="Due Date">04/01/2016</td>
+                      <td data-label="Amount">$1,190</td>
+                      <td data-label="Period">03/01/2016 - 03/31/2016</td>
+                    </tr>
+                  </>
+                ))}
                 <tr>
                   <td>
                     <input
@@ -212,7 +231,7 @@ export default function PortfolioPage() {
             </table>
           </div>
 
-           <input
+          <input
             type="radio"
             name="tabs"
             id="tab-crypto"
