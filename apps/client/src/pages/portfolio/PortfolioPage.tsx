@@ -7,7 +7,8 @@ type SymbolType = {
   name: string,
   symbol: string,
   exchange: string,
-  type: string
+  type: string;
+  price: number;
 }
 
 export default function PortfolioPage() {
@@ -20,6 +21,7 @@ export default function PortfolioPage() {
     dueDate: "",
     amount: "",
     period: "",
+    price: null
   });
 
 const [symbols, setSymbols] = useState<SymbolType[]>([]);
@@ -51,6 +53,29 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
     };
     fetchSymbols();
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    const fetchPrice = async () => {
+      symbols.forEach(async s => {
+        const response = await fetch(
+          `http://localhost:5173/api/symbols/price?symbol=${s.symbol}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        s.price = data.price;
+      })
+        
+    };
+    fetchPrice();
+  }, []);
   console.log(JSON.stringify(symbols));
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewAsset({ ...newAsset, [e.target.name]: e.target.value });
@@ -74,7 +99,7 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
       if (!res.ok) throw new Error("Failed to add stock");
 
       alert("Asset added successfully!");
-      setNewAsset({ account: "", dueDate: "", amount: "", period: "" });
+      setNewAsset({ account: "", dueDate: "", amount: "", period: "", price: null });
     } catch (err) {
       console.error(err);
       alert("Error adding stock");
@@ -99,7 +124,7 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
               <thead>
                 <tr>
                   <th scope="col">Account</th>
-                  <th scope="col">Due Date</th>
+                  <th scope="col">Price</th>
                   <th scope="col">Amount</th>
                   <th scope="col">Period</th>
                 </tr>
@@ -109,7 +134,7 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
                   <>
                     <tr>
                       <td data-label="Account">{s.symbol}</td>
-                      <td data-label="Due Date">04/01/2016</td>
+                      <td data-label="Due Date">{s.price}</td>
                       <td data-label="Amount">$1,190</td>
                       <td data-label="Period">03/01/2016 - 03/31/2016</td>
                     </tr>
