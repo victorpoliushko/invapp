@@ -48,6 +48,8 @@ model Symbol {
   type       SymbolType
   // type       String
   dataSource DataSource
+  price      Float
+  updatedAt  DateTime
 
   portfolios PortfolioSymbol[]
 }
@@ -70,11 +72,14 @@ enum DataSource {
 }
 
 model PortfolioSymbol {
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
   portfolioId String
-  symbols     Symbol    @relation(fields: [symbolId], references: [id])
   symbolId    String
+  
   quantity    Float
+  avgBuyPrice Float?
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
+  symbols Symbol @relation(fields: [symbolId], references: [id])
 
   @@id([portfolioId, symbolId])
 }
