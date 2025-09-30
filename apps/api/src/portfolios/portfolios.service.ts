@@ -49,11 +49,12 @@ export class PortfoliosService {
       );
     }
 
-    const portfolioSymbols = input.symbols.map(({ symbolId, quantity }) => {
+    const portfolioSymbols = input.symbols.map(async ({ symbolId, quantity }) =>  {
+      // fetch symbol, set price
       return this.prismaService.portfolioSymbol.upsert({
         where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
         update: { quantity },
-        create: { portfolioId: id, symbolId: symbolId, quantity },
+        create: { portfolioId: id, symbolId: symbolId, quantity, price },
       });
     });
 

@@ -57,21 +57,14 @@ export class SymbolsService {
       const apikey = this.configService.get<string>('API_KEY');
       const url = `https://www.alphavantage.co/query?function=${func}&apikey=${apikey}`;
       const response = await lastValueFrom(this.httpService.get(url));
-console.log('Response:', response.data);
+
       const data = response.data.split('\n').slice(1);
       const alphavantageData = data.map(line => {
         const [symbol, name, exchange, type] = line.split(',');
-        // console.log('name: ', name);
-        // const price = await this.getSharePrice(symbol);
-        return { symbol, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE };
+        return { symbol, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE, updatedAt: Date.now() };
       });
 
       alphavantageData.pop();
-
-      // alphavantageData.forEach(async i => {
-      //   i.price = await this.getSharePrice(i.symbol);
-      //   i.updatedAt = Date.now()
-      // });
 
       await this.prismaService.symbol.createMany({
         data: alphavantageData,

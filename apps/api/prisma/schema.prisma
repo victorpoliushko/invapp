@@ -48,7 +48,6 @@ model Symbol {
   type       SymbolType
   // type       String
   dataSource DataSource
-  price      Float
   updatedAt  DateTime
 
   portfolios PortfolioSymbol[]
@@ -76,6 +75,7 @@ model PortfolioSymbol {
   symbolId    String
   
   quantity    Float
+  price       Float
   avgBuyPrice Float?
 
   portfolio Portfolio @relation(fields: [portfolioId], references: [id])
