@@ -61,7 +61,7 @@ export class SymbolsService {
       const data = response.data.split('\n').slice(1);
       const alphavantageData = data.map(line => {
         const [symbol, name, exchange, type] = line.split(',');
-        return { symbol, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE, updatedAt: Date.now() };
+        return { symbol, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE };
       });
 
       alphavantageData.pop();

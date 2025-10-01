@@ -17,7 +17,10 @@ interface SymbolsWithPrices {
 }
 @Injectable()
 export class PortfoliosService {
-  constructor(private prismaService: PrismaService, private symbolsService: SymbolsService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private symbolsService: SymbolsService,
+  ) {}
 
   async create(input: CreatePortfolioDto): Promise<PortfolioDto> {
     const createdPortfolio = await this.prismaService.portfolio.create({
@@ -35,6 +38,23 @@ export class PortfoliosService {
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
+  async syncSymbolsPrice(symbolIds: string[]) {
+    const exsitingSymbols = await this.prismaService.symbol.findMany({
+      where: { id: { in: symbolIds } },
+    });
+    console.log('before exsitingSymbols', exsitingSymbols);
+
+    await Promise.all(
+      exsitingSymbols
+        .filter(s => symbolIds.includes(s.id))
+        .map(async (s) => {
+          const price = await this.symbolsService.getSharePrice(s.symbol);
+          console.log('Price: ', price);
+        }),
+    );
+  }
+
+
   async addSymbols(
     id: string,
     input: SymbolToPortfolioDto,
@@ -49,14 +69,18 @@ export class PortfoliosService {
       );
     }
 
-    const portfolioSymbols = input.symbols.map(async ({ symbolId, quantity }) =>  {
-      // fetch symbol, set price
-      return this.prismaService.portfolioSymbol.upsert({
-        where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
-        update: { quantity },
-        create: { portfolioId: id, symbolId: symbolId, quantity, price },
-      });
-    });
+    const symbolIds = input.symbols.map(s => s.symbolId);
+    await this.syncSymbolsPrice(symbolIds);
+
+    const portfolioSymbols = input.symbols.map(
+      async ({ symbolId, quantity }) => {
+        return this.prismaService.portfolioSymbol.upsert({
+          where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
+          update: { quantity },
+          create: { portfolioId: id, symbolId: symbolId, quantity },
+        });
+      },
+    );
 
     await Promise.all(portfolioSymbols);
 
@@ -115,12 +139,12 @@ export class PortfoliosService {
   async getPortfolioBalance(id: string, currency: Currency): Promise<any> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { id },
-      include: { 
-        symbols: { 
-          include: { 
-            symbols: true 
-          } 
-        } 
+      include: {
+        symbols: {
+          include: {
+            symbols: true,
+          },
+        },
       },
     });
 
@@ -128,30 +152,30 @@ export class PortfoliosService {
       portfolios.map(async (portfolio) => {
         const symbolsWithPrices = await Promise.all(
           portfolio.symbols.map(async (portfolioSymbols) => {
-            console.log(`Symbol: ${portfolioSymbols.symbols.symbol}`)
-            const price = await this.symbolsService.getSharePrice(portfolioSymbols.symbols.symbol)
-            return (
-              {
-                symbol: portfolioSymbols.symbols.symbol,
-                price,
-                currency,
-                quantity: portfolioSymbols.quantity
-              }
-            )
+            console.log(`Symbol: ${portfolioSymbols.symbols.symbol}`);
+            const price = await this.symbolsService.getSharePrice(
+              portfolioSymbols.symbols.symbol,
+            );
+            return {
+              symbol: portfolioSymbols.symbols.symbol,
+              price,
+              currency,
+              quantity: portfolioSymbols.quantity,
+            };
           }),
-        )
+        );
         return {
           ...portfolios,
           symbols: symbolsWithPrices,
-          totalPrice: this.calculateSymbolsTotalPrice(symbolsWithPrices)
-        }
-      })
+          totalPrice: this.calculateSymbolsTotalPrice(symbolsWithPrices),
+        };
+      }),
     );
 
     return portfoliosWithSymbolsPrice;
   }
 
   calculateSymbolsTotalPrice(symbols: SymbolsWithPrices[]) {
-    return symbols.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+    return symbols.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   }
 }
