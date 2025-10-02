@@ -38,22 +38,14 @@ export class PortfoliosService {
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
-  async syncSymbolsPrice(symbolIds: string[]) {
-    const exsitingSymbols = await this.prismaService.symbol.findMany({
-      where: { id: { in: symbolIds } },
+  async syncSymbolPrice(symbolId: string) {
+console.log('symbolId ', symbolId);
+    const exsitingSymbol = await this.prismaService.symbol.findUnique({
+      where: { id: symbolId },
     });
-    console.log('before exsitingSymbols', exsitingSymbols);
 
-    await Promise.all(
-      exsitingSymbols
-        .filter(s => symbolIds.includes(s.id))
-        .map(async (s) => {
-          const price = await this.symbolsService.getSharePrice(s.symbol);
-          console.log('Price: ', price);
-        }),
-    );
+    return await this.symbolsService.getSharePrice(symbolId);
   }
-
 
   async addSymbols(
     id: string,
@@ -69,15 +61,14 @@ export class PortfoliosService {
       );
     }
 
-    const symbolIds = input.symbols.map(s => s.symbolId);
-    await this.syncSymbolsPrice(symbolIds);
-
     const portfolioSymbols = input.symbols.map(
       async ({ symbolId, quantity }) => {
+        const price = await this.syncSymbolPrice(symbolId);
+        
         return this.prismaService.portfolioSymbol.upsert({
           where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
-          update: { quantity },
-          create: { portfolioId: id, symbolId: symbolId, quantity },
+          update: { quantity, price },
+          create: { portfolioId: id, symbolId: symbolId, quantity, price },
         });
       },
     );

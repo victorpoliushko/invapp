@@ -22,6 +22,7 @@ export class SymbolsService {
       
       const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol.trim().toUpperCase()}&apikey=${apikey}`;
       const matchingResponse = await lastValueFrom(this.httpService.get(matchingUrl));
+
       const matches = matchingResponse.data?.bestMatches || [];
 
       if (matches.length <= 0 || !matches.some(match => match["1. symbol"].trim().toUpperCase() === symbol.trim().toUpperCase())) {
