@@ -43,6 +43,7 @@ export class SymbolsService {
 
       return price;
     } catch (error) {
+      console.log(error)
       console.error('API error:', error.response?.data);
       throw new HttpException(getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR), StatusCodes.INTERNAL_SERVER_ERROR);
     }

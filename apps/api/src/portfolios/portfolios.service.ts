@@ -39,12 +39,11 @@ export class PortfoliosService {
   }
 
   async syncSymbolPrice(symbolId: string) {
-console.log('symbolId ', symbolId);
     const exsitingSymbol = await this.prismaService.symbol.findUnique({
       where: { id: symbolId },
     });
 
-    return await this.symbolsService.getSharePrice(symbolId);
+    return await this.symbolsService.getSharePrice(exsitingSymbol.symbol);
   }
 
   async addSymbols(
