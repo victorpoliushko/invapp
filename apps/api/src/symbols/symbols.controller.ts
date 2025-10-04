@@ -22,4 +22,9 @@ export class SymbolsController {
   async getAndStoreSymbols(): Promise<any> {
     return await this.symbolsService.fetchAndStoreSymbols();
   }
+
+  @Get('search')
+  async searchSymbol(@Query('q') query: string) {
+    return this.symbolsService.findSymbol(query);
+  }
 }

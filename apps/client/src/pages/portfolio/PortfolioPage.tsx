@@ -15,9 +15,12 @@ export default function PortfolioPage() {
   const params = useParams<{ portfolioId: string }>();
   const symbolsLimit = 10;
 
+  const [searchTerm, setSearchTerm] = useState("");
+const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
+
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState({
-    account: "",
+    symbol: "",
     dueDate: "",
     amount: "",
     period: "",
@@ -76,7 +79,38 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
     };
     fetchPrice();
   }, []);
-  console.log(JSON.stringify(symbols));
+
+  useEffect(() => {
+  const token = localStorage.getItem("accessToken");
+
+  if (!searchTerm.trim()) {
+    setSuggestions([]);
+    return;
+  }
+
+  const delayDebounceFn = setTimeout(async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5173/api/symbols/search?q=${searchTerm}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch symbol suggestions");
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (err) {
+      console.error("Autocomplete error:", err);
+    }
+  }, 400);
+
+  return () => clearTimeout(delayDebounceFn);
+}, [searchTerm]);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewAsset({ ...newAsset, [e.target.name]: e.target.value });
   };
@@ -99,7 +133,7 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
       if (!res.ok) throw new Error("Failed to add stock");
 
       alert("Asset added successfully!");
-      setNewAsset({ account: "", dueDate: "", amount: "", period: "", price: null });
+      setNewAsset({ symbol: "", dueDate: "", amount: "", period: "", price: null });
     } catch (err) {
       console.error(err);
       alert("Error adding stock");
@@ -142,14 +176,32 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
                 ))}
                 <tr>
                   <td>
-                    <input
-                      type="text"
-                      name="account"
-                      // what assed do I add?
-                      // value={newAsset.name}
-                      onChange={handleChange}
-                      placeholder="Account"
-                    />
+                    <div className="symbol-autocomplete">
+                      <input
+                        type="text"
+                        name="symbol"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Symbol"
+                        autoComplete="off"
+                      />
+                      {suggestions.length > 0 && (
+                        <ul className="suggestions-list">
+                          {suggestions.slice(0, 5).map((s) => (
+                            <li
+                              key={s.symbol}
+                              onClick={() => {
+                                setSearchTerm(s.symbol);
+                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setSuggestions([]);
+                              }}
+                            >
+                              {s.symbol} — {s.name}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </td>
                   <td>
                     <input

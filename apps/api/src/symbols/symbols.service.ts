@@ -80,4 +80,46 @@ export class SymbolsService {
       await this.prismaService.$disconnect();
     }
   }
+
+  // async findSymbol(symbol: string): Promise<Symbol> {
+  async findSymbol(symbol: string): Promise<Symbol[]> {
+    try {
+      const apikey = this.configService.get<string>('API_KEY');
+      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol.trim().toUpperCase()}&apikey=${apikey}`;
+
+      const response = await lastValueFrom(this.httpService.get(matchingUrl));
+      const matches = response.data?.bestMatches || [];
+
+      return matches.map((m) => ({
+        symbol: m['1. symbol'],
+        name: m['2. name'],
+        region: m['4. region'],
+        currency: m['8. currency'],
+      }));
+
+      // const matches = matchingResponse.data?.bestMatches || [];
+
+      // if (matches.length <= 0 || !matches.some(match => match["1. symbol"].trim().toUpperCase() === symbol.trim().toUpperCase())) {
+      //   throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
+      // }
+
+      // const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=${apikey}`;
+
+      // const response = await lastValueFrom(this.httpService.get(pricingUrl));
+      // const timeSeries = response.data['Time Series (5min)'];
+
+      // if (!timeSeries) {
+      //   throw new Error('No time series data available');
+      // }
+      // const latestTimestapm = Object.keys(timeSeries)[0];
+      // const latestData = timeSeries[latestTimestapm];
+      // const price = parseFloat(latestData['4. close']);
+
+
+    } catch (error) {
+      console.log(error)
+      console.error('Error in find symbols:', error.response?.data);
+      throw new HttpException(getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR), StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
