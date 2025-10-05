@@ -190,6 +190,7 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
                           {suggestions.slice(0, 5).map((s) => (
                             <li
                               key={s.symbol}
+                              title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
                                 setNewAsset({ ...newAsset, symbol: s.symbol });
