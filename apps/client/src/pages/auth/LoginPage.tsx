@@ -9,7 +9,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -35,7 +34,7 @@ export default function LoginPage() {
 
       const data = await response.json();
       
-      login(data.userId, data.accessToken);
+      login(data.userId, data.accessToken, data.refreshToken);
 
       setSuccessMessage(
         "You are successfully logged in. Redirecting to the main page..."
