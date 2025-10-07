@@ -1,5 +1,5 @@
 import { DataSource } from "@prisma/client";
-import { IsDefined, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class SymbolDto {
   @IsDefined()
@@ -24,4 +24,7 @@ export class SymbolDto {
 
   @IsEnum(DataSource)
   dataSource: DataSource;
+
+  @IsOptional()
+  updatedAt?: Date;
 }

@@ -27,6 +27,39 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
     price: null
   });
 
+  useEffect(() => {
+  const token = localStorage.getItem("accessToken");
+
+  const fetchPortfolio = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5173/api/portfolios/${params.portfolioId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const portfolio = await response.json();
+      console.log(`Portfolio FE: ${JSON.stringify(portfolio)}`)
+      setSymbols(portfolio.symbols || []); 
+    } catch (err) {
+      console.error(err);
+      alert("Error loading portfolio");
+    }
+  };
+
+  if (params.portfolioId) {
+    fetchPortfolio();
+  }
+}, [params.portfolioId]);
+
 const [symbols, setSymbols] = useState<SymbolType[]>([]);
 
   useEffect(() => {
@@ -142,7 +175,9 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
 
   return (
     <>
+          <h1>Portfolio name</h1>
       <section className="assets-section section-container">
+
         <div className="assets">
           <input
             type="radio"

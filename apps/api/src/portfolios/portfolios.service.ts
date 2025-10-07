@@ -30,6 +30,15 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, createdPortfolio);
   }
 
+  async getById(id: string): Promise<PortfolioDto> {
+    const portfolio = await this.prismaService.portfolio.findUnique({
+      where: { id },
+      include: { symbols: { include: { symbols: true } } },
+    });
+    console.log(`Portfolio BE: ${JSON.stringify(id)}`)
+    return plainToInstance(PortfolioDto, portfolio);
+  }
+
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },

@@ -5,8 +5,6 @@ import "./header.css";
 
 export function Header() {
   const { userId, logout } = useAuth();
-  console.log('userid: ', userId)
-  const navigate = useNavigate();
 
   const handeGoogleLogin = () => {
     window.location.href = "http://localhost:5173/api/auth-v2/google/login";

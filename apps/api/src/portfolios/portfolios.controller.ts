@@ -42,6 +42,14 @@ export class PortfoliosController {
     return this.portfoliosService.create(createPortfolioDto);
   }
 
+  @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  getPortfolio(@Param('id') id: string) {
+    console.log('hit getPortfolio')
+    return this.portfoliosService.getById(id);
+  }
+
   @Get('/user/:userId')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
