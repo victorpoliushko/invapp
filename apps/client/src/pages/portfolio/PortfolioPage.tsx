@@ -12,7 +12,7 @@ type SymbolType = {
 }
 
 export default function PortfolioPage() {
-  const params = useParams<{ portfolioId: string }>();
+const params = useParams<{ id: string }>();
   const symbolsLimit = 10;
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,13 +27,14 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
     price: null
   });
 
+
   useEffect(() => {
   const token = localStorage.getItem("accessToken");
 
   const fetchPortfolio = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5173/api/portfolios/${params.portfolioId}`,
+        `http://localhost:5173/api/portfolios/${params.id}`,
         {
           method: "GET",
           headers: {
@@ -55,10 +56,10 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
     }
   };
 
-  if (params.portfolioId) {
+  if (params.id) {
     fetchPortfolio();
   }
-}, [params.portfolioId]);
+}, [params.id]);
 
 const [symbols, setSymbols] = useState<SymbolType[]>([]);
 
@@ -152,7 +153,7 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
     const token = localStorage.getItem("accessToken");
     try {
       const res = await fetch(
-        `http://localhost:5173/api/portfolios/${params.portfolioId}/symbols`,
+        `http://localhost:5173/api/portfolios/${params.id}/symbols`,
         {
           method: "POST",
           headers: {

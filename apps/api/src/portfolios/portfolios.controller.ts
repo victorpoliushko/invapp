@@ -42,7 +42,7 @@ export class PortfoliosController {
     return this.portfoliosService.create(createPortfolioDto);
   }
 
-  @Get(':id')
+  @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   getPortfolio(@Param('id') id: string) {
