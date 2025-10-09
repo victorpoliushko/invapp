@@ -11,6 +11,28 @@ type SymbolType = {
   price: number;
 }
 
+type PortfolioType = {
+  id: string;
+  name: string;
+  userId: string;
+  symbols: Array<{
+    portfolioId: string;
+    symbolId: string;
+    quantity: number;
+    price: number;
+    avgBuyPrice: number;
+    symbols: {
+      id:string;
+      name: string;
+      symbol: string;
+      exchange: string;
+      type: string;
+      dataSource: string;
+      updatedAt: string;
+    }
+  }>
+}
+
 export default function PortfolioPage() {
 const params = useParams<{ id: string }>();
   const symbolsLimit = 10;
@@ -48,8 +70,8 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
         throw new Error(`HTTP error! status: ${response.status}`);
 
       const portfolio = await response.json();
-      console.log(`Portfolio FE: ${JSON.stringify(portfolio)}`)
-      setSymbols(portfolio.symbols || []); 
+      console.log(`portfolio 1: ${JSON.stringify(portfolio)}`)
+      setPortfolio(portfolio); 
     } catch (err) {
       console.error(err);
       alert("Error loading portfolio");
@@ -61,43 +83,16 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
   }
 }, [params.id]);
 
-const [symbols, setSymbols] = useState<SymbolType[]>([]);
+const [portfolio, setPortfolio] = useState<PortfolioType>();
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-
-    const fetchSymbols = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5173/api/symbols?limit=${symbolsLimit}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setSymbols(data);
-      } catch (err) {
-        console.error(err);
-        alert("Error adding stock");
-      }
-    };
-    fetchSymbols();
-  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
     const fetchPrice = async () => {
-      symbols.forEach(async s => {
+      portfolio && portfolio.symbols.forEach(async s => {
         const response = await fetch(
-          `http://localhost:5173/api/symbols/price?symbol=${s.symbol}`,
+          `http://localhost:5173/api/symbols/price?symbol=${s.symbols.symbol}`,
           {
             method: "GET",
             headers: {
@@ -200,13 +195,13 @@ const [symbols, setSymbols] = useState<SymbolType[]>([]);
                 </tr>
               </thead>
               <tbody>
-                {symbols.map((s) => (
+                {portfolio && portfolio.symbols.map((s) => (
                   <>
                     <tr>
-                      <td data-label="Account">{s.symbol}</td>
-                      <td data-label="Due Date">{s.price}</td>
-                      <td data-label="Amount">$1,190</td>
-                      <td data-label="Period">03/01/2016 - 03/31/2016</td>
+                      <td data-label="Symbol">{s.symbols.symbol}</td>
+                      <td data-label="Price">{s.price}</td>
+                      <td data-label="Amount">{s.quantity}</td>
+                      <td data-label="Bought">{s.symbols.updatedAt}</td>
                     </tr>
                   </>
                 ))}
