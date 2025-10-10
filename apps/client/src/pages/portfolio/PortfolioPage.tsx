@@ -171,9 +171,9 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
 
   return (
     <>
-          <h1>Portfolio name</h1>
+     
       <section className="assets-section section-container">
-
+        <h1 className="assets-h1">{portfolio?.name}</h1>
         <div className="assets">
           <input
             type="radio"
