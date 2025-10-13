@@ -50,6 +50,10 @@ export default function LoginPage() {
     }
   };
 
+    const handeGoogleLogin = () => {
+    window.location.href = "http://localhost:5173/api/auth-v2/google/login";
+  };
+
   return (
     <section className="section-container login-section section-flex-container">
       <div>
@@ -80,6 +84,10 @@ export default function LoginPage() {
           {error && <p>{error}</p>}
           {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
         </form>
+
+        <button className="signin-button" onClick={handeGoogleLogin}>
+              Sign in SSO
+            </button>
       </div>
     </section>
   );

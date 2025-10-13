@@ -35,9 +35,8 @@ type PortfolioType = {
 
 export default function PortfolioPage() {
 const params = useParams<{ id: string }>();
-  const symbolsLimit = 10;
 
-  const [searchTerm, setSearchTerm] = useState("");
+const [searchTerm, setSearchTerm] = useState("");
 const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
