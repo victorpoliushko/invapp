@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import "../../App.css";
 import "./PortfolioPage.css";
 import { useEffect, useState } from "react";
+import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 
 type SymbolType = {
   name: string,
@@ -35,6 +36,7 @@ type PortfolioType = {
 
 export default function PortfolioPage() {
 const params = useParams<{ id: string }>();
+const fetchWithRedirect = useFetchWithRedirect();
 
 const [searchTerm, setSearchTerm] = useState("");
 const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
@@ -53,28 +55,24 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
   const token = localStorage.getItem("accessToken");
 
   const fetchPortfolio = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5173/api/portfolios/${params.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    const response = await fetchWithRedirect(
+      `http://localhost:5173/api/portfolios/${params.id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok)
+      throw new Error(`HTTP error! status: ${response.status}`);
 
-      const portfolio = await response.json();
-      console.log(`portfolio 1: ${JSON.stringify(portfolio)}`)
-      setPortfolio(portfolio); 
-    } catch (err) {
-      console.error(err);
-      alert("Error loading portfolio");
-    }
+    const portfolio = await response.json();
+    console.log(`portfolio 1: ${JSON.stringify(portfolio)}`)
+    setPortfolio(portfolio); 
+
   };
 
   if (params.id) {
@@ -90,7 +88,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
 
     const fetchPrice = async () => {
       portfolio && portfolio.symbols.forEach(async s => {
-        const response = await fetch(
+        const response = await fetchWithRedirect(
           `http://localhost:5173/api/symbols/price?symbol=${s.symbols.symbol}`,
           {
             method: "GET",
@@ -118,7 +116,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
 
   const delayDebounceFn = setTimeout(async () => {
     try {
-      const response = await fetch(
+      const response = await fetchWithRedirect(
         `http://localhost:5173/api/symbols/search?q=${searchTerm}`,
         {
           headers: {
@@ -146,7 +144,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
   const handleAddAsset = async () => {
     const token = localStorage.getItem("accessToken");
     try {
-      const res = await fetch(
+      const res = await fetchWithRedirect(
         `http://localhost:5173/api/portfolios/${params.id}/symbols`,
         {
           method: "POST",

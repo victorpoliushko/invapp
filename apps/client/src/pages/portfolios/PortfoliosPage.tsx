@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 import { Link, useParams } from "react-router-dom";
+import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 
 export default function PortfoliosPage() {
+  const { userId } = useParams();
+  const fetchWithRedirect = useFetchWithRedirect();
+
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-    const { userId } = useParams();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -23,6 +25,7 @@ export default function PortfoliosPage() {
             },
           }
         );
+        console.log(`res: ${response}`)
 
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -43,7 +46,7 @@ export default function PortfoliosPage() {
   return (
     <section className="portfolios-section section-container">
       {portfolios.map((p: any) => (
-        <Link to={{ pathname: `/portfolios/${p.id}`}} key={1}>
+        <Link to={{ pathname: `/portfolios/${p.id}` }} key={1}>
           <div key={p.id} className="portfolio-min">
             <h2>{p.name}</h2>
             <div className="portfolio-min-cols">
