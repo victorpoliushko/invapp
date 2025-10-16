@@ -4,7 +4,7 @@ export const useFetchWithRedirect = () => {
   const navigate = useNavigate();
 
   async function fetchWithRedirect(input: RequestInfo, init?: RequestInit) {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("accessToken");
 
     const response = await fetch(input, {
       ...init,

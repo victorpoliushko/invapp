@@ -16,16 +16,16 @@ export default function PortfoliosPage() {
 
     const fetchPortfolios = async () => {
       try {
-        const response = await fetch(
+        const response = await fetchWithRedirect(
           `http://localhost:5173/api/portfolios/user/${userId}`,
           {
             method: "GET",
             headers: {
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log(`res: ${response}`)
 
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);

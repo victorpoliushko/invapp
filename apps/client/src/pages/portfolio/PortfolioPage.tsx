@@ -53,7 +53,6 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
 
   useEffect(() => {
   const token = localStorage.getItem("accessToken");
-
   const fetchPortfolio = async () => {
     const response = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/${params.id}`,
@@ -70,9 +69,7 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
       throw new Error(`HTTP error! status: ${response.status}`);
 
     const portfolio = await response.json();
-    console.log(`portfolio 1: ${JSON.stringify(portfolio)}`)
     setPortfolio(portfolio); 
-
   };
 
   if (params.id) {
