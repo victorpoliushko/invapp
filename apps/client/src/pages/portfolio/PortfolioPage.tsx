@@ -179,7 +179,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
           <label htmlFor="tab-stocks">Stocks</label>
 
           <div className="tab">
-            <table>
+            <table className="assets-table">
               <thead>
                 <tr>
                   <th scope="col">Account</th>
@@ -201,7 +201,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                 ))}
                 <tr>
                   <td>
-                    <div className="symbol-autocomplete">
+                    <div>
                       <input
                         type="text"
                         name="symbol"
