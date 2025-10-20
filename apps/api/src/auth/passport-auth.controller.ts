@@ -43,7 +43,7 @@ export class PassportAuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google/login')
   googleLogin() {
-
+    
   }
 
   @Public()
