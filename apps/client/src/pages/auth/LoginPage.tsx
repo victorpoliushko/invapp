@@ -49,41 +49,8 @@ export default function LoginPage() {
     }
   };
 
-  const handeGoogleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("http://localhost:5173/api/auth-v2/google/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Login failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      console.log(`google data: ${data}`);
-      
-      login(data.userId, data.accessToken, data.refreshToken);
-
-      setSuccessMessage(
-        "You are successfully logged in. Redirecting to the main page..."
-      );
-
-      setTimeout(() => {
-        navigate("/main", { replace: true });
-      }, 3000);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const handeGoogleLogin = () => {
+    window.location.href = "http://localhost:5173/api/auth-v2/google/login";
   };
 
   return (
@@ -118,8 +85,8 @@ export default function LoginPage() {
         </form>
 
         <button className="signin-button" onClick={handeGoogleLogin}>
-              Sign in SSO
-            </button>
+          Sign in SSO
+        </button>
       </div>
     </section>
   );

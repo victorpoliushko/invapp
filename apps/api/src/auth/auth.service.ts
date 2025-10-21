@@ -70,7 +70,6 @@ export class AuthService {
 
   async generateToken(input: SignInData) {
     const { username, userId } = input;
-
     const tokenPayload = {
       userId,
       username
