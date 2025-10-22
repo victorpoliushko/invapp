@@ -58,6 +58,8 @@ export class PassportAuthController {
       expires: new Date(Date.now() + 1000 * 60 * 15)
     });
     
-    res.redirect(`http://localhost:5173`);
+    res.redirect(
+    `http://localhost:5173?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&userId=${req.user.id}`
+  );
   }
 }

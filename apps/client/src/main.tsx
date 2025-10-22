@@ -11,6 +11,7 @@ import { HomePage } from "./pages/HomePage.tsx";
 import { MainPage } from "./pages/main/Main.tsx";
 import { AuthProvider } from "./AuthContext.tsx";
 import { Layout } from "./Layout.tsx";
+import AuthCallback from "./pages/auth/AuthCallback.tsx";
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "/portfolios/:portfolioId/ai-suggestions",
         element: <AiSuggestions />,
+      },
+      {
+        path: "/auth/google/callback",
+        element: <AuthCallback />
       },
     ],
   },
