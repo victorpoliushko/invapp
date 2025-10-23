@@ -7,7 +7,6 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  console.log(`Auth callback triggered`);
   useEffect(() => {
     const accessToken = params.get("accessToken");
     const refreshToken = params.get("refreshToken");

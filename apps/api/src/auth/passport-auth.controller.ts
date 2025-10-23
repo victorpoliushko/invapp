@@ -59,7 +59,7 @@ export class PassportAuthController {
     });
     
     res.redirect(
-    `http://localhost:5173?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&userId=${req.user.id}`
+    `http://localhost:5173/auth-redirect?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&userId=${req.user.id}`
   );
   }
 }

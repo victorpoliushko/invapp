@@ -48,7 +48,7 @@ const router = createBrowserRouter([
         element: <AiSuggestions />,
       },
       {
-        path: "/auth/google/callback",
+        path: "/auth-redirect",
         element: <AuthCallback />
       },
     ],
