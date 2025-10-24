@@ -103,11 +103,11 @@ table th {
   text-transform: uppercase;
 }
 
-/* .symbol-autocomplete {
+.symbol-autocomplete {
   position: relative;
   display: inline-block;
   width: 100%;
-} */
+}
 
 .assets-table input {
   width: 100%;

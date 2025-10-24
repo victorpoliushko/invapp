@@ -47,7 +47,7 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
     dueDate: "",
     amount: "",
     period: "",
-    price: null
+    price: 0
   });
 
 
@@ -106,6 +106,9 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
   useEffect(() => {
   const token = localStorage.getItem("accessToken");
 
+  console.log(`searchTerm: ${searchTerm}`);
+  
+
   if (!searchTerm.trim()) {
     setSuggestions([]);
     return;
@@ -125,6 +128,9 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
 
       if (!response.ok) throw new Error("Failed to fetch symbol suggestions");
       const data = await response.json();
+      console.log(`
+       data: ${JSON.stringify(data)} 
+      `);
       setSuggestions(data);
     } catch (err) {
       console.error("Autocomplete error:", err);
@@ -156,7 +162,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
       if (!res.ok) throw new Error("Failed to add stock");
 
       alert("Asset added successfully!");
-      setNewAsset({ symbol: "", dueDate: "", amount: "", period: "", price: null });
+      setNewAsset({ symbol: "", dueDate: "", amount: "", period: "", price: 0 });
     } catch (err) {
       console.error(err);
       alert("Error adding stock");
@@ -182,26 +188,26 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
             <table className="assets-table">
               <thead>
                 <tr>
-                  <th scope="col">Account</th>
-                  <th scope="col">Price</th>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Date</th>
                   <th scope="col">Amount</th>
-                  <th scope="col">Period</th>
+                  <th scope="col">Price</th>
                 </tr>
               </thead>
               <tbody>
                 {portfolio && portfolio.symbols.map((s) => (
                   <>
                     <tr>
-                      <td data-label="Symbol">{s.symbols.symbol}</td>
-                      <td data-label="Price">{s.price}</td>
-                      <td data-label="Amount">{s.quantity}</td>
-                      <td data-label="Bought">{s.symbols.updatedAt}</td>
+                      <td data-label="symbol">{s.symbols.symbol}</td>
+                      <td data-label="date">{s.symbols.updatedAt}</td>
+                      <td data-label="amount">{s.quantity}</td>
+                      <td data-label="price">{s.price}</td>
                     </tr>
                   </>
                 ))}
                 <tr>
                   <td>
-                    <div>
+                    <div className="symbol-autocomplete">
                       <input
                         type="text"
                         name="symbol"
@@ -249,8 +255,8 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                   <td>
                     <input
                       type="text"
-                      name="period"
-                      value={newAsset.period}
+                      name="price"
+                      value={newAsset.price}
                       onChange={handleChange}
                       placeholder="Period"
                     />
