@@ -35,7 +35,6 @@ export class PortfoliosService {
       where: { id },
       include: { symbols: { include: { symbols: true } } },
     });
-    console.log(`Portfolio BE: ${JSON.stringify(id)}`)
     return plainToInstance(PortfolioDto, portfolio);
   }
 
@@ -151,7 +150,6 @@ export class PortfoliosService {
       portfolios.map(async (portfolio) => {
         const symbolsWithPrices = await Promise.all(
           portfolio.symbols.map(async (portfolioSymbols) => {
-            console.log(`Symbol: ${portfolioSymbols.symbols.symbol}`);
             const price = await this.symbolsService.getSharePrice(
               portfolioSymbols.symbols.symbol,
             );

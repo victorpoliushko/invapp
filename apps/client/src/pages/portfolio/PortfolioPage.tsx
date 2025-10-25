@@ -106,9 +106,6 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
   useEffect(() => {
   const token = localStorage.getItem("accessToken");
 
-  console.log(`searchTerm: ${searchTerm}`);
-  
-
   if (!searchTerm.trim()) {
     setSuggestions([]);
     return;
@@ -128,9 +125,7 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
 
       if (!response.ok) throw new Error("Failed to fetch symbol suggestions");
       const data = await response.json();
-      console.log(`
-       data: ${JSON.stringify(data)} 
-      `);
+
       setSuggestions(data);
     } catch (err) {
       console.error("Autocomplete error:", err);
