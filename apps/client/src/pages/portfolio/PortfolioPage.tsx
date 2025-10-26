@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 
 type SymbolType = {
-  name: string,
-  symbol: string,
-  exchange: string,
+  name: string;
+  symbol: string;
+  exchange: string;
   type: string;
   price: number;
-}
+};
 
 type PortfolioType = {
   id: string;
@@ -23,23 +23,23 @@ type PortfolioType = {
     price: number;
     avgBuyPrice: number;
     symbols: {
-      id:string;
+      id: string;
       name: string;
       symbol: string;
       exchange: string;
       type: string;
       dataSource: string;
       updatedAt: string;
-    }
-  }>
-}
+    };
+  }>;
+};
 
 export default function PortfolioPage() {
-const params = useParams<{ id: string }>();
-const fetchWithRedirect = useFetchWithRedirect();
+  const params = useParams<{ id: string }>();
+  const fetchWithRedirect = useFetchWithRedirect();
 
-const [searchTerm, setSearchTerm] = useState("");
-const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState({
@@ -47,75 +47,16 @@ const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
     dueDate: "",
     amount: "",
     period: "",
-    price: 0
+    price: 0,
   });
-
-
-  useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-  const fetchPortfolio = async () => {
-    const response = await fetchWithRedirect(
-      `http://localhost:5173/api/portfolios/${params.id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!response.ok)
-      throw new Error(`HTTP error! status: ${response.status}`);
-
-    const portfolio = await response.json();
-    setPortfolio(portfolio); 
-  };
-
-  if (params.id) {
-    fetchPortfolio();
-  }
-}, [params.id]);
-
-const [portfolio, setPortfolio] = useState<PortfolioType>();
-
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-
-    const fetchPrice = async () => {
-      portfolio && portfolio.symbols.forEach(async s => {
-        const response = await fetchWithRedirect(
-          `http://localhost:5173/api/symbols/price?symbol=${s.symbols.symbol}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        s.price = data.price;
-      })
-        
-    };
-    fetchPrice();
-  }, []);
-
-  useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-
-  if (!searchTerm.trim()) {
-    setSuggestions([]);
-    return;
-  }
-
-  const delayDebounceFn = setTimeout(async () => {
-    try {
+    const fetchPortfolio = async () => {
       const response = await fetchWithRedirect(
-        `http://localhost:5173/api/symbols/search?q=${searchTerm}`,
+        `http://localhost:5173/api/portfolios/${params.id}`,
         {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -123,23 +64,87 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
         }
       );
 
-      if (!response.ok) throw new Error("Failed to fetch symbol suggestions");
-      const data = await response.json();
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
 
-      setSuggestions(data);
-    } catch (err) {
-      console.error("Autocomplete error:", err);
+      const portfolio = await response.json();
+      setPortfolio(portfolio);
+    };
+
+    if (params.id) {
+      fetchPortfolio();
     }
-  }, 400);
+  }, [params.id]);
 
-  return () => clearTimeout(delayDebounceFn);
-}, [searchTerm]);
-  
+  const [portfolio, setPortfolio] = useState<PortfolioType>();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    const fetchPrice = async () => {
+      portfolio &&
+        portfolio.symbols.forEach(async (s) => {
+          const response = await fetchWithRedirect(
+            `http://localhost:5173/api/symbols/price?symbol=${s.symbols.symbol}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const data = await response.json();
+          s.price = data.price;
+        });
+    };
+    fetchPrice();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!searchTerm.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const response = await fetchWithRedirect(
+          `http://localhost:5173/api/symbols/search?q=${searchTerm}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch symbol suggestions");
+        const data = await response.json();
+
+        setSuggestions(data);
+      } catch (err) {
+        console.error("Autocomplete error:", err);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewAsset({ ...newAsset, [e.target.name]: e.target.value });
   };
 
   const handleAddAsset = async () => {
+    const { symbol, dueDate, amount, price } = newAsset;
+
+    if (!symbol || !dueDate || !amount || !price) {
+      alert("Please fill in all fields before adding the asset.");
+      return;
+    }
+
     const token = localStorage.getItem("accessToken");
     try {
       const res = await fetchWithRedirect(
@@ -157,16 +162,25 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
       if (!res.ok) throw new Error("Failed to add stock");
 
       alert("Asset added successfully!");
-      setNewAsset({ symbol: "", dueDate: "", amount: "", period: "", price: 0 });
+      setNewAsset({
+        symbol: "",
+        dueDate: "",
+        amount: "",
+        period: "",
+        price: 0,
+      });
     } catch (err) {
       console.error(err);
       alert("Error adding stock");
     }
   };
 
+  console.log(`
+   newAsset: ${JSON.stringify(newAsset)} 
+  `);
+
   return (
     <>
-     
       <section className="assets-section section-container">
         <h1 className="assets-h1">{portfolio?.name}</h1>
         <div className="assets">
@@ -190,16 +204,17 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                 </tr>
               </thead>
               <tbody>
-                {portfolio && portfolio.symbols.map((s) => (
-                  <>
-                    <tr>
-                      <td data-label="symbol">{s.symbols.symbol}</td>
-                      <td data-label="date">{s.symbols.updatedAt}</td>
-                      <td data-label="amount">{s.quantity}</td>
-                      <td data-label="price">{s.price}</td>
-                    </tr>
-                  </>
-                ))}
+                {portfolio &&
+                  portfolio.symbols.map((s) => (
+                    <>
+                      <tr>
+                        <td data-label="symbol">{s.symbols.symbol}</td>
+                        <td data-label="date">{s.symbols.updatedAt}</td>
+                        <td data-label="amount">{s.quantity}</td>
+                        <td data-label="price">{s.price}</td>
+                      </tr>
+                    </>
+                  ))}
                 <tr>
                   <td>
                     <div className="symbol-autocomplete">
@@ -208,6 +223,10 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                         name="symbol"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddAsset();
+                        }}
+                        required
                         placeholder="Symbol"
                         autoComplete="off"
                       />
@@ -236,6 +255,10 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                       name="dueDate"
                       value={newAsset.dueDate}
                       onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
                     />
                   </td>
                   <td>
@@ -244,6 +267,10 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                       name="amount"
                       value={newAsset.amount}
                       onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
                       placeholder="Amount"
                     />
                   </td>
@@ -253,6 +280,10 @@ const [portfolio, setPortfolio] = useState<PortfolioType>();
                       name="price"
                       value={newAsset.price}
                       onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
                       placeholder="Period"
                     />
                   </td>
