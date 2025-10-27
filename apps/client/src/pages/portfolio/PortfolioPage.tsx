@@ -101,7 +101,10 @@ export default function PortfolioPage() {
     fetchPrice();
   }, []);
 
+  const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
+
   useEffect(() => {
+    if (!autocompleteEnabled) return;
     const token = localStorage.getItem("accessToken");
 
     if (!searchTerm.trim()) {
@@ -222,7 +225,10 @@ export default function PortfolioPage() {
                         type="text"
                         name="symbol"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={(e) => {
+    setAutocompleteEnabled(true);
+    setSearchTerm(e.target.value);
+  }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") handleAddAsset();
                         }}
@@ -240,6 +246,7 @@ export default function PortfolioPage() {
                                 setSearchTerm(s.symbol);
                                 setNewAsset({ ...newAsset, symbol: s.symbol });
                                 setSuggestions([]);
+                                setAutocompleteEnabled(false);
                               }}
                             >
                               {s.symbol} — {s.name}
