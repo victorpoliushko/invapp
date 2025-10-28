@@ -226,9 +226,9 @@ export default function PortfolioPage() {
                         name="symbol"
                         value={searchTerm}
                           onChange={(e) => {
-    setAutocompleteEnabled(true);
-    setSearchTerm(e.target.value);
-  }}
+                          setAutocompleteEnabled(true);
+                          setSearchTerm(e.target.value);
+                        }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") handleAddAsset();
                         }}
@@ -332,6 +332,83 @@ export default function PortfolioPage() {
                   <td data-label="Amount">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
+                                <tr>
+                  <td>
+                    <div className="symbol-autocomplete">
+                      <input
+                        type="text"
+                        name="symbol"
+                        value={searchTerm}
+                          onChange={(e) => {
+                          setAutocompleteEnabled(true);
+                          setSearchTerm(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddAsset();
+                        }}
+                        required
+                        placeholder="Symbol"
+                        autoComplete="off"
+                      />
+                      {suggestions.length > 0 && (
+                        <ul className="suggestions-list">
+                          {suggestions.slice(0, 5).map((s) => (
+                            <li
+                              key={s.symbol}
+                              title={s.name}
+                              onClick={() => {
+                                setSearchTerm(s.symbol);
+                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setSuggestions([]);
+                                setAutocompleteEnabled(false);
+                              }}
+                            >
+                              {s.symbol} — {s.name}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={newAsset.dueDate}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={newAsset.amount}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                      placeholder="Amount"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="price"
+                      value={newAsset.price}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                      placeholder="Period"
+                    />
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -369,6 +446,83 @@ export default function PortfolioPage() {
                   <td data-label="Amount">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
+                                <tr>
+                  <td>
+                    <div className="symbol-autocomplete">
+                      <input
+                        type="text"
+                        name="symbol"
+                        value={searchTerm}
+                          onChange={(e) => {
+                          setAutocompleteEnabled(true);
+                          setSearchTerm(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddAsset();
+                        }}
+                        required
+                        placeholder="Symbol"
+                        autoComplete="off"
+                      />
+                      {suggestions.length > 0 && (
+                        <ul className="suggestions-list">
+                          {suggestions.slice(0, 5).map((s) => (
+                            <li
+                              key={s.symbol}
+                              title={s.name}
+                              onClick={() => {
+                                setSearchTerm(s.symbol);
+                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setSuggestions([]);
+                                setAutocompleteEnabled(false);
+                              }}
+                            >
+                              {s.symbol} — {s.name}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={newAsset.dueDate}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={newAsset.amount}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                      placeholder="Amount"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="price"
+                      value={newAsset.price}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                      placeholder="Period"
+                    />
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -405,6 +559,83 @@ export default function PortfolioPage() {
                   <td data-label="Due Date">03/01/2016</td>
                   <td data-label="Amount">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
+                </tr>
+                                <tr>
+                  <td>
+                    <div className="symbol-autocomplete">
+                      <input
+                        type="text"
+                        name="symbol"
+                        value={searchTerm}
+                          onChange={(e) => {
+                          setAutocompleteEnabled(true);
+                          setSearchTerm(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddAsset();
+                        }}
+                        required
+                        placeholder="Symbol"
+                        autoComplete="off"
+                      />
+                      {suggestions.length > 0 && (
+                        <ul className="suggestions-list">
+                          {suggestions.slice(0, 5).map((s) => (
+                            <li
+                              key={s.symbol}
+                              title={s.name}
+                              onClick={() => {
+                                setSearchTerm(s.symbol);
+                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setSuggestions([]);
+                                setAutocompleteEnabled(false);
+                              }}
+                            >
+                              {s.symbol} — {s.name}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={newAsset.dueDate}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={newAsset.amount}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                      placeholder="Amount"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="price"
+                      value={newAsset.price}
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddAsset();
+                      }}
+                      required
+                      placeholder="Period"
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>
