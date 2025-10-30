@@ -39,20 +39,6 @@ model UserSettings {
   userId String @unique
 }
 
-model Symbol {
-  id         String     @id @default(uuid())
-  name       String
-  symbol     String
-  exchange   String
-  // TODO: fix stock type that comes from CSV
-  type       SymbolType
-  // type       String
-  dataSource DataSource
-  updatedAt  DateTime?
-
-  portfolios PortfolioSymbol[]
-}
-
 // TODO: fix stock type that comes from CSV
 enum SymbolType {
   BOND
@@ -70,18 +56,16 @@ enum DataSource {
   ALPHA_VANTAGE
 }
 
-model PortfolioSymbol {
-  portfolioId String
-  symbolId    String
-  
-  quantity    Float
-  price       Float?
-  avgBuyPrice Float?
+model Symbol {
+  id         String      @id @default(uuid())
+  symbol     String      @unique
+  name       String?
+  type       SymbolType?
+  exchange   String?
+  dataSource DataSource?
+  updatedAt  DateTime?   @updatedAt
 
-  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
-  symbols Symbol @relation(fields: [symbolId], references: [id])
-
-  @@id([portfolioId, symbolId])
+  portfolios PortfolioSymbol[]
 }
 
 model Portfolio {
@@ -92,6 +76,20 @@ model Portfolio {
   userId String
 
   symbols PortfolioSymbol[]
+}
+
+model PortfolioSymbol {
+  portfolioId String
+  symbolId    String
+
+  quantity    Float
+  price       Float?
+  avgBuyPrice Float?
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
+  symbols   Symbol    @relation(fields: [symbolId], references: [id])
+
+  @@id([portfolioId, symbolId])
 }
 
 model InvestStrategy {
