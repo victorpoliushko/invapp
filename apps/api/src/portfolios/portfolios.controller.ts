@@ -46,7 +46,6 @@ export class PortfoliosController {
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   getPortfolio(@Param('id') id: string) {
-    console.log('hit getPortfolio')
     return this.portfoliosService.getById(id);
   }
 
@@ -61,6 +60,9 @@ export class PortfoliosController {
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   addSymbols(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
+    console.log(`
+     add symbols controller method 
+    `);
     return this.portfoliosService.addSymbols(id, addSymbolToPortfolioDto);
   }
 

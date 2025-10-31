@@ -150,7 +150,7 @@ export default function PortfolioPage() {
 
     const token = localStorage.getItem("accessToken");
     try {
-      const res = await fetchWithRedirect(
+      const res = await fetch(
         `http://localhost:5173/api/portfolios/${params.id}/symbols`,
         {
           method: "POST",
@@ -161,6 +161,10 @@ export default function PortfolioPage() {
           body: JSON.stringify(newAsset),
         }
       );
+
+      console.log(`
+       res: ${JSON.stringify(res)} 
+      `);
 
       if (!res.ok) throw new Error("Failed to add stock");
 
