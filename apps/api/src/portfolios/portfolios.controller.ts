@@ -24,7 +24,9 @@ import { Currency } from './dto/PortfolioBalance.dto';
 
 @Controller('portfolios')
 export class PortfoliosController {
-  constructor(private portfoliosService: PortfoliosService) {}
+  constructor(private portfoliosService: PortfoliosService) {
+    console.log('portfolios controller'); 
+  }
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
@@ -56,7 +58,7 @@ export class PortfoliosController {
     return this.portfoliosService.getByUserId(userId);
   }
 
-  @Post(':id/symbols')
+  @Post('/:id/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   addSymbols(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
