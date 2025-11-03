@@ -149,9 +149,12 @@ export default function PortfolioPage() {
     }
 
     const token = localStorage.getItem("accessToken");
+    console.log(`
+     before post
+    `);
     try {
       const res = await fetch(
-        `http://localhost:5173/api/portfolios/${params.id}/symbols`,
+        `portfolios/${params.id}/symbols`,
         {
           method: "POST",
           headers: {
