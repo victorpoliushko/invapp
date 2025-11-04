@@ -154,7 +154,7 @@ export default function PortfolioPage() {
     `);
     try {
       const res = await fetch(
-        `portfolios/${params.id}/symbols`,
+        `/api/portfolios/${params.id}/symbols`,
         {
           method: "POST",
           headers: {
@@ -165,11 +165,11 @@ export default function PortfolioPage() {
         }
       );
 
-      console.log(`
-       res: ${JSON.stringify(res)} 
-      `);
-
-      if (!res.ok) throw new Error("Failed to add stock");
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null);
+        console.error("Error response:", errorBody);
+        throw new Error("Failed to add stock");
+      }
 
       alert("Asset added successfully!");
       setNewAsset({

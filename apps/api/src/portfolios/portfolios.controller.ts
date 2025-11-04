@@ -60,7 +60,7 @@ export class PortfoliosController {
 
   @Post('/:id/symbols')
   @UseGuards(AuthGuard('jwt'))
-  @UsePipes(new ValidationPipe())
+  // @UsePipes(new ValidationPipe())
   addSymbols(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
     console.log(`
      add symbols controller method 
