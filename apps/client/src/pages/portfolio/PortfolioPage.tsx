@@ -42,8 +42,14 @@ export default function PortfolioPage() {
   const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
-  const [newAsset, setNewAsset] = useState({
-    symbol: "",
+  const [newAsset, setNewAsset] = useState<{
+  symbols: string[];
+  dueDate: string;
+  amount: string;
+  period: string;
+  price: number;
+}>({
+    symbols: [],
     dueDate: "",
     amount: "",
     period: "",
@@ -141,9 +147,9 @@ export default function PortfolioPage() {
   };
 
   const handleAddAsset = async () => {
-    const { symbol, dueDate, amount, price } = newAsset;
+    const { symbols, dueDate, amount, price } = newAsset;
 
-    if (!symbol || !dueDate || !amount || !price) {
+    if (!symbols || symbols.length === 0 || !dueDate || !amount || !price) {
       alert("Please fill in all fields before adding the asset.");
       return;
     }
@@ -173,7 +179,7 @@ export default function PortfolioPage() {
 
       alert("Asset added successfully!");
       setNewAsset({
-        symbol: "",
+        symbols: [],
         dueDate: "",
         amount: "",
         period: "",
@@ -251,7 +257,7 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
@@ -365,7 +371,7 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
@@ -479,7 +485,7 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
@@ -593,7 +599,7 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbol: s.symbol });
+                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
