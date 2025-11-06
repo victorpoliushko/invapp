@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { DataSource } from '@prisma/client';
-import { SymbolDto } from './dto/Symbol.dto';
+import { CreateSymbolDto, SymbolDto } from './dto/Symbol.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
 
@@ -51,6 +51,12 @@ export class SymbolsService {
 
   async getSymbols(paginationDTO: PaginationDTO): Promise<SymbolDto[]> {
     return await this.prismaService.symbol.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
+  }
+
+  async createSymbols(input: CreateSymbolDto[]): Promise<void> {
+    await this.prismaService.symbol.createMany({
+      data: input
+    });
   }
 
   async fetchAndStoreSymbols() {

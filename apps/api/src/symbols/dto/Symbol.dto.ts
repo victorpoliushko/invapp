@@ -1,11 +1,18 @@
-import { DataSource } from "@prisma/client";
-import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { DataSource, SymbolType } from '@prisma/client';
+import {
+  IsDefined,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class SymbolDto {
   @IsDefined()
   @IsNotEmpty()
-  id: string
-  
+  id: string;
+
   @IsDefined()
   @IsNotEmpty()
   name: string;
@@ -27,4 +34,38 @@ export class SymbolDto {
 
   @IsOptional()
   updatedAt?: Date;
+}
+
+export class CreateSymbolDto {
+  @IsDefined()
+  @IsUUID()
+  @IsNotEmpty()
+  id: string;
+
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  symbol: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
+
+  @IsOptional()
+  @IsEnum(SymbolType)
+  @IsNotEmpty()
+  type?: SymbolType;
+
+  @IsOptional()
+  @IsString()
+  exchange?: string;
+
+  @IsOptional()
+  @IsEnum(DataSource)
+  dataSource?: DataSource;
+
+  @IsOptional()
+  @IsString()
+  updatedAt?: string;
 }

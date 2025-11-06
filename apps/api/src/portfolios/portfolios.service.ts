@@ -72,6 +72,8 @@ export class PortfoliosService {
      input: ${JSON.stringify(input)} 
     `);
 
+    // const symbol = await this.symbolsService.
+
     const portfolioSymbols = input.symbols.map(
       async ({ symbolId, quantity }) => {
         const price = await this.syncSymbolPrice(symbolId);
