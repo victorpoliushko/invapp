@@ -156,7 +156,7 @@ export default function PortfolioPage() {
 
     const token = localStorage.getItem("accessToken");
     console.log(`
-     before post
+     newAsset: ${JSON.stringify(newAsset)} 
     `);
     try {
       const res = await fetch(

@@ -38,11 +38,6 @@ export class SymbolDto {
 
 export class CreateSymbolDto {
   @IsDefined()
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
-
-  @IsDefined()
   @IsString()
   @IsNotEmpty()
   symbol: string;

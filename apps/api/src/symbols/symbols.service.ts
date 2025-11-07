@@ -54,6 +54,9 @@ export class SymbolsService {
   }
 
   async createSymbols(input: CreateSymbolDto[]): Promise<void> {
+    console.log(`
+     create input: ${JSON.stringify(input)} 
+    `);
     await this.prismaService.symbol.createMany({
       data: input
     });

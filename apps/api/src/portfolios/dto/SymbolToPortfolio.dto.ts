@@ -16,3 +16,5 @@ export class SymbolToPortfolioDto {
   @Type(() => SymbolQuantityDto)
   symbols: SymbolQuantityDto[];
 }
+
+// {"symbols":["A"],"dueDate":"2025-11-06","amount":"2","period":"","price":"3"} 
