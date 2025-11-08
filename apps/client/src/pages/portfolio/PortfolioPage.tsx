@@ -3,6 +3,8 @@ import "../../App.css";
 import "./PortfolioPage.css";
 import { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import editIcon from "../../assets/pencil-svgrepo-com.svg";
+import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
 type SymbolType = {
   name: string;
@@ -43,18 +45,20 @@ export default function PortfolioPage() {
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState<{
-  symbols: string[];
-  dueDate: string;
-  amount: string;
-  period: string;
-  price: number;
-}>({
+    symbols: string[];
+    dueDate: string;
+    amount: string;
+    period: string;
+    price: number;
+  }>({
     symbols: [],
     dueDate: "",
     amount: "",
     period: "",
     price: 0,
   });
+
+
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -159,17 +163,14 @@ export default function PortfolioPage() {
      newAsset: ${JSON.stringify(newAsset)} 
     `);
     try {
-      const res = await fetch(
-        `/api/portfolios/${params.id}/symbols`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newAsset),
-        }
-      );
+      const res = await fetch(`/api/portfolios/${params.id}/symbols`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newAsset),
+      });
 
       if (!res.ok) {
         const errorBody = await res.json().catch(() => null);
@@ -199,6 +200,20 @@ export default function PortfolioPage() {
     <>
       <section className="assets-section section-container">
         <h1 className="assets-h1">{portfolio?.name}</h1>
+        <img
+          className="edit-icon"
+          src={editIcon}
+          alt="edit-icon"
+          height={30}
+          width={30}
+        />
+        <img
+          className="delete-icon"
+          src={deleteIcon}
+          alt="delete-icon"
+          height={30}
+          width={30}
+        />
         <div className="assets">
           <input
             type="radio"
@@ -238,7 +253,7 @@ export default function PortfolioPage() {
                         type="text"
                         name="symbol"
                         value={searchTerm}
-                          onChange={(e) => {
+                        onChange={(e) => {
                           setAutocompleteEnabled(true);
                           setSearchTerm(e.target.value);
                         }}
@@ -257,7 +272,10 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
+                                setNewAsset({
+                                  ...newAsset,
+                                  symbols: [s.symbol],
+                                });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
@@ -345,14 +363,14 @@ export default function PortfolioPage() {
                   <td data-label="Amount">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
-                                <tr>
+                <tr>
                   <td>
                     <div className="symbol-autocomplete">
                       <input
                         type="text"
                         name="symbol"
                         value={searchTerm}
-                          onChange={(e) => {
+                        onChange={(e) => {
                           setAutocompleteEnabled(true);
                           setSearchTerm(e.target.value);
                         }}
@@ -371,7 +389,10 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
+                                setNewAsset({
+                                  ...newAsset,
+                                  symbols: [s.symbol],
+                                });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
@@ -459,14 +480,14 @@ export default function PortfolioPage() {
                   <td data-label="Amount">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
-                                <tr>
+                <tr>
                   <td>
                     <div className="symbol-autocomplete">
                       <input
                         type="text"
                         name="symbol"
                         value={searchTerm}
-                          onChange={(e) => {
+                        onChange={(e) => {
                           setAutocompleteEnabled(true);
                           setSearchTerm(e.target.value);
                         }}
@@ -485,7 +506,10 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
+                                setNewAsset({
+                                  ...newAsset,
+                                  symbols: [s.symbol],
+                                });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
@@ -573,14 +597,14 @@ export default function PortfolioPage() {
                   <td data-label="Amount">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
-                                <tr>
+                <tr>
                   <td>
                     <div className="symbol-autocomplete">
                       <input
                         type="text"
                         name="symbol"
                         value={searchTerm}
-                          onChange={(e) => {
+                        onChange={(e) => {
                           setAutocompleteEnabled(true);
                           setSearchTerm(e.target.value);
                         }}
@@ -599,7 +623,10 @@ export default function PortfolioPage() {
                               title={s.name}
                               onClick={() => {
                                 setSearchTerm(s.symbol);
-                                setNewAsset({ ...newAsset, symbols: [s.symbol] });
+                                setNewAsset({
+                                  ...newAsset,
+                                  symbols: [s.symbol],
+                                });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
