@@ -53,11 +53,12 @@ export class SymbolsService {
     return await this.prismaService.symbol.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
   }
 
-  async createSymbols(input: CreateSymbolDto[]): Promise<void> {
+  async createSymbols(input: CreateSymbolDto[]): Promise<Symbol[]> {
     console.log(`
      create input: ${JSON.stringify(input)} 
     `);
-    await this.prismaService.symbol.createMany({
+    return await this.prismaService.symbol.createManyAndReturn({
+      select: { id: true },
       data: input
     });
   }

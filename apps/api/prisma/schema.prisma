@@ -84,7 +84,6 @@ model PortfolioSymbol {
 
   quantity    Float
   price       Float?
-  avgBuyPrice Float?
 
   portfolio Portfolio @relation(fields: [portfolioId], references: [id])
   symbols   Symbol    @relation(fields: [symbolId], references: [id])

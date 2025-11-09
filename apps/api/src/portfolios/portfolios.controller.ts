@@ -59,8 +59,8 @@ export class PortfoliosController {
   @Post('/:id/symbols')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addSymbols(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
-    return this.portfoliosService.addSymbols(id, addSymbolToPortfolioDto);
+  addSymbol(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
+    return this.portfoliosService.addSymbol(id, addSymbolToPortfolioDto);
   }
 
   @Patch(':id/symbols')

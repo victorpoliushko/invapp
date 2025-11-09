@@ -45,20 +45,18 @@ export default function PortfolioPage() {
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState<{
-    symbols: string[];
+    symbolName: string;
     dueDate: string;
-    amount: string;
+    quantity: string;
     period: string;
     price: number;
   }>({
-    symbols: [],
+    symbolName: "",
     dueDate: "",
-    amount: "",
+    quantity: "",
     period: "",
     price: 0,
   });
-
-
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -151,9 +149,9 @@ export default function PortfolioPage() {
   };
 
   const handleAddAsset = async () => {
-    const { symbols, dueDate, amount, price } = newAsset;
+    const { symbolName, dueDate, quantity, price } = newAsset;
 
-    if (!symbols || symbols.length === 0 || !dueDate || !amount || !price) {
+    if (!symbolName || !dueDate || !quantity || !price) {
       alert("Please fill in all fields before adding the asset.");
       return;
     }
@@ -180,9 +178,9 @@ export default function PortfolioPage() {
 
       alert("Asset added successfully!");
       setNewAsset({
-        symbols: [],
+        symbolName: "",
         dueDate: "",
-        amount: "",
+        quantity: "",
         period: "",
         price: 0,
       });
@@ -230,7 +228,7 @@ export default function PortfolioPage() {
                 <tr>
                   <th scope="col">Symbol</th>
                   <th scope="col">Date</th>
-                  <th scope="col">Amount</th>
+                  <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
                 </tr>
               </thead>
@@ -241,7 +239,7 @@ export default function PortfolioPage() {
                       <tr>
                         <td data-label="symbol">{s.symbols.symbol}</td>
                         <td data-label="date">{s.symbols.updatedAt}</td>
-                        <td data-label="amount">{s.quantity}</td>
+                        <td data-label="quantity">{s.quantity}</td>
                         <td data-label="price">{s.price}</td>
                       </tr>
                     </>
@@ -274,7 +272,7 @@ export default function PortfolioPage() {
                                 setSearchTerm(s.symbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbols: [s.symbol],
+                                  symbolName: s.symbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
@@ -302,14 +300,14 @@ export default function PortfolioPage() {
                   <td>
                     <input
                       type="number"
-                      name="amount"
-                      value={newAsset.amount}
+                      name="quantity"
+                      value={newAsset.quantity}
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleAddAsset();
                       }}
                       required
-                      placeholder="Amount"
+                      placeholder="Quantity"
                     />
                   </td>
                   <td>
@@ -344,7 +342,7 @@ export default function PortfolioPage() {
                 <tr>
                   <th scope="col">Account</th>
                   <th scope="col">Due Date</th>
-                  <th scope="col">Amount</th>
+                  <th scope="col">Quantity</th>
                   <th scope="col">Period</th>
                 </tr>
               </thead>
@@ -352,7 +350,7 @@ export default function PortfolioPage() {
                 <tr>
                   <td data-label="Account">Bond - 3412</td>
                   <td data-label="Due Date">04/01/2016</td>
-                  <td data-label="Amount">$1,190</td>
+                  <td data-label="Quantity">$1,190</td>
                   <td data-label="Period">03/01/2016 - 03/31/2016</td>
                 </tr>
                 <tr>
@@ -360,7 +358,7 @@ export default function PortfolioPage() {
                     Bond - 6076
                   </td>
                   <td data-label="Due Date">03/01/2016</td>
-                  <td data-label="Amount">$2,443</td>
+                  <td data-label="Quantity">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
                 <tr>
@@ -391,7 +389,7 @@ export default function PortfolioPage() {
                                 setSearchTerm(s.symbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbols: [s.symbol],
+                                  symbolName: s.symbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
@@ -419,14 +417,14 @@ export default function PortfolioPage() {
                   <td>
                     <input
                       type="number"
-                      name="amount"
-                      value={newAsset.amount}
+                      name="quantity"
+                      value={newAsset.quantity}
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleAddAsset();
                       }}
                       required
-                      placeholder="Amount"
+                      placeholder="Quantity"
                     />
                   </td>
                   <td>
@@ -461,7 +459,7 @@ export default function PortfolioPage() {
                 <tr>
                   <th scope="col">Account</th>
                   <th scope="col">Due Date</th>
-                  <th scope="col">Amount</th>
+                  <th scope="col">Quantity</th>
                   <th scope="col">Period</th>
                 </tr>
               </thead>
@@ -469,7 +467,7 @@ export default function PortfolioPage() {
                 <tr>
                   <td data-label="Account">Real estate - 3412</td>
                   <td data-label="Due Date">04/01/2016</td>
-                  <td data-label="Amount">$1,190</td>
+                  <td data-label="Quantity">$1,190</td>
                   <td data-label="Period">03/01/2016 - 03/31/2016</td>
                 </tr>
                 <tr>
@@ -477,7 +475,7 @@ export default function PortfolioPage() {
                     Real estate - 6076
                   </td>
                   <td data-label="Due Date">03/01/2016</td>
-                  <td data-label="Amount">$2,443</td>
+                  <td data-label="Quantity">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
                 <tr>
@@ -508,7 +506,7 @@ export default function PortfolioPage() {
                                 setSearchTerm(s.symbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbols: [s.symbol],
+                                  symbolName: s.symbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
@@ -536,14 +534,14 @@ export default function PortfolioPage() {
                   <td>
                     <input
                       type="number"
-                      name="amount"
-                      value={newAsset.amount}
+                      name="quantity"
+                      value={newAsset.quantity}
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleAddAsset();
                       }}
                       required
-                      placeholder="Amount"
+                      placeholder="Quantity"
                     />
                   </td>
                   <td>
@@ -578,7 +576,7 @@ export default function PortfolioPage() {
                 <tr>
                   <th scope="col">Account</th>
                   <th scope="col">Due Date</th>
-                  <th scope="col">Amount</th>
+                  <th scope="col">Quantity</th>
                   <th scope="col">Period</th>
                 </tr>
               </thead>
@@ -586,7 +584,7 @@ export default function PortfolioPage() {
                 <tr>
                   <td data-label="Account">Crypto - 3412</td>
                   <td data-label="Due Date">04/01/2016</td>
-                  <td data-label="Amount">$1,190</td>
+                  <td data-label="Quantity">$1,190</td>
                   <td data-label="Period">03/01/2016 - 03/31/2016</td>
                 </tr>
                 <tr>
@@ -594,7 +592,7 @@ export default function PortfolioPage() {
                     Crypto - 6076
                   </td>
                   <td data-label="Due Date">03/01/2016</td>
-                  <td data-label="Amount">$2,443</td>
+                  <td data-label="Quantity">$2,443</td>
                   <td data-label="Period">02/01/2016 - 02/29/2016</td>
                 </tr>
                 <tr>
@@ -625,7 +623,7 @@ export default function PortfolioPage() {
                                 setSearchTerm(s.symbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbols: [s.symbol],
+                                  symbolName: s.symbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
@@ -653,14 +651,14 @@ export default function PortfolioPage() {
                   <td>
                     <input
                       type="number"
-                      name="amount"
-                      value={newAsset.amount}
+                      name="quantity"
+                      value={newAsset.quantity}
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleAddAsset();
                       }}
                       required
-                      placeholder="Amount"
+                      placeholder="Quantity"
                     />
                   </td>
                   <td>

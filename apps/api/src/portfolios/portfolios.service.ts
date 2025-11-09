@@ -15,6 +15,14 @@ interface SymbolsWithPrices {
   currency: Currency;
   quantity: number;
 }
+
+interface AddSymbolInput {
+  symbolName: string;
+  dueDate: string;
+  quantity: number;
+  price: number;
+}
+
 @Injectable()
 export class PortfoliosService {
   constructor(
@@ -54,10 +62,19 @@ export class PortfoliosService {
     return await this.symbolsService.getSharePrice(exsitingSymbol.symbol);
   }
 
-  async addSymbols(
+  async addSymbol(
     id: string,
-    input: SymbolToPortfolioDto,
+    // input: SymbolToPortfolioDto,
+    input: AddSymbolInput
   ): Promise<PortfolioDto> {
+
+    /*  
+     *  1. find existing portfolio
+     *  2. find existing symbols
+     *    - if no existing, add to the symbols table
+     *  3. add symbol to the PortfolioSymbol
+     */
+
     const exsitingPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({ where: { id } });
 
@@ -72,7 +89,17 @@ export class PortfoliosService {
      input: ${JSON.stringify(input)} 
     `);
 
-    // const symbol = await this.symbolsService.
+    let symbol = await this.symbolsService.findSymbol(input.symbolName);
+    // if (!symbol) {
+    //   throw new HttpException(
+    //     getReasonPhrase(StatusCodes.NOT_FOUND),
+    //     StatusCodes.NOT_FOUND,
+    //   );
+    // }
+
+    if (!symbol) {
+      symbol = await this.symbolsService.createSymbols([{ symbol: input.symbolName, updatedAt: Date.now().toLocaleString() }]);
+    }
 
     const portfolioSymbols = input.symbols.map(
       async ({ symbolId, quantity }) => {
