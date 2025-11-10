@@ -3,33 +3,33 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
-import { DataSource } from '@prisma/client';
-import { CreateSymbolDto, SymbolDto } from './dto/Symbol.dto';
+import { Asset, DataSource } from '@prisma/client';
+import { CreateAssetDto, AssetDto } from './dto/Asset.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
 
 @Injectable()
-export class SymbolsService {
+export class AssetsService {
   constructor(
     private configService: ConfigService,
     private httpService: HttpService,
     private prismaService: PrismaService
   ) {}
 
-  async getSharePrice(symbol: string): Promise<number> {
+  async getSharePrice(asset: string): Promise<number> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
       
-      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol.trim().toUpperCase()}&apikey=${apikey}`;
+      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;
       const matchingResponse = await lastValueFrom(this.httpService.get(matchingUrl));
 
       const matches = matchingResponse.data?.bestMatches || [];
 
-      if (matches.length <= 0 || !matches.some(match => match["1. symbol"].trim().toUpperCase() === symbol.trim().toUpperCase())) {
+      if (matches.length <= 0 || !matches.some(match => match["1. asset"].trim().toUpperCase() === asset.trim().toUpperCase())) {
         throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
       }
 
-      const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=${apikey}`;
+      const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&asset=${asset}&interval=5min&apikey=${apikey}`;
 
       const response = await lastValueFrom(this.httpService.get(pricingUrl));
       const timeSeries = response.data['Time Series (5min)'];
@@ -49,21 +49,20 @@ export class SymbolsService {
     }
   }
 
-  async getSymbols(paginationDTO: PaginationDTO): Promise<SymbolDto[]> {
-    return await this.prismaService.symbol.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
+  async getAssets(paginationDTO: PaginationDTO): Promise<AssetDto[]> {
+    return await this.prismaService.asset.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
   }
 
-  async createSymbols(input: CreateSymbolDto[]): Promise<Symbol[]> {
+  async createAssets(input: CreateAssetDto[]): Promise<Asset[]> {
     console.log(`
      create input: ${JSON.stringify(input)} 
     `);
-    return await this.prismaService.symbol.createManyAndReturn({
-      select: { id: true },
+    return await this.prismaService.asset.createManyAndReturn({
       data: input
     });
   }
 
-  async fetchAndStoreSymbols() {
+  async fetchAndStoreAssets() {
     try {
       const func = 'LISTING_STATUS';
       const apikey = this.configService.get<string>('API_KEY');
@@ -72,42 +71,42 @@ export class SymbolsService {
 
       const data = response.data.split('\n').slice(1);
       const alphavantageData = data.map(line => {
-        const [symbol, name, exchange, type] = line.split(',');
-        return { symbol, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE };
+        const [asset, name, exchange, type] = line.split(',');
+        return { asset, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE };
       });
 
       alphavantageData.pop();
 
-      await this.prismaService.symbol.createMany({
+      await this.prismaService.asset.createMany({
         data: alphavantageData,
         skipDuplicates: true
       });
 
-      console.log(`Fetched and stored ${alphavantageData.length} symbols.`);
+      console.log(`Fetched and stored ${alphavantageData.length} assets.`);
     } catch (error) {
-      console.error('Error fetching symbols', error);
+      console.error('Error fetching assets', error);
     } finally {
       await this.prismaService.$disconnect();
     }
   }
 
-  async findSymbol(symbol: string): Promise<Symbol[]> {
+  async findAsset(asset: string): Promise<Asset[]> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
-      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol.trim().toUpperCase()}&apikey=${apikey}`;
+      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;
 
       const response = await lastValueFrom(this.httpService.get(matchingUrl));
       const matches = response.data?.bestMatches || [];
 
       return matches.map((m) => ({
-        symbol: m['1. symbol'],
+        asset: m['1. asset'],
         name: m['2. name'],
         region: m['4. region'],
         currency: m['8. currency'],
       }));
     } catch (error) {
       console.log(error)
-      console.error('Error in find symbols:', error.response?.data);
+      console.error('Error in find assets:', error.response?.data);
       throw new HttpException(getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR), StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }

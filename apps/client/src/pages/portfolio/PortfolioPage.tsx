@@ -6,9 +6,9 @@ import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
-type SymbolType = {
+type AssetType = {
   name: string;
-  symbol: string;
+  asset: string;
   exchange: string;
   type: string;
   price: number;
@@ -18,16 +18,16 @@ type PortfolioType = {
   id: string;
   name: string;
   userId: string;
-  symbols: Array<{
+  assets: Array<{
     portfolioId: string;
-    symbolId: string;
+    assetId: string;
     quantity: number;
     price: number;
     avgBuyPrice: number;
-    symbols: {
+    assets: {
       id: string;
       name: string;
-      symbol: string;
+      asset: string;
       exchange: string;
       type: string;
       dataSource: string;
@@ -41,17 +41,17 @@ export default function PortfolioPage() {
   const fetchWithRedirect = useFetchWithRedirect();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useState<SymbolType[]>([]);
+  const [suggestions, setSuggestions] = useState<AssetType[]>([]);
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState<{
-    symbolName: string;
+    assetName: string;
     dueDate: string;
     quantity: string;
     period: string;
     price: number;
   }>({
-    symbolName: "",
+    assetName: "",
     dueDate: "",
     quantity: "",
     period: "",
@@ -91,9 +91,9 @@ export default function PortfolioPage() {
 
     const fetchPrice = async () => {
       portfolio &&
-        portfolio.symbols.forEach(async (s) => {
+        portfolio.assets.forEach(async (s) => {
           const response = await fetchWithRedirect(
-            `http://localhost:5173/api/symbols/price?symbol=${s.symbols.symbol}`,
+            `http://localhost:5173/api/assets/price?asset=${s.assets.asset}`,
             {
               method: "GET",
               headers: {
@@ -123,7 +123,7 @@ export default function PortfolioPage() {
     const delayDebounceFn = setTimeout(async () => {
       try {
         const response = await fetchWithRedirect(
-          `http://localhost:5173/api/symbols/search?q=${searchTerm}`,
+          `http://localhost:5173/api/assets/search?q=${searchTerm}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -132,7 +132,7 @@ export default function PortfolioPage() {
           }
         );
 
-        if (!response.ok) throw new Error("Failed to fetch symbol suggestions");
+        if (!response.ok) throw new Error("Failed to fetch asset suggestions");
         const data = await response.json();
 
         setSuggestions(data);
@@ -149,9 +149,9 @@ export default function PortfolioPage() {
   };
 
   const handleAddAsset = async () => {
-    const { symbolName, dueDate, quantity, price } = newAsset;
+    const { assetName, dueDate, quantity, price } = newAsset;
 
-    if (!symbolName || !dueDate || !quantity || !price) {
+    if (!assetName || !dueDate || !quantity || !price) {
       alert("Please fill in all fields before adding the asset.");
       return;
     }
@@ -161,7 +161,7 @@ export default function PortfolioPage() {
      newAsset: ${JSON.stringify(newAsset)} 
     `);
     try {
-      const res = await fetch(`/api/portfolios/${params.id}/symbols`, {
+      const res = await fetch(`/api/portfolios/${params.id}/assets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -178,7 +178,7 @@ export default function PortfolioPage() {
 
       alert("Asset added successfully!");
       setNewAsset({
-        symbolName: "",
+        assetName: "",
         dueDate: "",
         quantity: "",
         period: "",
@@ -226,7 +226,7 @@ export default function PortfolioPage() {
             <table className="assets-table">
               <thead>
                 <tr>
-                  <th scope="col">Symbol</th>
+                  <th scope="col">Asset</th>
                   <th scope="col">Date</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
@@ -234,11 +234,11 @@ export default function PortfolioPage() {
               </thead>
               <tbody>
                 {portfolio &&
-                  portfolio.symbols.map((s) => (
+                  portfolio.assets.map((s) => (
                     <>
                       <tr>
-                        <td data-label="symbol">{s.symbols.symbol}</td>
-                        <td data-label="date">{s.symbols.updatedAt}</td>
+                        <td data-label="asset">{s.assets.asset}</td>
+                        <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantity">{s.quantity}</td>
                         <td data-label="price">{s.price}</td>
                       </tr>
@@ -246,10 +246,10 @@ export default function PortfolioPage() {
                   ))}
                 <tr>
                   <td>
-                    <div className="symbol-autocomplete">
+                    <div className="asset-autocomplete">
                       <input
                         type="text"
-                        name="symbol"
+                        name="asset"
                         value={searchTerm}
                         onChange={(e) => {
                           setAutocompleteEnabled(true);
@@ -259,26 +259,26 @@ export default function PortfolioPage() {
                           if (e.key === "Enter") handleAddAsset();
                         }}
                         required
-                        placeholder="Symbol"
+                        placeholder="Asset"
                         autoComplete="off"
                       />
                       {suggestions.length > 0 && (
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.symbol}
+                              key={s.asset}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.symbol);
+                                setSearchTerm(s.asset);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbolName: s.symbol,
+                                  assetName: s.asset,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.symbol} — {s.name}
+                              {s.asset} — {s.name}
                             </li>
                           ))}
                         </ul>
@@ -363,10 +363,10 @@ export default function PortfolioPage() {
                 </tr>
                 <tr>
                   <td>
-                    <div className="symbol-autocomplete">
+                    <div className="asset-autocomplete">
                       <input
                         type="text"
-                        name="symbol"
+                        name="asset"
                         value={searchTerm}
                         onChange={(e) => {
                           setAutocompleteEnabled(true);
@@ -376,26 +376,26 @@ export default function PortfolioPage() {
                           if (e.key === "Enter") handleAddAsset();
                         }}
                         required
-                        placeholder="Symbol"
+                        placeholder="Asset"
                         autoComplete="off"
                       />
                       {suggestions.length > 0 && (
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.symbol}
+                              key={s.asset}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.symbol);
+                                setSearchTerm(s.asset);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbolName: s.symbol,
+                                  assetName: s.asset,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.symbol} — {s.name}
+                              {s.asset} — {s.name}
                             </li>
                           ))}
                         </ul>
@@ -480,10 +480,10 @@ export default function PortfolioPage() {
                 </tr>
                 <tr>
                   <td>
-                    <div className="symbol-autocomplete">
+                    <div className="asset-autocomplete">
                       <input
                         type="text"
-                        name="symbol"
+                        name="asset"
                         value={searchTerm}
                         onChange={(e) => {
                           setAutocompleteEnabled(true);
@@ -493,26 +493,26 @@ export default function PortfolioPage() {
                           if (e.key === "Enter") handleAddAsset();
                         }}
                         required
-                        placeholder="Symbol"
+                        placeholder="Asset"
                         autoComplete="off"
                       />
                       {suggestions.length > 0 && (
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.symbol}
+                              key={s.asset}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.symbol);
+                                setSearchTerm(s.asset);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbolName: s.symbol,
+                                  assetName: s.asset,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.symbol} — {s.name}
+                              {s.asset} — {s.name}
                             </li>
                           ))}
                         </ul>
@@ -597,10 +597,10 @@ export default function PortfolioPage() {
                 </tr>
                 <tr>
                   <td>
-                    <div className="symbol-autocomplete">
+                    <div className="asset-autocomplete">
                       <input
                         type="text"
-                        name="symbol"
+                        name="asset"
                         value={searchTerm}
                         onChange={(e) => {
                           setAutocompleteEnabled(true);
@@ -610,26 +610,26 @@ export default function PortfolioPage() {
                           if (e.key === "Enter") handleAddAsset();
                         }}
                         required
-                        placeholder="Symbol"
+                        placeholder="Asset"
                         autoComplete="off"
                       />
                       {suggestions.length > 0 && (
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.symbol}
+                              key={s.asset}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.symbol);
+                                setSearchTerm(s.asset);
                                 setNewAsset({
                                   ...newAsset,
-                                  symbolName: s.symbol,
+                                  assetName: s.asset,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.symbol} — {s.name}
+                              {s.asset} — {s.name}
                             </li>
                           ))}
                         </ul>

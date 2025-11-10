@@ -3,21 +3,21 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
 import { HttpException, Injectable } from '@nestjs/common';
-import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
+import { AssetToPortfolioDto } from './dto/AssetToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
-import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
+import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
-import { SymbolsService } from '../symbols/symbols.service';
+import { AssetsService } from '../assets/assets.service';
 
-interface SymbolsWithPrices {
-  symbol: string;
+interface AssetsWithPrices {
+  asset: string;
   price: number;
   currency: Currency;
   quantity: number;
 }
 
-interface AddSymbolInput {
-  symbolName: string;
+interface AddAssetInput {
+  assetName: string;
   dueDate: string;
   quantity: number;
   price: number;
@@ -27,7 +27,7 @@ interface AddSymbolInput {
 export class PortfoliosService {
   constructor(
     private prismaService: PrismaService,
-    private symbolsService: SymbolsService,
+    private assetsService: AssetsService,
   ) {}
 
   async create(input: CreatePortfolioDto): Promise<PortfolioDto> {
@@ -41,7 +41,7 @@ export class PortfoliosService {
   async getById(id: string): Promise<PortfolioDto> {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
-      include: { symbols: { include: { symbols: true } } },
+      include: { assets: { include: { assets: true } } },
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
@@ -49,30 +49,30 @@ export class PortfoliosService {
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
-      include: { symbols: { include: { symbols: true } } },
+      include: { assets: { include: { assets: true } } },
     });
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
-  async syncSymbolPrice(symbolId: string) {
-    const exsitingSymbol = await this.prismaService.symbol.findUnique({
-      where: { id: symbolId },
+  async syncAssetPrice(assetId: string) {
+    const exsitingAsset = await this.prismaService.asset.findUnique({
+      where: { id: assetId },
     });
 
-    return await this.symbolsService.getSharePrice(exsitingSymbol.symbol);
+    return await this.assetsService.getSharePrice(exsitingAsset.asset);
   }
 
-  async addSymbol(
+  async addAsset(
     id: string,
-    // input: SymbolToPortfolioDto,
-    input: AddSymbolInput
+    // input: AssetToPortfolioDto,
+    input: AddAssetInput
   ): Promise<PortfolioDto> {
 
     /*  
      *  1. find existing portfolio
-     *  2. find existing symbols
-     *    - if no existing, add to the symbols table
-     *  3. add symbol to the PortfolioSymbol
+     *  2. find existing assets
+     *    - if no existing, add to the assets table
+     *  3. add asset to the PortfolioAsset
      */
 
     const exsitingPortfolio =
@@ -89,51 +89,51 @@ export class PortfoliosService {
      input: ${JSON.stringify(input)} 
     `);
 
-    let symbol = await this.symbolsService.findSymbol(input.symbolName);
-    // if (!symbol) {
+    let asset = await this.assetsService.findAsset(input.assetName);
+    // if (!asset) {
     //   throw new HttpException(
     //     getReasonPhrase(StatusCodes.NOT_FOUND),
     //     StatusCodes.NOT_FOUND,
     //   );
     // }
 
-    if (!symbol) {
-      symbol = await this.symbolsService.createSymbols([{ symbol: input.symbolName, updatedAt: Date.now().toLocaleString() }]);
+    if (!asset) {
+      asset = await this.assetsService.createAssets([{ asset: input.assetName, updatedAt: Date.now().toLocaleString() }]);
     }
 
-    const portfolioSymbols = input.symbols.map(
-      async ({ symbolId, quantity }) => {
-        const price = await this.syncSymbolPrice(symbolId);
+    const portfolioAssets = input.assets.map(
+      async ({ assetId, quantity }) => {
+        const price = await this.syncAssetPrice(assetId);
         
-        return this.prismaService.portfolioSymbol.upsert({
-          where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
+        return this.prismaService.portfolioAsset.upsert({
+          where: { portfolioId_assetId: { portfolioId: id, assetId } },
           update: { quantity, price },
-          create: { portfolioId: id, symbolId: symbolId, quantity, price },
+          create: { portfolioId: id, assetId: assetId, quantity, price },
         });
       },
     );
 
-    await Promise.all(portfolioSymbols);
+    await Promise.all(portfolioAssets);
 
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { symbols: true },
+        include: { assets: true },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async updateSymbols(
+  async updateAssets(
     id: string,
-    input: SymbolToPortfolioDto,
+    input: AssetToPortfolioDto,
   ): Promise<PortfolioDto> {
-    const updates = input.symbols.map(({ symbolId, quantity }) =>
-      this.prismaService.portfolioSymbol.update({
-        where: { portfolioId_symbolId: { portfolioId: id, symbolId } },
+    const updates = input.assets.map(({ assetId, quantity }) =>
+      this.prismaService.portfolioAsset.update({
+        where: { portfolioId_assetId: { portfolioId: id, assetId } },
         data: {
           portfolioId: id,
-          symbolId,
+          assetId,
           quantity,
         },
       }),
@@ -144,24 +144,24 @@ export class PortfoliosService {
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { symbols: true },
+        include: { assets: true },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async deleteSymbols(
+  async deleteAssets(
     id: string,
-    input: DeleteSymbolsFromPortfolioDto,
+    input: DeleteAssetsFromPortfolioDto,
   ): Promise<PortfolioDto> {
-    await this.prismaService.portfolioSymbol.deleteMany({
-      where: { portfolioId: id, symbolId: { in: input.symbolIds } },
+    await this.prismaService.portfolioAsset.deleteMany({
+      where: { portfolioId: id, assetId: { in: input.assetIds } },
     });
 
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { symbols: true },
+        include: { assets: true },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
@@ -171,41 +171,41 @@ export class PortfoliosService {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { id },
       include: {
-        symbols: {
+        assets: {
           include: {
-            symbols: true,
+            assets: true,
           },
         },
       },
     });
 
-    const portfoliosWithSymbolsPrice = await Promise.all(
+    const portfoliosWithAssetsPrice = await Promise.all(
       portfolios.map(async (portfolio) => {
-        const symbolsWithPrices = await Promise.all(
-          portfolio.symbols.map(async (portfolioSymbols) => {
-            const price = await this.symbolsService.getSharePrice(
-              portfolioSymbols.symbols.symbol,
+        const assetsWithPrices = await Promise.all(
+          portfolio.assets.map(async (portfolioAssets) => {
+            const price = await this.assetsService.getSharePrice(
+              portfolioAssets.assets.asset,
             );
             return {
-              symbol: portfolioSymbols.symbols.symbol,
+              asset: portfolioAssets.assets.asset,
               price,
               currency,
-              quantity: portfolioSymbols.quantity,
+              quantity: portfolioAssets.quantity,
             };
           }),
         );
         return {
           ...portfolios,
-          symbols: symbolsWithPrices,
-          totalPrice: this.calculateSymbolsTotalPrice(symbolsWithPrices),
+          assets: assetsWithPrices,
+          totalPrice: this.calculateAssetsTotalPrice(assetsWithPrices),
         };
       }),
     );
 
-    return portfoliosWithSymbolsPrice;
+    return portfoliosWithAssetsPrice;
   }
 
-  calculateSymbolsTotalPrice(symbols: SymbolsWithPrices[]) {
-    return symbols.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
+  calculateAssetsTotalPrice(assets: AssetsWithPrices[]) {
+    return assets.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   }
 }

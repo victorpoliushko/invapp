@@ -1,13 +1,13 @@
 import { IsDefined, IsNumber, IsOptional, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { SymbolDto } from "../../symbols/dto/Symbol.dto";
+import { AssetDto } from "../../assets/dto/Asset.dto";
 
-export class PortfolioSymbolDto {
+export class PortfolioAssetDto {
   @IsDefined()
   portfolioId: string;
 
   @IsDefined()
-  symbolId: string;
+  assetId: string;
 
   @IsNumber()
   quantity: number;
@@ -21,6 +21,6 @@ export class PortfolioSymbolDto {
   avgBuyPrice?: number;
 
   @ValidateNested()
-  @Type(() => SymbolDto)
-  symbols: SymbolDto;
+  @Type(() => AssetDto)
+  assets: AssetDto;
 }

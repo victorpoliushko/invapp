@@ -18,8 +18,8 @@ import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
-import { SymbolToPortfolioDto } from './dto/SymbolToPortfolio.dto';
-import { DeleteSymbolsFromPortfolioDto } from './dto/DeleteSymbolsFromPortfolio.dto';
+import { AssetToPortfolioDto } from './dto/AssetToPortfolio.dto';
+import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
 
 @Controller('portfolios')
@@ -56,25 +56,25 @@ export class PortfoliosController {
     return this.portfoliosService.getByUserId(userId);
   }
 
-  @Post('/:id/symbols')
+  @Post('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addSymbol(@Param('id') id: string, @Body() addSymbolToPortfolioDto: SymbolToPortfolioDto) {
-    return this.portfoliosService.addSymbol(id, addSymbolToPortfolioDto);
+  addAsset(@Param('id') id: string, @Body() addAssetToPortfolioDto: AssetToPortfolioDto) {
+    return this.portfoliosService.addAsset(id, addAssetToPortfolioDto);
   }
 
-  @Patch(':id/symbols')
+  @Patch(':id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  updateSymbols(@Param('id') id: string, @Body() updateSymbolsToPortfolioDto: SymbolToPortfolioDto) {
-    return this.portfoliosService.updateSymbols(id, updateSymbolsToPortfolioDto);
+  updateAssets(@Param('id') id: string, @Body() updateAssetsToPortfolioDto: AssetToPortfolioDto) {
+    return this.portfoliosService.updateAssets(id, updateAssetsToPortfolioDto);
   }
 
-  @Delete(':id/symbols')
+  @Delete(':id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  deleteSymbols(@Param('id') id: string, @Body() deleteSymbolsDto: DeleteSymbolsFromPortfolioDto) {
-    return this.portfoliosService.deleteSymbols(id, deleteSymbolsDto);
+  deleteAssets(@Param('id') id: string, @Body() deleteAssetsDto: DeleteAssetsFromPortfolioDto) {
+    return this.portfoliosService.deleteAssets(id, deleteAssetsDto);
   }
 
   @Get(':id/balance')

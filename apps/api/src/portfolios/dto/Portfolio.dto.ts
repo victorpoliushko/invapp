@@ -1,7 +1,7 @@
 import { IsArray, IsDefined, IsNotEmpty, ValidateNested } from "class-validator";
 import { UserDto } from "../../users/dto/User.dto";
 import { Type } from "class-transformer";
-import { PortfolioSymbolDto } from "./PortfolioSymbol.dto";
+import { PortfolioAssetDto } from "./PortfolioAsset.dto";
 
 export class PortfolioDto {
   @IsDefined()
@@ -19,6 +19,6 @@ export class PortfolioDto {
 
   @IsArray()
   @ValidateNested({each: true})
-  @Type(() => PortfolioSymbolDto)
-  symbols: PortfolioSymbolDto[];
+  @Type(() => PortfolioAssetDto)
+  assets: PortfolioAssetDto[];
 }

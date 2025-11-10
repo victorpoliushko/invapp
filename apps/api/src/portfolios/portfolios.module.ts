@@ -1,13 +1,11 @@
 import { Module } from "@nestjs/common";
 import { PortfoliosController } from "./portfolios.controller";
 import { PortfoliosService } from "./portfolios.service";
-import { UsersService } from "../users/users.service";
-import { SymbolsService } from "../symbols/symbols.service";
-import { SymbolsModule } from "../symbols/symbols.module";
+import { AssetsModule } from "../assets/assets.module";
 import { PrismaModule } from "../prisma/prisma.module";
 
 @Module({
-  imports: [SymbolsModule, PrismaModule],
+  imports: [AssetsModule, PrismaModule],
   controllers: [PortfoliosController],
   providers: [PortfoliosService]
 })

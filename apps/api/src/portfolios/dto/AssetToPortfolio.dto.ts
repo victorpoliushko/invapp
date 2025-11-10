@@ -1,20 +1,20 @@
 import { Type } from "class-transformer";
 import { IsArray, IsInt, IsUUID, Min, ValidateNested } from "class-validator";
 
-class SymbolQuantityDto {
+class AssetQuantityDto {
   @IsUUID()
-  symbolId: string;
+  assetId: string;
 
   @IsInt()
   @Min(1)
   quantity: number;
 }
 
-export class SymbolToPortfolioDto {
+export class AssetToPortfolioDto {
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => SymbolQuantityDto)
-  symbol: SymbolQuantityDto;
+  @Type(() => AssetQuantityDto)
+  asset: AssetQuantityDto;
 }
 
-// {"symbols":["A"],"dueDate":"2025-11-06","amount":"2","period":"","price":"3"} 
+// {"assets":["A"],"dueDate":"2025-11-06","amount":"2","period":"","price":"3"} 

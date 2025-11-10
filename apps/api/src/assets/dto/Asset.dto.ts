@@ -1,4 +1,4 @@
-import { DataSource, SymbolType } from '@prisma/client';
+import { DataSource, AssetType } from '@prisma/client';
 import {
   IsDefined,
   IsEnum,
@@ -8,7 +8,7 @@ import {
   IsUUID,
 } from 'class-validator';
 
-export class SymbolDto {
+export class AssetDto {
   @IsDefined()
   @IsNotEmpty()
   id: string;
@@ -19,7 +19,7 @@ export class SymbolDto {
 
   @IsString()
   @IsNotEmpty()
-  symbol: string;
+  asset: string;
 
   @IsString()
   @IsNotEmpty()
@@ -36,11 +36,11 @@ export class SymbolDto {
   updatedAt?: Date;
 }
 
-export class CreateSymbolDto {
+export class CreateAssetDto {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  symbol: string;
+  asset: string;
 
   @IsOptional()
   @IsString()
@@ -48,9 +48,9 @@ export class CreateSymbolDto {
   name?: string;
 
   @IsOptional()
-  @IsEnum(SymbolType)
+  @IsEnum(AssetType)
   @IsNotEmpty()
-  type?: SymbolType;
+  type?: AssetType;
 
   @IsOptional()
   @IsString()
