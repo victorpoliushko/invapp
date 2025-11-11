@@ -53,11 +53,11 @@ export class AssetsService {
     return await this.prismaService.asset.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
   }
 
-  async createAssets(input: CreateAssetDto[]): Promise<Asset[]> {
+  async createAsset(input: CreateAssetDto): Promise<Asset> {
     console.log(`
      create input: ${JSON.stringify(input)} 
     `);
-    return await this.prismaService.asset.createManyAndReturn({
+    return await this.prismaService.asset.create({
       data: input
     });
   }
@@ -90,7 +90,7 @@ export class AssetsService {
     }
   }
 
-  async findAsset(asset: string): Promise<Asset[]> {
+  async findAsset(asset: string): Promise<Asset> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
       const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;

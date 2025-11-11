@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
 import { HttpException, Injectable } from '@nestjs/common';
-import { AssetToPortfolioDto } from './dto/AssetToPortfolio.dto';
+import { AddAssetInputDto } from './dto/AssetToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
@@ -64,8 +64,7 @@ export class PortfoliosService {
 
   async addAsset(
     id: string,
-    // input: AssetToPortfolioDto,
-    input: AddAssetInput
+    input: AddAssetInputDto
   ): Promise<PortfolioDto> {
 
     /*  
@@ -98,22 +97,16 @@ export class PortfoliosService {
     // }
 
     if (!asset) {
-      asset = await this.assetsService.createAssets([{ asset: input.assetName, updatedAt: Date.now().toLocaleString() }]);
+      asset = await this.assetsService.createAsset({ asset: input.assetName, updatedAt: Date.now().toLocaleString()});
     }
 
-    const portfolioAssets = input.assets.map(
-      async ({ assetId, quantity }) => {
-        const price = await this.syncAssetPrice(assetId);
+    const price = await this.syncAssetPrice(asset.id);
         
-        return this.prismaService.portfolioAsset.upsert({
-          where: { portfolioId_assetId: { portfolioId: id, assetId } },
-          update: { quantity, price },
-          create: { portfolioId: id, assetId: assetId, quantity, price },
-        });
-      },
-    );
-
-    await Promise.all(portfolioAssets);
+    this.prismaService.portfolioAsset.upsert({
+      where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
+      update: { quantity: input.quantity, price },
+      create: { portfolioId: id, assetId: asset.id, quantity: input.quantity, price },
+    });
 
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({

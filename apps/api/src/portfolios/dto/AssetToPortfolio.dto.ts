@@ -1,20 +1,20 @@
 import { Type } from "class-transformer";
-import { IsArray, IsInt, IsUUID, Min, ValidateNested } from "class-validator";
+import { IsArray, IsDefined, IsInt, IsNumber, IsString, IsUUID, Min, ValidateNested } from "class-validator";
 
-class AssetQuantityDto {
-  @IsUUID()
-  assetId: string;
+export class AddAssetInputDto {
+  @IsString()
+  @IsDefined()
+  assetName: string;
 
-  @IsInt()
-  @Min(1)
+    @IsString()
+  @IsDefined()
+  dueDate: string;
+
+    @IsNumber()
+  @IsDefined()
   quantity: number;
-}
 
-export class AssetToPortfolioDto {
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => AssetQuantityDto)
-  asset: AssetQuantityDto;
+    @IsNumber()
+  @IsDefined()
+  price: number;
 }
-
-// {"assets":["A"],"dueDate":"2025-11-06","amount":"2","period":"","price":"3"} 

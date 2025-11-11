@@ -18,9 +18,9 @@ import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
-import { AssetToPortfolioDto } from './dto/AssetToPortfolio.dto';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
+import { AddAssetInputDto } from './dto/AssetToPortfolio.dto';
 
 @Controller('portfolios')
 export class PortfoliosController {
@@ -59,7 +59,7 @@ export class PortfoliosController {
   @Post('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addAsset(@Param('id') id: string, @Body() addAssetToPortfolioDto: AssetToPortfolioDto) {
+  addAsset(@Param('id') id: string, @Body() addAssetToPortfolioDto: AddAssetInputDto) {
     return this.portfoliosService.addAsset(id, addAssetToPortfolioDto);
   }
 
