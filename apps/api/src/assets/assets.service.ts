@@ -99,7 +99,7 @@ export class AssetsService {
       const matches = response.data?.bestMatches || [];
 
       return matches.map((m) => ({
-        asset: m['1. asset'],
+        assetSymbol: m['1. symbol'],
         name: m['2. name'],
         region: m['4. region'],
         currency: m['8. currency'],

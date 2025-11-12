@@ -117,31 +117,31 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async updateAssets(
-    id: string,
-    input: AssetToPortfolioDto,
-  ): Promise<PortfolioDto> {
-    const updates = input.assets.map(({ assetId, quantity }) =>
-      this.prismaService.portfolioAsset.update({
-        where: { portfolioId_assetId: { portfolioId: id, assetId } },
-        data: {
-          portfolioId: id,
-          assetId,
-          quantity,
-        },
-      }),
-    );
+  // async updateAssets(
+  //   id: string,
+  //   input: AssetToPortfolioDto,
+  // ): Promise<PortfolioDto> {
+  //   const updates = input.assets.map(({ assetId, quantity }) =>
+  //     this.prismaService.portfolioAsset.update({
+  //       where: { portfolioId_assetId: { portfolioId: id, assetId } },
+  //       data: {
+  //         portfolioId: id,
+  //         assetId,
+  //         quantity,
+  //       },
+  //     }),
+  //   );
 
-    await Promise.all(updates);
+  //   await Promise.all(updates);
 
-    const updatedPortfolio =
-      await this.prismaService.portfolio.findUniqueOrThrow({
-        where: { id },
-        include: { assets: true },
-      });
+  //   const updatedPortfolio =
+  //     await this.prismaService.portfolio.findUniqueOrThrow({
+  //       where: { id },
+  //       include: { assets: true },
+  //     });
 
-    return plainToInstance(PortfolioDto, updatedPortfolio);
-  }
+  //   return plainToInstance(PortfolioDto, updatedPortfolio);
+  // }
 
   async deleteAssets(
     id: string,

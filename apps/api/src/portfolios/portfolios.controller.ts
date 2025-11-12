@@ -63,12 +63,12 @@ export class PortfoliosController {
     return this.portfoliosService.addAsset(id, addAssetToPortfolioDto);
   }
 
-  @Patch(':id/assets')
-  @UseGuards(AuthGuard('jwt'))
-  @UsePipes(new ValidationPipe())
-  updateAssets(@Param('id') id: string, @Body() updateAssetsToPortfolioDto: AssetToPortfolioDto) {
-    return this.portfoliosService.updateAssets(id, updateAssetsToPortfolioDto);
-  }
+  // @Patch(':id/assets')
+  // @UseGuards(AuthGuard('jwt'))
+  // @UsePipes(new ValidationPipe())
+  // updateAssets(@Param('id') id: string, @Body() updateAssetsToPortfolioDto: AssetToPortfolioDto) {
+  //   return this.portfoliosService.updateAssets(id, updateAssetsToPortfolioDto);
+  // }
 
   @Delete(':id/assets')
   @UseGuards(AuthGuard('jwt'))

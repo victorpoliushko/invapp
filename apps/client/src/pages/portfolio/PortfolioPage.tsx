@@ -8,7 +8,7 @@ import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
 type AssetType = {
   name: string;
-  asset: string;
+  assetSymbol: string;
   exchange: string;
   type: string;
   price: number;
@@ -115,6 +115,10 @@ export default function PortfolioPage() {
     if (!autocompleteEnabled) return;
     const token = localStorage.getItem("accessToken");
 
+    console.log(`
+     searchTerm: ${JSON.stringify(searchTerm)} 
+    `);
+
     if (!searchTerm.trim()) {
       setSuggestions([]);
       return;
@@ -134,7 +138,7 @@ export default function PortfolioPage() {
 
         if (!response.ok) throw new Error("Failed to fetch asset suggestions");
         const data = await response.json();
-
+        
         setSuggestions(data);
       } catch (err) {
         console.error("Autocomplete error:", err);
@@ -157,9 +161,6 @@ export default function PortfolioPage() {
     }
 
     const token = localStorage.getItem("accessToken");
-    console.log(`
-     newAsset: ${JSON.stringify(newAsset)} 
-    `);
     try {
       const res = await fetch(`/api/portfolios/${params.id}/assets`, {
         method: "POST",
@@ -192,6 +193,10 @@ export default function PortfolioPage() {
 
   console.log(`
    newAsset: ${JSON.stringify(newAsset)} 
+  `);
+
+  console.log(`
+   suggestions: ${JSON.stringify(suggestions)} 
   `);
 
   return (
@@ -266,19 +271,19 @@ export default function PortfolioPage() {
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.asset}
+                              key={s.assetSymbol}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.asset);
+                                setSearchTerm(s.assetSymbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  assetName: s.asset,
+                                  assetName: s.assetSymbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.asset} — {s.name}
+                              {s.assetSymbol} — {s.name}
                             </li>
                           ))}
                         </ul>
@@ -383,19 +388,19 @@ export default function PortfolioPage() {
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.asset}
+                              key={s.assetSymbol}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.asset);
+                                setSearchTerm(s.assetSymbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  assetName: s.asset,
+                                  assetName: s.assetSymbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.asset} — {s.name}
+                              {s.assetSymbol} — {s.name}
                             </li>
                           ))}
                         </ul>
@@ -500,19 +505,19 @@ export default function PortfolioPage() {
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.asset}
+                              key={s.assetSymbol}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.asset);
+                                setSearchTerm(s.assetSymbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  assetName: s.asset,
+                                  assetName: s.assetSymbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.asset} — {s.name}
+                              {s.assetSymbol} — {s.name}
                             </li>
                           ))}
                         </ul>
@@ -617,19 +622,19 @@ export default function PortfolioPage() {
                         <ul className="suggestions-list">
                           {suggestions.slice(0, 5).map((s) => (
                             <li
-                              key={s.asset}
+                              key={s.assetSymbol}
                               title={s.name}
                               onClick={() => {
-                                setSearchTerm(s.asset);
+                                setSearchTerm(s.assetSymbol);
                                 setNewAsset({
                                   ...newAsset,
-                                  assetName: s.asset,
+                                  assetName: s.assetSymbol,
                                 });
                                 setSuggestions([]);
                                 setAutocompleteEnabled(false);
                               }}
                             >
-                              {s.asset} — {s.name}
+                              {s.assetSymbol} — {s.name}
                             </li>
                           ))}
                         </ul>
