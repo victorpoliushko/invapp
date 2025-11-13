@@ -70,12 +70,13 @@ export class PortfoliosService {
     /*  
      *  1. find existing portfolio
      *  2. find existing assets
+     *    - if yes - add id to id
      *    - if no existing, add to the assets table
      *  3. add asset to the PortfolioAsset
      */
 
     const exsitingPortfolio =
-      await this.prismaService.portfolio.findUniqueOrThrow({ where: { id } });
+      await this.prismaService.portfolio.findUnique({ where: { id } });
 
     if (!exsitingPortfolio) {
       throw new HttpException(
@@ -89,6 +90,9 @@ export class PortfoliosService {
     `);
 
     let asset = await this.assetsService.findAsset(input.assetName);
+    if (asset) {
+      asset = await this.assetsService.updateAsset({ asset: input.assetName});
+    }
     // if (!asset) {
     //   throw new HttpException(
     //     getReasonPhrase(StatusCodes.NOT_FOUND),
@@ -99,6 +103,10 @@ export class PortfoliosService {
     if (!asset) {
       asset = await this.assetsService.createAsset({ asset: input.assetName, updatedAt: Date.now().toLocaleString()});
     }
+
+    console.log(`
+     asset: ${JSON.stringify(asset)} 
+    `);
 
     const price = await this.syncAssetPrice(asset.id);
         

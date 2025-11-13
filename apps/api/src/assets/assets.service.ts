@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { Asset, DataSource } from '@prisma/client';
-import { CreateAssetDto, AssetDto } from './dto/Asset.dto';
+import { CreateAssetDto, AssetDto, UpdateAssetDto } from './dto/Asset.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
 
@@ -58,6 +58,13 @@ export class AssetsService {
      create input: ${JSON.stringify(input)} 
     `);
     return await this.prismaService.asset.create({
+      data: input
+    });
+  }
+
+  async updateAsset(input: UpdateAssetDto): Promise<Asset> {
+    return await this.prismaService.asset.update({
+      where: input.id ? { id: input.id } : { asset: input.asset },
       data: input
     });
   }

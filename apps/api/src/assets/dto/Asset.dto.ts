@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  ValidateIf,
 } from 'class-validator';
 
 export class AssetDto {
@@ -41,6 +42,40 @@ export class CreateAssetDto {
   @IsString()
   @IsNotEmpty()
   asset: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
+
+  @IsOptional()
+  @IsEnum(AssetType)
+  @IsNotEmpty()
+  type?: AssetType;
+
+  @IsOptional()
+  @IsString()
+  exchange?: string;
+
+  @IsOptional()
+  @IsEnum(DataSource)
+  dataSource?: DataSource;
+
+  @IsOptional()
+  @IsString()
+  updatedAt?: string;
+}
+
+export class UpdateAssetDto {
+  @ValidateIf(i => i.id || i.asset)
+  @IsDefined({message: 'At least one of id or asset must be provided'})
+  @IsString()
+  id?: string;
+
+  @ValidateIf(i => i.id || i.asset)
+  @IsDefined({message: 'At least one of id or asset must be provided'})
+  @IsString()
+  asset?: string;
 
   @IsOptional()
   @IsString()
