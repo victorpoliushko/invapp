@@ -103,7 +103,7 @@ table th {
   text-transform: uppercase;
 }
 
-.symbol-autocomplete {
+.asset-autocomplete {
   position: relative;
   display: inline-block;
   width: 100%;
