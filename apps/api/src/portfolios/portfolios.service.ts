@@ -69,9 +69,10 @@ export class PortfoliosService {
 
     /*  
      *  1. find existing portfolio
-     *  2. find existing assets
-     *    - if yes - add id to id
-     *    - if no existing, add to the assets table
+     *  2. find existing asset
+     *    - if exists - proceed
+     *    - if doesn't exist in Asset table then add find in external API and add to Asset table
+     *    - if doesn't exist in external API then create from scratch and add to Asset table
      *  3. add asset to the PortfolioAsset
      */
 
@@ -90,9 +91,13 @@ export class PortfoliosService {
     `);
 
     let asset = await this.assetsService.findAsset(input.assetName);
-    if (asset) {
-      asset = await this.assetsService.updateAsset({ asset: input.assetName});
-    }
+
+    console.log(`
+     asset: ${JSON.stringify(asset)} 
+    `);
+    // if (asset) {
+    //   asset = await this.assetsService.updateAsset({ asset: input.assetName });
+    // }
     // if (!asset) {
     //   throw new HttpException(
     //     getReasonPhrase(StatusCodes.NOT_FOUND),
