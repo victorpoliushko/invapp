@@ -7,26 +7,39 @@ import { Asset, DataSource } from '@prisma/client';
 import { CreateAssetDto, AssetDto, UpdateAssetDto } from './dto/Asset.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AssetsService {
   constructor(
     private configService: ConfigService,
     private httpService: HttpService,
-    private prismaService: PrismaService
+    private prismaService: PrismaService,
   ) {}
 
   async getSharePrice(asset: string): Promise<number> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
-      
+
       const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;
-      const matchingResponse = await lastValueFrom(this.httpService.get(matchingUrl));
+      const matchingResponse = await lastValueFrom(
+        this.httpService.get(matchingUrl),
+      );
 
       const matches = matchingResponse.data?.bestMatches || [];
 
-      if (matches.length <= 0 || !matches.some(match => match["1. asset"].trim().toUpperCase() === asset.trim().toUpperCase())) {
-        throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
+      if (
+        matches.length <= 0 ||
+        !matches.some(
+          (match) =>
+            match['1. asset'].trim().toUpperCase() ===
+            asset.trim().toUpperCase(),
+        )
+      ) {
+        throw new HttpException(
+          getReasonPhrase(StatusCodes.NOT_FOUND),
+          StatusCodes.NOT_FOUND,
+        );
       }
 
       const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&asset=${asset}&interval=5min&apikey=${apikey}`;
@@ -43,29 +56,44 @@ export class AssetsService {
 
       return price;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       console.error('API error:', error.response?.data);
-      throw new HttpException(getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR), StatusCodes.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getAssets(paginationDTO: PaginationDTO): Promise<AssetDto[]> {
-    return await this.prismaService.asset.findMany({ take: paginationDTO.limit, skip: paginationDTO.offset });
+    return await this.prismaService.asset.findMany({
+      take: paginationDTO.limit,
+      skip: paginationDTO.offset,
+    });
   }
 
   async createAsset(input: CreateAssetDto): Promise<Asset> {
     console.log(`
      create input: ${JSON.stringify(input)} 
     `);
+    const id = uuidv4();
     return await this.prismaService.asset.create({
-      data: input
+      data: {
+        id,
+        asset: input.asset,
+        name: input.name,
+        type: input.type,
+        exchange: input.exchange,
+        dataSource: input.dataSource,
+        updatedAt: input.updatedAt,
+      },
     });
   }
 
   async updateAsset(input: UpdateAssetDto): Promise<Asset> {
     return await this.prismaService.asset.update({
       where: input.id ? { id: input.id } : { asset: input.asset },
-      data: input
+      data: input,
     });
   }
 
@@ -77,16 +105,22 @@ export class AssetsService {
       const response = await lastValueFrom(this.httpService.get(url));
 
       const data = response.data.split('\n').slice(1);
-      const alphavantageData = data.map(line => {
+      const alphavantageData = data.map((line) => {
         const [asset, name, exchange, type] = line.split(',');
-        return { asset, name, exchange, type, dataSource: DataSource.ALPHA_VANTAGE };
+        return {
+          asset,
+          name,
+          exchange,
+          type,
+          dataSource: DataSource.ALPHA_VANTAGE,
+        };
       });
 
       alphavantageData.pop();
 
       await this.prismaService.asset.createMany({
         data: alphavantageData,
-        skipDuplicates: true
+        skipDuplicates: true,
       });
 
       console.log(`Fetched and stored ${alphavantageData.length} assets.`);
@@ -112,9 +146,12 @@ export class AssetsService {
         currency: m['8. currency'],
       }));
     } catch (error) {
-      console.log(error)
+      console.log(error);
       console.error('Error in find assets:', error.response?.data);
-      throw new HttpException(getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR), StatusCodes.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+        StatusCodes.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

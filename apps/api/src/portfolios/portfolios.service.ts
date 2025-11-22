@@ -92,9 +92,9 @@ export class PortfoliosService {
 
     let asset = await this.assetsService.findAsset(input.assetName);
 
-    console.log(`
-     asset: ${JSON.stringify(asset)} 
-    `);
+    // console.log(`
+    //  asset: ${JSON.stringify(asset)} 
+    // `);
     // if (asset) {
     //   asset = await this.assetsService.updateAsset({ asset: input.assetName });
     // }
