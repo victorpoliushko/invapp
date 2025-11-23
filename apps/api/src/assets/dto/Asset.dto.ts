@@ -63,7 +63,7 @@ export class CreateAssetDto {
 
   @IsOptional()
   @IsString()
-  updatedAt?: string;
+  buyDate?: string;
 }
 
 export class UpdateAssetDto {

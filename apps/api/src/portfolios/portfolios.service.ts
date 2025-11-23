@@ -90,7 +90,7 @@ export class PortfoliosService {
      input: ${JSON.stringify(input)} 
     `);
 
-    let asset = await this.assetsService.findAsset(input.assetName);
+    let asset = await this.assetsService.findAsset(input.assetName)[0];
 
     // console.log(`
     //  asset: ${JSON.stringify(asset)} 
@@ -106,7 +106,7 @@ export class PortfoliosService {
     // }
 
     if (!asset) {
-      asset = await this.assetsService.createAsset({ asset: input.assetName, updatedAt: Date.now().toLocaleString()});
+      asset = await this.assetsService.createAsset({ asset: input.assetName });
     }
 
     console.log(`

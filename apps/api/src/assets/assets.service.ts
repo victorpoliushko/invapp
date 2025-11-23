@@ -84,8 +84,7 @@ export class AssetsService {
         name: input.name,
         type: input.type,
         exchange: input.exchange,
-        dataSource: input.dataSource,
-        updatedAt: input.updatedAt,
+        dataSource: input.dataSource
       },
     });
   }
