@@ -18,6 +18,9 @@ export class AssetsService {
   ) {}
 
   async getSharePrice(asset: string): Promise<number> {
+    console.log(`
+     asset: ${JSON.stringify(asset)} 
+    `);
     try {
       const apikey = this.configService.get<string>('API_KEY');
 

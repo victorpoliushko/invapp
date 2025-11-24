@@ -8,6 +8,7 @@ import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AssetsService } from '../assets/assets.service';
+import { Asset } from '@prisma/client';
 
 interface AssetsWithPrices {
   asset: string;
@@ -54,9 +55,9 @@ export class PortfoliosService {
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
-  async syncAssetPrice(assetId: string) {
+  async syncAssetPrice(asset: any) {
     const exsitingAsset = await this.prismaService.asset.findUnique({
-      where: { id: assetId },
+      where: asset[0].id ? { id: asset[0].id } : { asset: asset[0].assetSymbol },
     });
 
     return await this.assetsService.getSharePrice(exsitingAsset.asset);
@@ -90,7 +91,7 @@ export class PortfoliosService {
      input: ${JSON.stringify(input)} 
     `);
 
-    let asset = await this.assetsService.findAsset(input.assetName)[0];
+    let asset = await this.assetsService.findAsset(input.assetName);
 
     // console.log(`
     //  asset: ${JSON.stringify(asset)} 
@@ -105,15 +106,17 @@ export class PortfoliosService {
     //   );
     // }
 
+        console.log(`
+     asset: ${JSON.stringify(asset)} 
+    `);
+
     if (!asset) {
       asset = await this.assetsService.createAsset({ asset: input.assetName });
     }
 
-    console.log(`
-     asset: ${JSON.stringify(asset)} 
-    `);
 
-    const price = await this.syncAssetPrice(asset.id);
+
+    const price = await this.syncAssetPrice(asset);
         
     this.prismaService.portfolioAsset.upsert({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },

@@ -191,14 +191,6 @@ export default function PortfolioPage() {
     }
   };
 
-  console.log(`
-   newAsset: ${JSON.stringify(newAsset)} 
-  `);
-
-  console.log(`
-   suggestions: ${JSON.stringify(suggestions)} 
-  `);
-
   return (
     <>
       <section className="assets-section section-container">
