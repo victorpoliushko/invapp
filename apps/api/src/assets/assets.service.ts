@@ -18,9 +18,6 @@ export class AssetsService {
   ) {}
 
   async getSharePrice(asset: string): Promise<number> {
-    console.log(`
-     asset: ${JSON.stringify(asset)} 
-    `);
     try {
       const apikey = this.configService.get<string>('API_KEY');
 
@@ -31,11 +28,15 @@ export class AssetsService {
 
       const matches = matchingResponse.data?.bestMatches || [];
 
+      console.log(`
+       matches: ${JSON.stringify(matches)} 
+      `);
+
       if (
         matches.length <= 0 ||
         !matches.some(
           (match) =>
-            match['1. asset'].trim().toUpperCase() ===
+            match['1. symbol'].trim().toUpperCase() ===
             asset.trim().toUpperCase(),
         )
       ) {
@@ -45,17 +46,28 @@ export class AssetsService {
         );
       }
 
-      const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&asset=${asset}&interval=5min&apikey=${apikey}`;
+      // const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&asset=${asset}&interval=5min&apikey=${apikey}`;
 
-      const response = await lastValueFrom(this.httpService.get(pricingUrl));
-      const timeSeries = response.data['Time Series (5min)'];
+      // const response = await lastValueFrom(this.httpService.get(pricingUrl));
+      // const timeSeries = response.data['Time Series (5min)'];
 
-      if (!timeSeries) {
-        throw new Error('No time series data available');
-      }
-      const latestTimestapm = Object.keys(timeSeries)[0];
-      const latestData = timeSeries[latestTimestapm];
-      const price = parseFloat(latestData['4. close']);
+      // if (!timeSeries) {
+      //   throw new Error('No time series data available');
+      // }
+      // const latestTimestapm = Object.keys(timeSeries)[0];
+      // const latestData = timeSeries[latestTimestapm];
+      // const price = parseFloat(latestData['4. close']);
+
+      const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${asset}&apikey=${apikey}`;
+
+const response = await lastValueFrom(this.httpService.get(quoteUrl));
+const globalQuote = response.data['Global Quote'];
+
+if (!globalQuote || Object.keys(globalQuote).length === 0) {
+    throw new Error('No quote data available'); 
+}
+
+const price = parseFloat(globalQuote['05. price'] || globalQuote['08. previous close']);
 
       return price;
     } catch (error) {
