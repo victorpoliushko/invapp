@@ -57,18 +57,16 @@ export class PortfoliosService {
 
   async syncAssetPrice(asset: any) {
     const exsitingAsset = await this.prismaService.asset.findUnique({
-      where: asset[0].id ? { id: asset[0].id } : { asset: asset[0].assetSymbol },
+      where: asset[0].id
+        ? { id: asset[0].id }
+        : { asset: asset[0].assetSymbol },
     });
 
     return await this.assetsService.getSharePrice(exsitingAsset.asset);
   }
 
-  async addAsset(
-    id: string,
-    input: AddAssetInputDto
-  ): Promise<PortfolioDto> {
-
-    /*  
+  async addAsset(id: string, input: AddAssetInputDto): Promise<PortfolioDto> {
+    /*
      *  1. find existing portfolio
      *  2. find existing asset
      *    - if exists - proceed
@@ -77,8 +75,9 @@ export class PortfoliosService {
      *  3. add asset to the PortfolioAsset
      */
 
-    const exsitingPortfolio =
-      await this.prismaService.portfolio.findUnique({ where: { id } });
+    const exsitingPortfolio = await this.prismaService.portfolio.findUnique({
+      where: { id },
+    });
 
     if (!exsitingPortfolio) {
       throw new HttpException(
@@ -87,41 +86,21 @@ export class PortfoliosService {
       );
     }
 
-    console.log(`
-     input: ${JSON.stringify(input)} 
-    `);
-
-    let asset = await this.assetsService.findAsset(input.assetName);
-
-    // console.log(`
-    //  asset: ${JSON.stringify(asset)} 
-    // `);
-    // if (asset) {
-    //   asset = await this.assetsService.updateAsset({ asset: input.assetName });
-    // }
-    // if (!asset) {
-    //   throw new HttpException(
-    //     getReasonPhrase(StatusCodes.NOT_FOUND),
-    //     StatusCodes.NOT_FOUND,
-    //   );
-    // }
-
-        console.log(`
-     asset: ${JSON.stringify(asset)} 
-    `);
+    let asset = await this.assetsService.findAssetByName(input.assetName);
 
     if (!asset) {
       asset = await this.assetsService.createAsset({ asset: input.assetName });
     }
 
-
-
-    const price = await this.syncAssetPrice(asset);
-        
-    this.prismaService.portfolioAsset.upsert({
+    await this.prismaService.portfolioAsset.upsert({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
-      update: { quantity: input.quantity, price },
-      create: { portfolioId: id, assetId: asset.id, quantity: input.quantity, price },
+      update: { quantity: input.quantity, price: input.price },
+      create: {
+        portfolioId: id,
+        assetId: asset.id,
+        quantity: input.quantity,
+        price: input.price,
+      },
     });
 
     const updatedPortfolio =
@@ -132,32 +111,6 @@ export class PortfoliosService {
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
-
-  // async updateAssets(
-  //   id: string,
-  //   input: AssetToPortfolioDto,
-  // ): Promise<PortfolioDto> {
-  //   const updates = input.assets.map(({ assetId, quantity }) =>
-  //     this.prismaService.portfolioAsset.update({
-  //       where: { portfolioId_assetId: { portfolioId: id, assetId } },
-  //       data: {
-  //         portfolioId: id,
-  //         assetId,
-  //         quantity,
-  //       },
-  //     }),
-  //   );
-
-  //   await Promise.all(updates);
-
-  //   const updatedPortfolio =
-  //     await this.prismaService.portfolio.findUniqueOrThrow({
-  //       where: { id },
-  //       include: { assets: true },
-  //     });
-
-  //   return plainToInstance(PortfolioDto, updatedPortfolio);
-  // }
 
   async deleteAssets(
     id: string,

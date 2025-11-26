@@ -28,9 +28,6 @@ export class AssetsService {
 
       const matches = matchingResponse.data?.bestMatches || [];
 
-      console.log(`
-       matches: ${JSON.stringify(matches)} 
-      `);
 
       if (
         matches.length <= 0 ||
@@ -60,14 +57,16 @@ export class AssetsService {
 
       const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${asset}&apikey=${apikey}`;
 
-const response = await lastValueFrom(this.httpService.get(quoteUrl));
-const globalQuote = response.data['Global Quote'];
+      const response = await lastValueFrom(this.httpService.get(quoteUrl));
+      const globalQuote = response.data['Global Quote'];
 
-if (!globalQuote || Object.keys(globalQuote).length === 0) {
-    throw new Error('No quote data available'); 
-}
+      if (!globalQuote || Object.keys(globalQuote).length === 0) {
+        throw new Error('No quote data available');
+      }
 
-const price = parseFloat(globalQuote['05. price'] || globalQuote['08. previous close']);
+      const price = parseFloat(
+        globalQuote['05. price'] || globalQuote['08. previous close'],
+      );
 
       return price;
     } catch (error) {
@@ -80,6 +79,10 @@ const price = parseFloat(globalQuote['05. price'] || globalQuote['08. previous c
     }
   }
 
+  async findAssetByName(asset: string): Promise<AssetDto> {
+    return await this.prismaService.asset.findFirst({ where: { asset }});
+  }
+
   async getAssets(paginationDTO: PaginationDTO): Promise<AssetDto[]> {
     return await this.prismaService.asset.findMany({
       take: paginationDTO.limit,
@@ -88,9 +91,6 @@ const price = parseFloat(globalQuote['05. price'] || globalQuote['08. previous c
   }
 
   async createAsset(input: CreateAssetDto): Promise<Asset> {
-    console.log(`
-     create input: ${JSON.stringify(input)} 
-    `);
     const id = uuidv4();
     return await this.prismaService.asset.create({
       data: {
@@ -99,7 +99,7 @@ const price = parseFloat(globalQuote['05. price'] || globalQuote['08. previous c
         name: input.name,
         type: input.type,
         exchange: input.exchange,
-        dataSource: input.dataSource
+        dataSource: input.dataSource,
       },
     });
   }
@@ -145,7 +145,7 @@ const price = parseFloat(globalQuote['05. price'] || globalQuote['08. previous c
     }
   }
 
-  async findAsset(asset: string): Promise<Asset> {
+  async findAssetInAPI(asset: string): Promise<Asset> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
       const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;

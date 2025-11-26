@@ -25,6 +25,6 @@ export class AssetsController {
 
   @Get('search')
   async searchAsset(@Query('q') query: string) {
-    return this.assetsService.findAsset(query);
+    return this.assetsService.findAssetInAPI(query);
   }
 }

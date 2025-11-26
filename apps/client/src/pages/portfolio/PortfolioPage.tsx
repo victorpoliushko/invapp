@@ -115,10 +115,6 @@ export default function PortfolioPage() {
     if (!autocompleteEnabled) return;
     const token = localStorage.getItem("accessToken");
 
-    console.log(`
-     searchTerm: ${JSON.stringify(searchTerm)} 
-    `);
-
     if (!searchTerm.trim()) {
       setSuggestions([]);
       return;
@@ -176,6 +172,13 @@ export default function PortfolioPage() {
         console.error("Error response:", errorBody);
         throw new Error("Failed to add stock");
       }
+
+      console.log(`
+       res: ${JSON.stringify(await res.json())} 
+      `);
+
+      // set updated portfolio
+      // setPortfolio()
 
       alert("Asset added successfully!");
       setNewAsset({
