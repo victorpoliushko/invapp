@@ -173,12 +173,16 @@ export default function PortfolioPage() {
         throw new Error("Failed to add stock");
       }
 
-      console.log(`
-       res: ${JSON.stringify(await res.json())} 
-      `);
+      const updatedPortfolio = await res.json();
+
+      // console.log(`
+      //  res: ${JSON.stringify(await res.json())} 
+      // `);
 
       // set updated portfolio
-      // setPortfolio()
+      setPortfolio(updatedPortfolio);
+
+      // {"portfolioId":"140f5933-6f4b-424f-86c3-3f350a2b1293","assetId":"ab2ee9b6-3363-48bb-bb90-9492c148b270","quantity":2,"price":3}
 
       alert("Asset added successfully!");
       setNewAsset({
