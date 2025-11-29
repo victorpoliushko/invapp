@@ -106,7 +106,7 @@ export class PortfoliosService {
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { assets: true },
+        include: { assets: { include: { assets: true } } },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
