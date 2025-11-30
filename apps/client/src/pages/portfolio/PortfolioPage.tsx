@@ -6,6 +6,12 @@ import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
+const DeleteIconSvg = (props: any) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M5 4V6H19V4H5ZM6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6ZM9 10H10V18H9V10ZM14 10H15V18H14V10Z" />
+  </svg>
+);
+
 type AssetType = {
   name: string;
   assetSymbol: string;
@@ -190,9 +196,15 @@ export default function PortfolioPage() {
     }
   };
 
-  console.log(`
-   portfolio: ${JSON.stringify(portfolio)} 
-  `);
+  const onDeleteAsset = (index: any) => {
+    console.log(`
+     index: ${JSON.stringify(index)} 
+    `);
+  }
+
+  // console.log(`
+  //  portfolio: ${JSON.stringify(portfolio)} 
+  // `);
 
   return (
     <>
@@ -230,6 +242,7 @@ export default function PortfolioPage() {
                   <th scope="col">Date</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -241,6 +254,21 @@ export default function PortfolioPage() {
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantity">{s.quantity}</td>
                         <td data-label="price">{s.price}</td>
+                                <td data-label="actions">
+                  <button
+                    onClick={() => onDeleteAsset(s.assetId)}
+                    // className="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-150"
+                    title={`Remove ${s.assets.asset}`}
+                  >
+                            <img
+          className="delete-icon"
+          src={deleteIcon}
+          alt="delete-icon"
+          height={30}
+          width={30}
+        />
+                  </button>
+                </td>
                       </tr>
                     </>
                   ))}
