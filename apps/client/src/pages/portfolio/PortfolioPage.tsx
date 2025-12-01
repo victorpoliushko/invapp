@@ -196,10 +196,36 @@ export default function PortfolioPage() {
     }
   };
 
-  const onDeleteAsset = (index: any) => {
+  const onDeleteAsset = async (index: any) => {
     console.log(`
      index: ${JSON.stringify(index)} 
     `);
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const res = await fetch(`/api/portfolios/${params.id}/assets`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null);
+        console.error("Error response:", errorBody);
+        throw new Error("Failed to delete stock");
+      }
+
+      const updatedPortfolio = await res.json();
+      setPortfolio(updatedPortfolio);
+      
+      alert("Asset removed successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting a stock");
+    }
+
   }
 
   // console.log(`

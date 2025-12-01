@@ -112,18 +112,18 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async deleteAssets(
+  async deleteAsset(
     id: string,
     input: DeleteAssetsFromPortfolioDto,
   ): Promise<PortfolioDto> {
-    await this.prismaService.portfolioAsset.deleteMany({
-      where: { portfolioId: id, assetId: { in: input.assetIds } },
+    await this.prismaService.portfolioAsset.delete({
+      where: { portfolioId: id, assetId: input.assetId },
     });
 
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { assets: true },
+        include: { assets: { include: { assets: true } } },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);

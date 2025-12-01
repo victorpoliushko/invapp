@@ -1,6 +1,6 @@
-import { IsArray } from "class-validator";
+import { IsString } from "class-validator";
 
 export class DeleteAssetsFromPortfolioDto {
-  @IsArray()
-  assetIds: string[];
+  @IsString()
+  assetId: string;
 }
