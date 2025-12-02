@@ -117,7 +117,12 @@ export class PortfoliosService {
     input: DeleteAssetsFromPortfolioDto,
   ): Promise<PortfolioDto> {
     await this.prismaService.portfolioAsset.delete({
-      where: { portfolioId: id, assetId: input.assetId },
+      where: {
+        portfolioId_assetId: {
+          portfolioId: id,
+          assetId: input.assetId,
+        },
+      },
     });
 
     const updatedPortfolio =

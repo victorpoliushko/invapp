@@ -209,6 +209,7 @@ export default function PortfolioPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ assetId: index }),
       });
 
       if (!res.ok) {

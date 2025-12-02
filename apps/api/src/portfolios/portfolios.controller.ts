@@ -60,9 +60,6 @@ export class PortfoliosController {
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   addAsset(@Param('id') id: string, @Body() addAssetToPortfolioDto: AddAssetInputDto) {
-        console.log(`
-     addAsset
-    `);
     return this.portfoliosService.addAsset(id, addAssetToPortfolioDto);
   }
 
@@ -73,13 +70,10 @@ export class PortfoliosController {
   //   return this.portfoliosService.updateAssets(id, updateAssetsToPortfolioDto);
   // }
 
-  @Delete(':id/assets')
+  @Delete('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   deleteAsset(@Param('id') assetId: string, @Body() deleteAssetsDto: DeleteAssetsFromPortfolioDto) {
-    console.log(`
-     deleteasset} 
-    `);
     return this.portfoliosService.deleteAsset(assetId, deleteAssetsDto);
   }
 
