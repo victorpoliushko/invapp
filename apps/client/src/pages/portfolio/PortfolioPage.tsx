@@ -7,7 +7,12 @@ import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
 const DeleteIconSvg = (props: any) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
     <path d="M5 4V6H19V4H5ZM6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6ZM9 10H10V18H9V10ZM14 10H15V18H14V10Z" />
   </svg>
 );
@@ -140,7 +145,7 @@ export default function PortfolioPage() {
 
         if (!response.ok) throw new Error("Failed to fetch asset suggestions");
         const data = await response.json();
-        
+
         setSuggestions(data);
       } catch (err) {
         console.error("Autocomplete error:", err);
@@ -181,7 +186,7 @@ export default function PortfolioPage() {
 
       const updatedPortfolio = await res.json();
       setPortfolio(updatedPortfolio);
-      
+
       alert("Asset added successfully!");
       setNewAsset({
         assetName: "",
@@ -220,37 +225,79 @@ export default function PortfolioPage() {
 
       const updatedPortfolio = await res.json();
       setPortfolio(updatedPortfolio);
-      
+
       alert("Asset removed successfully!");
     } catch (err) {
       console.error(err);
       alert("Error deleting a stock");
     }
+  };
 
-  }
+  const onUpdatePortfolio = async (index: any) => {
+    console.log(`
+     index: ${JSON.stringify(index)} 
+    `);
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const res = await fetch(`/api/portfolios/${params.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: index }),
+      });
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null);
+        console.error("Error response:", errorBody);
+        throw new Error("Failed to delete stock");
+      }
+
+      const updatedPortfolio = await res.json();
+      setPortfolio(updatedPortfolio);
+
+      alert("Asset removed successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting a stock");
+    }
+  };
 
   // console.log(`
-  //  portfolio: ${JSON.stringify(portfolio)} 
+  //  portfolio: ${JSON.stringify(portfolio)}
   // `);
 
   return (
     <>
       <section className="assets-section section-container">
         <h1 className="assets-h1">{portfolio?.name}</h1>
-        <img
-          className="edit-icon"
-          src={editIcon}
-          alt="edit-icon"
-          height={30}
-          width={30}
-        />
-        <img
-          className="delete-icon"
-          src={deleteIcon}
-          alt="delete-icon"
-          height={30}
-          width={30}
-        />
+        <button
+          onClick={() => onUpdatePortfolio(portfolio?.id)}
+          title={`Edit portfolio`}
+        >
+          <img
+            className="edit-icon"
+            src={editIcon}
+            alt="edit-icon"
+            height={30}
+            width={30}
+          />
+        </button>
+        <button
+          onClick={() => onDeletePortfolio(portfolio?.id)}
+          title={`Remove portfolio`}
+        >
+          <img
+            className="delete-icon"
+            src={deleteIcon}
+            alt="delete-icon"
+            height={30}
+            width={30}
+          />
+        </button>
+
         <div className="assets">
           <input
             type="radio"
@@ -281,21 +328,21 @@ export default function PortfolioPage() {
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantity">{s.quantity}</td>
                         <td data-label="price">{s.price}</td>
-                                <td data-label="actions">
-                  <button
-                    onClick={() => onDeleteAsset(s.assetId)}
-                    // className="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-150"
-                    title={`Remove ${s.assets.asset}`}
-                  >
+                        <td data-label="actions">
+                          <button
+                            onClick={() => onDeleteAsset(s.assetId)}
+                            // className="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-150"
+                            title={`Remove ${s.assets.asset}`}
+                          >
                             <img
-          className="delete-icon"
-          src={deleteIcon}
-          alt="delete-icon"
-          height={30}
-          width={30}
-        />
-                  </button>
-                </td>
+                              className="delete-icon"
+                              src={deleteIcon}
+                              alt="delete-icon"
+                              height={30}
+                              width={30}
+                            />
+                          </button>
+                        </td>
                       </tr>
                     </>
                   ))}

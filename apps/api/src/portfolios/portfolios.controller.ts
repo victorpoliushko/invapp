@@ -42,6 +42,20 @@ export class PortfoliosController {
     return this.portfoliosService.create(createPortfolioDto);
   }
 
+  @Patch()
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  updatePortfolio(@Param('id') id: string, @Body() updatePortfolioInput: UpdatePortfolioDto, @GetUser() user: User
+  ) {
+    if (updatePortfolioInput.userId !== user.id) {
+      throw new HttpException(
+        getReasonPhrase(StatusCodes.FORBIDDEN),
+        StatusCodes.FORBIDDEN,
+      );
+    }
+    return this.portfoliosService.update(updatePortfolioInput);
+  }
+
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
