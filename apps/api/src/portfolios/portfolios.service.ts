@@ -9,6 +9,7 @@ import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dt
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AssetsService } from '../assets/assets.service';
 import { Asset } from '@prisma/client';
+import { UpdatePortfolioDto } from './dto/UpdatePortfolio.dto';
 
 interface AssetsWithPrices {
   asset: string;
@@ -43,6 +44,16 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: { assets: { include: { assets: true } } },
+    });
+    return plainToInstance(PortfolioDto, portfolio);
+  }
+
+  async update(input: UpdatePortfolioDto): Promise<PortfolioDto> {
+    const portfolio = await this.prismaService.portfolio.update({
+      where: { id: input.id },
+      data: {
+        name: input.name
+      }
     });
     return plainToInstance(PortfolioDto, portfolio);
   }

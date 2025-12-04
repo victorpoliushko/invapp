@@ -21,6 +21,7 @@ import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AddAssetInputDto } from './dto/AssetToPortfolio.dto';
+import { UpdatePortfolioDto } from './dto/UpdatePortfolio.dto';
 
 @Controller('portfolios')
 export class PortfoliosController {
@@ -47,12 +48,12 @@ export class PortfoliosController {
   @UsePipes(new ValidationPipe())
   updatePortfolio(@Param('id') id: string, @Body() updatePortfolioInput: UpdatePortfolioDto, @GetUser() user: User
   ) {
-    if (updatePortfolioInput.userId !== user.id) {
-      throw new HttpException(
-        getReasonPhrase(StatusCodes.FORBIDDEN),
-        StatusCodes.FORBIDDEN,
-      );
-    }
+    // if (updatePortfolioInput.userId !== user.id) {
+    //   throw new HttpException(
+    //     getReasonPhrase(StatusCodes.FORBIDDEN),
+    //     StatusCodes.FORBIDDEN,
+    //   );
+    // }
     return this.portfoliosService.update(updatePortfolioInput);
   }
 
