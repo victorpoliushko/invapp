@@ -69,7 +69,7 @@ export default function PortfolioPage() {
     price: 0,
   });
   const [isEditing, setIsEditing] = useState(false);
-    const [newName, setNewName] = useState("");
+  const [newName, setNewName] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -237,7 +237,7 @@ export default function PortfolioPage() {
 
   const onUpdatePortfolio = async (portfolioId: any, updatedName: string) => {
     // console.log(`
-    //  index: ${JSON.stringify(index)} 
+    //  index: ${JSON.stringify(index)}
     // `);
     if (!updatedName.trim() || updatedName === portfolio?.name) {
       setIsEditing(false);
@@ -252,13 +252,13 @@ export default function PortfolioPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: updatedName }),
+        body: JSON.stringify({ id: portfolioId, name: updatedName }),
       });
 
       if (!res.ok) {
         const errorBody = await res.json().catch(() => null);
         console.error("Error response:", errorBody);
-        throw new Error("Failed to delete stock");
+        throw new Error("Failed to update portfolio");
       }
 
       const updatedPortfolio = await res.json();
@@ -266,10 +266,10 @@ export default function PortfolioPage() {
       setNewName(updatedPortfolio.name);
       setIsEditing(false);
 
-      alert("Asset removed successfully!");
+      alert("Portfolio updated successfully!");
     } catch (err) {
       console.error(err);
-      alert("Error deleting a stock");
+      alert("Error update portfolio");
     }
   };
 
@@ -281,6 +281,7 @@ export default function PortfolioPage() {
     <>
       <section className="assets-section section-container">
         {isEditing ? (
+          <>
             <input
               type="text"
               value={newName}
@@ -290,34 +291,53 @@ export default function PortfolioPage() {
                   onUpdatePortfolio(portfolio.id, newName);
                 }
               }}
-              className="assets-h1-input" 
+              className="assets-h1-input"
               autoFocus
             />
-          ) : (
-            <h1 className="assets-h1">{portfolio?.name}</h1>
-          )}
-          {/* need to add a button for save */}
-        {portfolio?.id && (
-            <button
-              onClick={() => {
-                if (isEditing) {
-                  onUpdatePortfolio(portfolio.id, newName);
-                } else {
+            {portfolio?.id && (
+              <button
+                onClick={() => onUpdatePortfolio(portfolio.id, newName)}
+                title="Save changes"
+              >
+                Save
+              </button>
+            )}
+            {portfolio?.id && (
+              <button
+                onClick={() => {
                   setNewName(portfolio.name || "");
-                  setIsEditing(true);
-                }
-              }}
-              title={isEditing ? "Save changes" : "Edit portfolio name"}
-            >
-              <img
-                className="edit-icon"
-                src={editIcon}
-                alt={isEditing ? "Save icon" : "Edit icon"}
-                height={30}
-                width={30}
-              />
-            </button>
-          )}
+                  setIsEditing(false);
+                }}
+                title="Cancel editing"
+              >
+                Cancel
+              </button>
+            )}
+          </>
+        ) : (
+          <h1 className="assets-h1">{portfolio?.name}</h1>
+        )}
+        {portfolio?.id && (
+          <button
+            onClick={() => {
+              if (isEditing) {
+                onUpdatePortfolio(portfolio.id, newName);
+              } else {
+                setNewName(portfolio.name || "");
+                setIsEditing(true);
+              }
+            }}
+            title={isEditing ? "Save changes" : "Edit portfolio name"}
+          >
+            <img
+              className="edit-icon"
+              src={editIcon}
+              alt={isEditing ? "Save icon" : "Edit icon"}
+              height={30}
+              width={30}
+            />
+          </button>
+        )}
         <button
           onClick={() => onDeletePortfolio(portfolio?.id)}
           title={`Remove portfolio`}

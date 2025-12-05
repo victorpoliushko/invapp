@@ -48,6 +48,8 @@ export class PortfoliosController {
   @UsePipes(new ValidationPipe())
   updatePortfolio(@Param('id') id: string, @Body() updatePortfolioInput: UpdatePortfolioDto, @GetUser() user: User
   ) {
+    console.log(`
+     updatePortfolio controller`);
     // if (updatePortfolioInput.userId !== user.id) {
     //   throw new HttpException(
     //     getReasonPhrase(StatusCodes.FORBIDDEN),
