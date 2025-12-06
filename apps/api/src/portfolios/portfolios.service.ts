@@ -59,6 +59,12 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, portfolio);
   }
 
+  async delete(id: string): Promise<void> {
+    await this.prismaService.portfolio.delete({
+      where: { id }
+    });
+  }
+
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },

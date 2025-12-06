@@ -270,9 +270,33 @@ export default function PortfolioPage() {
     }
   };
 
-  // console.log(`
-  //  portfolio: ${JSON.stringify(portfolio)}
-  // `);
+  const onDeletePortfolio = async (portfolioId?: string) => {
+    const token = localStorage.getItem("accessToken");
+
+    if (portfolioId) {
+      try {
+        const res = await fetchWithRedirect(`/api/portfolios/${portfolioId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          const errorBody = await res.json().catch(() => null);
+          console.error("Error response:", errorBody);
+          throw new Error("Failed to delete portfolio");
+        }
+
+        alert("Portfolio deleted successfully!");
+      } catch (err) {
+        console.error(err);
+        alert("Error update portfolio");
+      }
+    }
+    alert("Portfolio not found");
+  };
 
   return (
     <>

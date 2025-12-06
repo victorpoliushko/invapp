@@ -46,17 +46,20 @@ export class PortfoliosController {
   @Patch('/:id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  updatePortfolio(@Param('id') id: string, @Body() updatePortfolioInput: UpdatePortfolioDto, @GetUser() user: User
+  updatePortfolio(
+    @Param('id') id: string,
+    @Body() updatePortfolioInput: UpdatePortfolioDto,
   ) {
-    console.log(`
-     updatePortfolio controller`);
-    // if (updatePortfolioInput.userId !== user.id) {
-    //   throw new HttpException(
-    //     getReasonPhrase(StatusCodes.FORBIDDEN),
-    //     StatusCodes.FORBIDDEN,
-    //   );
-    // }
     return this.portfoliosService.update(updatePortfolioInput);
+  }
+
+  @Delete('/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  deletePortfolio(
+    @Param('id') id: string,
+  ) {
+    return this.portfoliosService.delete(id);
   }
 
   @Get('/:id')
@@ -76,21 +79,20 @@ export class PortfoliosController {
   @Post('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addAsset(@Param('id') id: string, @Body() addAssetToPortfolioDto: AddAssetInputDto) {
+  addAsset(
+    @Param('id') id: string,
+    @Body() addAssetToPortfolioDto: AddAssetInputDto,
+  ) {
     return this.portfoliosService.addAsset(id, addAssetToPortfolioDto);
   }
-
-  // @Patch(':id/assets')
-  // @UseGuards(AuthGuard('jwt'))
-  // @UsePipes(new ValidationPipe())
-  // updateAssets(@Param('id') id: string, @Body() updateAssetsToPortfolioDto: AssetToPortfolioDto) {
-  //   return this.portfoliosService.updateAssets(id, updateAssetsToPortfolioDto);
-  // }
 
   @Delete('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  deleteAsset(@Param('id') assetId: string, @Body() deleteAssetsDto: DeleteAssetsFromPortfolioDto) {
+  deleteAsset(
+    @Param('id') assetId: string,
+    @Body() deleteAssetsDto: DeleteAssetsFromPortfolioDto,
+  ) {
     return this.portfoliosService.deleteAsset(assetId, deleteAssetsDto);
   }
 
