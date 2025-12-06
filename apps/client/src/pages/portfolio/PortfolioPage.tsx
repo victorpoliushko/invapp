@@ -236,9 +236,6 @@ export default function PortfolioPage() {
   };
 
   const onUpdatePortfolio = async (portfolioId: any, updatedName: string) => {
-    // console.log(`
-    //  index: ${JSON.stringify(index)}
-    // `);
     if (!updatedName.trim() || updatedName === portfolio?.name) {
       setIsEditing(false);
       return;

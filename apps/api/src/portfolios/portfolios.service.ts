@@ -49,14 +49,12 @@ export class PortfoliosService {
   }
 
   async update(input: UpdatePortfolioDto): Promise<PortfolioDto> {
-    console.log(`
-     input.id: ${JSON.stringify(input.id)} 
-    `);
     const portfolio = await this.prismaService.portfolio.update({
       where: { id: input.id },
       data: {
         name: input.name
-      }
+      },
+      include: { assets: { include: { assets: true } } },
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
@@ -80,15 +78,6 @@ export class PortfoliosService {
   }
 
   async addAsset(id: string, input: AddAssetInputDto): Promise<PortfolioDto> {
-    /*
-     *  1. find existing portfolio
-     *  2. find existing asset
-     *    - if exists - proceed
-     *    - if doesn't exist in Asset table then add find in external API and add to Asset table
-     *    - if doesn't exist in external API then create from scratch and add to Asset table
-     *  3. add asset to the PortfolioAsset
-     */
-
     const exsitingPortfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
     });

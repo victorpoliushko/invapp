@@ -43,7 +43,7 @@ export class PortfoliosController {
     return this.portfoliosService.create(createPortfolioDto);
   }
 
-  @Patch()
+  @Patch('/:id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   updatePortfolio(@Param('id') id: string, @Body() updatePortfolioInput: UpdatePortfolioDto, @GetUser() user: User
