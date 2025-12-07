@@ -389,7 +389,8 @@ export default function PortfolioPage() {
                   <th scope="col">Asset</th>
                   <th scope="col">Date</th>
                   <th scope="col">Quantity</th>
-                  <th scope="col">Price</th>
+                  <th scope="col">Avg price</th>
+                  <th scope="col">Current price</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -402,6 +403,7 @@ export default function PortfolioPage() {
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantity">{s.quantity}</td>
                         <td data-label="price">{s.price}</td>
+                        <td data-label="current-price">{s.price}</td>
                         <td data-label="actions">
                           <button
                             onClick={() => onDeleteAsset(s.assetId)}

@@ -101,6 +101,20 @@ export class PortfoliosService {
       asset = await this.assetsService.createAsset({ asset: input.assetName });
     }
 
+    const existingPosition = await this.prismaService.portfolioAsset.findUnique({
+      where: { portfolioId_assetId: {
+        portfolioId: id, assetId: asset.id
+      } }
+    });
+
+    let newQuantity = input.quantity;
+    let newAvgPrice = input.price;
+
+    if (existingPosition) {
+      newQuantity += existingPosition.quantity;
+      newAvgPrice = existingPosition.price 
+    }
+
     await this.prismaService.portfolioAsset.upsert({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
       update: { quantity: input.quantity, price: input.price },
@@ -109,6 +123,7 @@ export class PortfoliosService {
         assetId: asset.id,
         quantity: input.quantity,
         price: input.price,
+        
       },
     });
 
