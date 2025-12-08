@@ -111,19 +111,22 @@ export class PortfoliosService {
     let newAvgPrice = input.price;
 
     if (existingPosition) {
-      newQuantity += existingPosition.quantity;
-      newAvgPrice = existingPosition.price 
+      const oldQuantity = existingPosition.quantity;
+      const oldAvgPrice = existingPosition.price;
+
+      newQuantity = oldQuantity + input.quantity;
+
+      newAvgPrice = Math.round((oldAvgPrice * oldQuantity + input.price * input.quantity) / newQuantity);
     }
 
     await this.prismaService.portfolioAsset.upsert({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
-      update: { quantity: input.quantity, price: input.price },
+      update: { quantity: newQuantity, price: newAvgPrice },
       create: {
         portfolioId: id,
         assetId: asset.id,
-        quantity: input.quantity,
-        price: input.price,
-        
+        quantity: newQuantity,
+        price: newAvgPrice
       },
     });
 
