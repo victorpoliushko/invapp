@@ -197,6 +197,9 @@ export default function PortfolioPage() {
         period: "",
         price: 0,
       });
+
+      setSearchTerm("");
+      setSuggestions([]);
     } catch (err) {
       console.error(err);
       alert("Error adding stock");
@@ -434,7 +437,9 @@ export default function PortfolioPage() {
                           setSearchTerm(e.target.value);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleAddAsset();
+                          if (e.key === "Enter") {
+                            handleAddAsset();
+                          }
                         }}
                         required
                         placeholder="Asset"
