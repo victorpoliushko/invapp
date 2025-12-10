@@ -60,13 +60,13 @@ export default function PortfolioPage() {
     dueDate: string;
     quantity: string;
     period: string;
-    price: number;
+    price?: number;
   }>({
     assetName: "",
     dueDate: "",
     quantity: "",
     period: "",
-    price: 0,
+    price: undefined,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
@@ -195,7 +195,7 @@ export default function PortfolioPage() {
         dueDate: "",
         quantity: "",
         period: "",
-        price: 0,
+        price: undefined,
       });
 
       setSearchTerm("");
@@ -394,6 +394,7 @@ export default function PortfolioPage() {
                   <th scope="col">Quantity</th>
                   <th scope="col">Avg price</th>
                   <th scope="col">Current price</th>
+                  <th scope="col">% change</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -407,6 +408,7 @@ export default function PortfolioPage() {
                         <td data-label="quantity">{s.quantity}</td>
                         <td data-label="price">{s.price}</td>
                         <td data-label="current-price">{s.price}</td>
+                        <td data-label="percent-change">{25}</td>
                         <td data-label="actions">
                           <button
                             onClick={() => onDeleteAsset(s.assetId)}
@@ -503,7 +505,7 @@ export default function PortfolioPage() {
                         if (e.key === "Enter") handleAddAsset();
                       }}
                       required
-                      placeholder="Period"
+                      placeholder="Price bought"
                     />
                   </td>
                 </tr>
