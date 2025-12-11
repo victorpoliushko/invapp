@@ -65,7 +65,8 @@ model Asset {
   dataSource DataSource?
   updatedAt  DateTime?   @updatedAt
 
-  portfolios PortfolioAsset[]
+  portfolios   PortfolioAsset[]
+  transactions Transaction[]
 }
 
 model Portfolio {
@@ -75,7 +76,8 @@ model Portfolio {
   user   User?  @relation(fields: [userId], references: [id])
   userId String
 
-  assets PortfolioAsset[]
+  assets       PortfolioAsset[]
+  transactions Transaction[]
 }
 
 model PortfolioAsset {
@@ -111,6 +113,26 @@ model MixedAssets {
   type     MixedAssetType
   quantity Int
   price    Float
+}
+
+model Transaction {
+  id             String          @id @default(uuid())
+  portfolioId    String
+  assetId        String
+  type           TransactionType
+  quantityChange Float
+  pricePerUnit   Float
+  date           DateTime
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
+  asset     Asset     @relation(fields: [assetId], references: [id])
+
+  @@index([id, portfolioId, assetId])
+}
+
+enum TransactionType {
+  BUY
+  SELL
 }
 
 // TODO
