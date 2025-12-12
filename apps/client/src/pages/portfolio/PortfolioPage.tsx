@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import "../../App.css";
 import "./PortfolioPage.css";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
@@ -301,6 +301,13 @@ export default function PortfolioPage() {
     alert("Portfolio not found");
   };
 
+  const [expandedAssetId, setExpandedAssetId] = useState(null);
+
+  const toggleExpand = (assetId: string) => {
+    setExpandedAssetId(assetId === expandedAssetId ? null : assetId);
+  };
+  const COLUMN_COUNT = 7;
+
   return (
     <>
       <section className="assets-section section-container">
@@ -389,6 +396,7 @@ export default function PortfolioPage() {
             <table className="assets-table">
               <thead>
                 <tr>
+                  <th></th>
                   <th scope="col">Asset</th>
                   <th scope="col">Date</th>
                   <th scope="col">Quantity</th>
@@ -401,8 +409,23 @@ export default function PortfolioPage() {
               <tbody>
                 {portfolio &&
                   portfolio.assets.map((s) => (
-                    <>
+                    <React.Fragment key={s.assetId}>
                       <tr>
+                        {/* 1A. EXPAND/COLLAPSE COLUMN */}
+                        <td data-label="expand">
+                          <button
+                            onClick={() => toggleExpand(s.assetId)}
+                            title={
+                              expandedAssetId === s.assetId
+                                ? "Collapse Details"
+                                : "Expand Details"
+                            }
+                            style={{ marginRight: "10px" }} // Added a small style for spacing
+                          >
+                            {expandedAssetId === s.assetId ? "▼" : "►"}
+                          </button>
+                        </td>
+                        {/* Original Columns (Shifted by 1 due to new expand column) */}
                         <td data-label="asset">{s.assets.asset}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantity">{s.quantity}</td>
@@ -412,7 +435,6 @@ export default function PortfolioPage() {
                         <td data-label="actions">
                           <button
                             onClick={() => onDeleteAsset(s.assetId)}
-                            // className="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-150"
                             title={`Remove ${s.assets.asset}`}
                           >
                             <img
@@ -425,7 +447,164 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                       </tr>
-                    </>
+
+                      {expandedAssetId === s.assetId && (
+                        <tr className="detail-row">
+                          <td colSpan={COLUMN_COUNT + 1}>
+                            <div>
+                              <table>
+                                <tbody>
+                                  <tr>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                        <img
+                                          className="edit-icon"
+                                          src={editIcon}
+                                          alt="edit-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                    <td>VOO</td>
+                                    <td>2025-11-24</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                        <img
+                                          className="delete-icon"
+                                          src={deleteIcon}
+                                          alt="delete-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                         <img
+                                          className="edit-icon"
+                                          src={editIcon}
+                                          alt="edit-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                    <td>VOO</td>
+                                    <td>2025-11-24</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                        <img
+                                          className="delete-icon"
+                                          src={deleteIcon}
+                                          alt="delete-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                  </tr>
+<tr>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                         <img
+                                          className="edit-icon"
+                                          src={editIcon}
+                                          alt="edit-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                    <td>VOO</td>
+                                    <td>2025-11-24</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                        <img
+                                          className="delete-icon"
+                                          src={deleteIcon}
+                                          alt="delete-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                  </tr>
+<tr>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                         <img
+                                          className="edit-icon"
+                                          src={editIcon}
+                                          alt="edit-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                    <td>VOO</td>
+                                    <td>2025-11-24</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td>+15.00%</td>
+                                    <td data-label="actions">
+                                      <button
+                                        onClick={() => onDeleteAsset(s.assetId)}
+                                        title={`Remove ${s.assets.asset}`}
+                                      >
+                                        <img
+                                          className="delete-icon"
+                                          src={deleteIcon}
+                                          alt="delete-icon"
+                                          height={30}
+                                          width={30}
+                                        />
+                                      </button>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 <tr>
                   <td>
