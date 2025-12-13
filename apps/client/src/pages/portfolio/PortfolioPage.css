@@ -76,8 +76,8 @@ table {
   border-collapse: collapse;
   margin: 0;
   padding: 0;
-  width: 100%;
-  table-layout: fixed;
+  /* width: 100%; */
+  /* table-layout: fixed; */
 }
 
 table caption {

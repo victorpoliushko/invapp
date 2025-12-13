@@ -496,7 +496,7 @@ export default function PortfolioPage() {
                                         onClick={() => onDeleteAsset(s.assetId)}
                                         title={`Remove ${s.assets.asset}`}
                                       >
-                                         <img
+                                        <img
                                           className="edit-icon"
                                           src={editIcon}
                                           alt="edit-icon"
@@ -526,13 +526,13 @@ export default function PortfolioPage() {
                                       </button>
                                     </td>
                                   </tr>
-<tr>
+                                  <tr>
                                     <td data-label="actions">
                                       <button
                                         onClick={() => onDeleteAsset(s.assetId)}
                                         title={`Remove ${s.assets.asset}`}
                                       >
-                                         <img
+                                        <img
                                           className="edit-icon"
                                           src={editIcon}
                                           alt="edit-icon"
@@ -562,13 +562,13 @@ export default function PortfolioPage() {
                                       </button>
                                     </td>
                                   </tr>
-<tr>
+                                  <tr>
                                     <td data-label="actions">
                                       <button
                                         onClick={() => onDeleteAsset(s.assetId)}
                                         title={`Remove ${s.assets.asset}`}
                                       >
-                                         <img
+                                        <img
                                           className="edit-icon"
                                           src={editIcon}
                                           alt="edit-icon"
@@ -607,6 +607,7 @@ export default function PortfolioPage() {
                     </React.Fragment>
                   ))}
                 <tr>
+                  <td></td>
                   <td>
                     <div className="asset-autocomplete">
                       <input
@@ -687,6 +688,9 @@ export default function PortfolioPage() {
                       placeholder="Price bought"
                     />
                   </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
                 </tr>
               </tbody>
             </table>
