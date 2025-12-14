@@ -6,17 +6,6 @@ import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
-const DeleteIconSvg = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path d="M5 4V6H19V4H5ZM6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7H6ZM9 10H10V18H9V10ZM14 10H15V18H14V10Z" />
-  </svg>
-);
-
 type AssetType = {
   name: string;
   assetSymbol: string;

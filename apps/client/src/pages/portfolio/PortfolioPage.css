@@ -14,7 +14,7 @@
   cursor: pointer;
   background-color: #383838;
   font-weight: bold;
-  transition: background ease 0.3s;
+  transition: ease 0.3s;
 }
  
 .assets .tab {
