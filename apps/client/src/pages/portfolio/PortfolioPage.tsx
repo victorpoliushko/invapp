@@ -5,36 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
-
-type AssetType = {
-  name: string;
-  assetSymbol: string;
-  exchange: string;
-  type: string;
-  price: number;
-};
-
-type PortfolioType = {
-  id: string;
-  name: string;
-  userId: string;
-  assets: Array<{
-    portfolioId: string;
-    assetId: string;
-    quantity: number;
-    price: number;
-    avgBuyPrice: number;
-    assets: {
-      id: string;
-      name: string;
-      asset: string;
-      exchange: string;
-      type: string;
-      dataSource: string;
-      updatedAt: string;
-    };
-  }>;
-};
+import { AssetType, PortfolioType } from "../../types/portfolio";
 
 export default function PortfolioPage() {
   const params = useParams<{ id: string }>();
