@@ -20,13 +20,13 @@ export default function PortfolioPage() {
     dueDate: string;
     quantity: string;
     period: string;
-    price?: number;
+    price: number;
   }>({
     assetName: "",
     dueDate: "",
     quantity: "",
     period: "",
-    price: undefined,
+    price: 0,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
@@ -155,7 +155,7 @@ export default function PortfolioPage() {
         dueDate: "",
         quantity: "",
         period: "",
-        price: undefined,
+        price: 0,
       });
 
       setSearchTerm("");
@@ -267,6 +267,20 @@ export default function PortfolioPage() {
     setExpandedAssetId(assetId === expandedAssetId ? null : assetId);
   };
   const COLUMN_COUNT = 7;
+
+  const clearInputs = () => {
+    setSearchTerm("");
+    setSuggestions([]);
+    setAutocompleteEnabled(false);
+
+    setNewAsset({
+      assetName: "",
+      dueDate: "",
+      quantity: "",
+      period: "",
+      price: 0,
+    });
+  };
 
   return (
     <>
@@ -650,7 +664,17 @@ export default function PortfolioPage() {
                   </td>
                   <td></td>
                   <td></td>
-                  <td></td>
+                  <td>
+                    <button onClick={clearInputs}title={`Clear`}>
+                      <img
+                        className="delete-icon"
+                        src={deleteIcon}
+                        alt="delete-icon"
+                        height={30}
+                        width={30}
+                      />
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
