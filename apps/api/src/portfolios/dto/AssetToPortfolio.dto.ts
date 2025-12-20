@@ -1,20 +1,23 @@
-import { Type } from "class-transformer";
-import { IsArray, IsDefined, IsInt, IsNumber, IsString, IsUUID, Min, ValidateNested } from "class-validator";
+import {
+  IsDefined,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class AddAssetInputDto {
   @IsString()
   @IsDefined()
   assetName: string;
 
-    @IsString()
+  @IsString()
   @IsDefined()
   dueDate: string;
 
-    @IsNumber()
+  @IsNumber()
   @IsDefined()
   quantity: number;
 
-    @IsNumber()
+  @IsNumber()
   @IsDefined()
   price: number;
 }

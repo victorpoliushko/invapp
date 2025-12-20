@@ -43,7 +43,7 @@ export class PortfoliosService {
   async getById(id: string): Promise<PortfolioDto> {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
-      include: { assets: { include: { assets: true, transations: true } } },
+      include: { assets: { include: { assets: true, transactions: true } } },
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
