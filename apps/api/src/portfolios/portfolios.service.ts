@@ -43,7 +43,14 @@ export class PortfoliosService {
   async getById(id: string): Promise<PortfolioDto> {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
-      include: { assets: { include: { assets: true, transactions: true } } },
+      include: { 
+        assets: { 
+          include: { 
+            assets: true
+           } 
+          } 
+        },
+        transactions: true 
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
@@ -52,7 +59,7 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.update({
       where: { id: input.id },
       data: {
-        name: input.name
+        name: input.name,
       },
       include: { assets: { include: { assets: true } } },
     });
@@ -61,7 +68,7 @@ export class PortfoliosService {
 
   async delete(id: string): Promise<void> {
     await this.prismaService.portfolio.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -101,11 +108,16 @@ export class PortfoliosService {
       asset = await this.assetsService.createAsset({ asset: input.assetName });
     }
 
-    const existingPosition = await this.prismaService.portfolioAsset.findUnique({
-      where: { portfolioId_assetId: {
-        portfolioId: id, assetId: asset.id
-      } }
-    });
+    const existingPosition = await this.prismaService.portfolioAsset.findUnique(
+      {
+        where: {
+          portfolioId_assetId: {
+            portfolioId: id,
+            assetId: asset.id,
+          },
+        },
+      },
+    );
 
     let newQuantity = input.quantity;
     let newAvgPrice = input.price;
@@ -116,7 +128,10 @@ export class PortfoliosService {
 
       newQuantity = oldQuantity + input.quantity;
 
-      newAvgPrice = Math.round((oldAvgPrice * oldQuantity + input.price * input.quantity) / newQuantity);
+      newAvgPrice = Math.round(
+        (oldAvgPrice * oldQuantity + input.price * input.quantity) /
+          newQuantity,
+      );
     }
 
     await this.prismaService.portfolioAsset.upsert({
@@ -126,7 +141,7 @@ export class PortfoliosService {
         portfolioId: id,
         assetId: asset.id,
         quantity: newQuantity,
-        price: newAvgPrice
+        price: newAvgPrice,
       },
     });
 
