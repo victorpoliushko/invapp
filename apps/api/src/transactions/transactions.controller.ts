@@ -26,5 +26,6 @@ export class TransactionsController {
   addTransation(
     @Body() createTransactionDTO: CreateTransactionDto,
     @GetUser() user: User,
-  ) {}
+  ) {
+  }
 }
