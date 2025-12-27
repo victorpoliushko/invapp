@@ -10,7 +10,18 @@ export class TransactionsService {
 
   async create(input: CreateTransactionDto): Promise<TransactionsDto> {
     const createdTransaction = await this.prismaService.transaction.create({
-      data: input
+      data: {
+        type: input.type,
+        quantityChange: input.quantityChange,
+        date: input.date,
+        pricePerUnit: input.pricePerUnit,
+        portfolio: {
+          connect: { id: input.portfolioId }
+        },
+        asset: {
+          connect: { id: input.assetId}
+        }
+      }
     });
 
     return plainToInstance(TransactionsDto, createdTransaction);

@@ -11,13 +11,8 @@ import { AssetDto } from 'src/assets/dto/Asset.dto';
 import { PortfolioDto } from 'src/portfolios/dto/Portfolio.dto';
 
 export class CreateTransactionDto {
-  @IsUUID()
-  @IsDefined()
-  portfolioId: string;
-
-  @IsUUID()
-  @IsDefined()
-  assetId: string;
+  @IsDecimal()
+  pricePerUnit: number;
 
   @IsEnum(TransactionType)
   type: TransactionType;
@@ -28,4 +23,12 @@ export class CreateTransactionDto {
   @IsString()
   @IsDefined()
   date: string;
+
+  @IsUUID()
+  @IsDefined()
+  portfolioId: string;
+
+  @IsUUID()
+  @IsDefined()
+  assetId: string;
 }

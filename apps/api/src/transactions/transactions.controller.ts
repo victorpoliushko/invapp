@@ -9,8 +9,6 @@ import {
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTransactionDto } from './dto/CreateTransaction.dto';
-import { GetUser } from 'src/auth/decorators/GetUser.decorator';
-import { User } from '@prisma/client';
 
 export class TransactionsController {
   constructor(private transactionsService: TransactionsService) {}
@@ -24,8 +22,8 @@ export class TransactionsController {
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   addTransation(
-    @Body() createTransactionDTO: CreateTransactionDto,
-    @GetUser() user: User,
+    @Body() createTransactionDTO: CreateTransactionDto
   ) {
+    return this.transactionsService.create(createTransactionDTO);
   }
 }
