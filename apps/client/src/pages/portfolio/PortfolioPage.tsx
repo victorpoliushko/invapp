@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
-import { AssetType, PortfolioType } from "../../types/portfolio";
+import { AssetType, PortfolioType, TransactionType } from "../../types/portfolio";
 
 export default function PortfolioPage() {
   const params = useParams<{ id: string }>();
@@ -168,49 +168,76 @@ export default function PortfolioPage() {
   };
 
   // wip
-    const handleAddTransaction = async () => {
+  console.log(`
+   newAsset: ${JSON.stringify(newAsset)} 
+  `);
+    const handleAddTransaction = async (portfolioId: string, assetId: string, type: TransactionType) => {
     const { assetName, dueDate, quantity, price } = newAsset;
-
-    if (!assetName || !dueDate || !quantity || !price) {
-      alert("Please fill in all fields before adding the asset.");
-      return;
+    const newTransaction = {
+  pricePerUnit: price,
+  quantityChange: quantity,
+  date: dueDate,
+  type,
+  portfolioId,
+  assetId
     }
-
     const token = localStorage.getItem("accessToken");
+
     try {
-      const res = await fetch(`/api/portfolios/${params.id}/assets`, {
+      const res = await fetch(`/api/transactions`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+          Authoziration: `Bearer ${token}`
         },
-        body: JSON.stringify(newAsset),
+        body: JSON.stringify(newTransaction)
       });
-
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => null);
-        console.error("Error response:", errorBody);
-        throw new Error("Failed to add stock");
-      }
-
-      const updatedPortfolio = await res.json();
-      setPortfolio(updatedPortfolio);
-
-      alert("Asset added successfully!");
-      setNewAsset({
-        assetName: "",
-        dueDate: "",
-        quantity: "",
-        period: "",
-        price: 0,
-      });
-
-      setSearchTerm("");
-      setSuggestions([]);
-    } catch (err) {
-      console.error(err);
-      alert("Error adding stock");
+      console.log(
+       await res.json());
+    } catch (error) {
+      
     }
+
+    // if (!assetName || !dueDate || !quantity || !price) {
+    //   alert("Please fill in all fields before adding the asset.");
+    //   return;
+    // }
+
+    // const token = localStorage.getItem("accessToken");
+    // try {
+    //   const res = await fetch(`/api/portfolios/${params.id}/assets`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: JSON.stringify(newAsset),
+    //   });
+
+    //   if (!res.ok) {
+    //     const errorBody = await res.json().catch(() => null);
+    //     console.error("Error response:", errorBody);
+    //     throw new Error("Failed to add stock");
+    //   }
+
+    //   const updatedPortfolio = await res.json();
+    //   setPortfolio(updatedPortfolio);
+
+    //   alert("Asset added successfully!");
+    //   setNewAsset({
+    //     assetName: "",
+    //     dueDate: "",
+    //     quantity: "",
+    //     period: "",
+    //     price: 0,
+    //   });
+
+    //   setSearchTerm("");
+    //   setSuggestions([]);
+    // } catch (err) {
+    //   console.error(err);
+    //   alert("Error adding stock");
+    // }
   };
 
   const onDeleteAsset = async (index: any) => {
@@ -645,7 +672,8 @@ export default function PortfolioPage() {
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleAddAsset();
+                            // handleAddAsset();
+                            handleAddTransaction(portfolio?.id);
                           }
                         }}
                         required
@@ -682,7 +710,9 @@ export default function PortfolioPage() {
                       value={newAsset.dueDate}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        if (e.key === "Enter") 
+                          // handleAddAsset();
+                        handleAddTransaction();
                       }}
                       required
                     />
@@ -694,7 +724,9 @@ export default function PortfolioPage() {
                       value={newAsset.quantity}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        if (e.key === "Enter") 
+                          // handleAddAsset();
+                        handleAddTransaction();
                       }}
                       required
                       placeholder="Quantity"
@@ -707,7 +739,9 @@ export default function PortfolioPage() {
                       value={newAsset.price}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        if (e.key === "Enter") 
+                          // handleAddAsset();
+                        handleAddTransaction();
                       }}
                       required
                       placeholder="Price bought"

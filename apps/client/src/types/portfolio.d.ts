@@ -27,3 +27,8 @@ export type PortfolioType = {
     };
   }>;
 };
+
+export type TransactionType = {
+  BUY
+  SELL
+}
