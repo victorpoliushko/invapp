@@ -171,7 +171,7 @@ export default function PortfolioPage() {
   console.log(`
    newAsset: ${JSON.stringify(newAsset)} 
   `);
-    const handleAddTransaction = async (portfolioId: string, assetId: string, type: TransactionType) => {
+    const handleAddTransaction = async (portfolioId: string, type: TransactionType, assetId?: string) => {
     const { assetName, dueDate, quantity, price } = newAsset;
     const newTransaction = {
   pricePerUnit: price,
@@ -179,7 +179,8 @@ export default function PortfolioPage() {
   date: dueDate,
   type,
   portfolioId,
-  assetId
+  assetId,
+  assetName
     }
     const token = localStorage.getItem("accessToken");
 
