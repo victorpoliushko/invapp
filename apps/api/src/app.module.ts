@@ -23,6 +23,7 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 // import { GoogleAnalyticsService } from './ga4/googleAnalyticsApi.service';
 // import { GoogleAnalyticsController } from './ga4/googleAnalyticsApi.controller';
 import { UploadModule } from './upload/upload.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UploadModule } from './upload/upload.module';
     UsersModule,
     AuthModule,
     PortfoliosModule,
+    TransactionsModule,
     AssetsModule,
     MixedAssetsModule,
     PrometheusModule.register(),
