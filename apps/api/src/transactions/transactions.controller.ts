@@ -13,19 +13,24 @@ import { CreateTransactionDto } from './dto/CreateTransaction.dto';
 
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private transactionsService: TransactionsService) {}
+  constructor(private transactionsService: TransactionsService) {
+    console.log('transaction controller');
+  }
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  getTransations() {}
+  getTransactions() {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addTransation(
+  addTransaction(
     @Body() createTransactionDTO: CreateTransactionDto
   ) {
+    console.log(`
+     add transaction 
+    `);
     return this.transactionsService.create(createTransactionDTO);
   }
 }

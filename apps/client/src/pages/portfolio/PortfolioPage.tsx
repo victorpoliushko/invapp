@@ -172,9 +172,9 @@ export default function PortfolioPage() {
   };
 
   // wip
-  console.log(`
-   newAsset: ${JSON.stringify(newAsset)} 
-  `);
+  // console.log(`
+  //  newAsset: ${JSON.stringify(newAsset)} 
+  // `);
   const handleAddTransaction = async (
     portfolioId: string,
     type: TransactionType,
@@ -191,6 +191,10 @@ export default function PortfolioPage() {
       assetName,
     };
     const token = localStorage.getItem("accessToken");
+
+    console.log(`
+     token: ${JSON.stringify(token)} 
+    `);
 
     try {
       const res = await fetch(`/api/transactions`, {
@@ -247,9 +251,9 @@ export default function PortfolioPage() {
   };
 
   const onDeleteAsset = async (index: any) => {
-    console.log(`
-     index: ${JSON.stringify(index)} 
-    `);
+    // console.log(`
+    //  index: ${JSON.stringify(index)} 
+    // `);
     const token = localStorage.getItem("accessToken");
 
     try {
@@ -362,9 +366,9 @@ export default function PortfolioPage() {
     });
   };
 
-  console.log(`
-   portfolio: ${JSON.stringify(portfolio)} 
-  `);
+  // console.log(`
+  //  portfolio: ${JSON.stringify(portfolio)} 
+  // `);
 
   return (
     <>
