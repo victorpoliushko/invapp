@@ -17,10 +17,10 @@ export class TransactionsController {
     console.log('transaction controller');
   }
 
-  @Get()
-  @UseGuards(AuthGuard('jwt'))
-  @UsePipes(new ValidationPipe())
-  getTransactions() {}
+  // @Get()
+  // @UseGuards(AuthGuard('jwt'))
+  // @UsePipes(new ValidationPipe())
+  // getTransactions() {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'))

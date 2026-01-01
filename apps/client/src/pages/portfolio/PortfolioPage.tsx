@@ -8,7 +8,7 @@ import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import {
   AssetType,
   PortfolioType,
-  TransactionType,
+  TransactionType
 } from "../../types/portfolio";
 
 export default function PortfolioPage() {
@@ -62,6 +62,10 @@ export default function PortfolioPage() {
   }, [params.id]);
 
   const [portfolio, setPortfolio] = useState<PortfolioType>();
+
+  if (!portfolio) {
+    return null;
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -201,7 +205,7 @@ export default function PortfolioPage() {
         method: "POST",
         headers: {
           "Content-type": "application/json",
-          Authoziration: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(newTransaction),
       });
@@ -683,7 +687,7 @@ export default function PortfolioPage() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             // handleAddAsset();
-                            handleAddTransaction(portfolio?.id);
+                            handleAddTransaction(portfolio?.id, TransactionType.BUY);
                           }
                         }}
                         required
@@ -722,7 +726,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction();
+                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
                       }}
                       required
                     />
@@ -736,7 +740,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction();
+                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
                       }}
                       required
                       placeholder="Quantity"
@@ -751,7 +755,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction();
+                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
                       }}
                       required
                       placeholder="Price bought"
