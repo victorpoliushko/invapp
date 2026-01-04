@@ -154,7 +154,12 @@ export default function PortfolioPage() {
   }, [searchTerm]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewAsset({ ...newAsset, [e.target.name]: e.target.value });
+    setNewAsset({ price: parseFloat(newAsset.price), 
+      assetName: newAsset.assetName, 
+      dueDate: e.va 
+      quantity, 
+      // ...newAsset, 
+      [e.target.name]: e.target.value });
   };
 
   // add transaction here
@@ -213,6 +218,10 @@ export default function PortfolioPage() {
     assetId?: string
   ) => {
     const { assetName, dueDate, quantity, price } = newAsset;
+
+    console.log(`
+     newAsset: ${JSON.stringify(newAsset)} 
+    `);
     const newTransaction = {
       pricePerUnit: price,
       quantityChange: quantity,
@@ -224,9 +233,9 @@ export default function PortfolioPage() {
     };
     const token = localStorage.getItem("accessToken");
 
-    console.log(`
-     token: ${JSON.stringify(token)} 
-    `);
+    // console.log(`
+    //  token: ${JSON.stringify(token)} 
+    // `);
 
     try {
       const res = await fetch(`/api/transactions`, {
