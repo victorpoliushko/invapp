@@ -53,13 +53,13 @@ export default function PortfolioPage() {
     assetName: string;
     dueDate: string;
     quantity: string;
-    period: string;
+    // period: string;
     price: number;
   }>({
     assetName: "",
     dueDate: "",
     quantity: "",
-    period: "",
+    // period: "",
     price: 0,
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -154,12 +154,12 @@ export default function PortfolioPage() {
   }, [searchTerm]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewAsset({ price: parseFloat(newAsset.price), 
-      assetName: newAsset.assetName, 
-      dueDate: e.va 
-      quantity, 
-      // ...newAsset, 
-      [e.target.name]: e.target.value });
+    setNewAsset({ 
+      price: parseFloat(e.target.price), 
+      assetName: e.target.assetName,
+      dueDate: e.target.dueDate,
+      quantity: e.target.quantity
+    });
   };
 
   // add transaction here
@@ -196,7 +196,7 @@ export default function PortfolioPage() {
         assetName: "",
         dueDate: "",
         quantity: "",
-        period: "",
+        // period: "",
         price: 0,
       });
 
@@ -402,7 +402,7 @@ export default function PortfolioPage() {
       assetName: "",
       dueDate: "",
       quantity: "",
-      period: "",
+      // period: "",
       price: 0,
     });
   };
