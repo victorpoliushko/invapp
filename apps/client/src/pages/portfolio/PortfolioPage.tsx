@@ -154,12 +154,18 @@ export default function PortfolioPage() {
   }, [searchTerm]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewAsset({ 
-      price: parseFloat(e.target.price), 
-      assetName: e.target.assetName,
-      dueDate: e.target.dueDate,
-      quantity: e.target.quantity
-    });
+    const { name, value } = e.target;
+console.log(`
+ name: ${JSON.stringify(name)} 
+`);
+    setNewAsset((prev) => ({
+      ...prev,
+      [name]: value,
+      // price: parseFloat(e.target.price), 
+      // assetName: e.target.assetName,
+      // dueDate: e.target.dueDate,
+      // quantity: e.target.quantity
+    }));
   };
 
   // add transaction here
@@ -789,8 +795,8 @@ export default function PortfolioPage() {
                   </td>
                   <td>
                     <input
-                      type="text"
-                      name="price"
+                      type="number"
+                      name="pricePerUnit"
                       value={newAsset.price}
                       onChange={handleChange}
                       onKeyDown={(e) => {
