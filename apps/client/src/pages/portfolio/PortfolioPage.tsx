@@ -5,12 +5,13 @@ import React, { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+
 export type AssetType = {
   name: string;
   assetSymbol: string;
   exchange: string;
   type: string;
-  price: number;
+  pricePerUnit: number;
 };
 
 export type PortfolioType = {
@@ -20,8 +21,8 @@ export type PortfolioType = {
   assets: Array<{
     portfolioId: string;
     assetId: string;
-    quantity: number;
-    price: number;
+    quantityChange: number;
+    pricePerUnit: number;
     avgBuyPrice: number;
     assets: {
       id: string;
@@ -36,10 +37,9 @@ export type PortfolioType = {
 };
 
 export enum TransactionType {
-  BUY = 'BUY',
-  SELL = 'SELL'
+  BUY = "BUY",
+  SELL = "SELL",
 }
-
 
 export default function PortfolioPage() {
   const params = useParams<{ id: string }>();
@@ -52,15 +52,15 @@ export default function PortfolioPage() {
   const [newAsset, setNewAsset] = useState<{
     assetName: string;
     dueDate: string;
-    quantity: string;
+    quantityChange: string;
     // period: string;
-    price: number;
+    pricePerUnit: number;
   }>({
     assetName: "",
     dueDate: "",
-    quantity: "",
+    quantityChange: "",
     // period: "",
-    price: 0,
+    pricePerUnit: 0,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
@@ -93,8 +93,6 @@ export default function PortfolioPage() {
 
   const [portfolio, setPortfolio] = useState<PortfolioType>();
 
-
-
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
@@ -102,7 +100,7 @@ export default function PortfolioPage() {
       portfolio &&
         portfolio.assets.forEach(async (s) => {
           const response = await fetchWithRedirect(
-            `http://localhost:5173/api/assets/price?asset=${s.assets.asset}`,
+            `http://localhost:5173/api/assets/pricePerUnit?asset=${s.assets.asset}`,
             {
               method: "GET",
               headers: {
@@ -112,7 +110,7 @@ export default function PortfolioPage() {
             }
           );
           const data = await response.json();
-          s.price = data.price;
+          s.pricePerUnit = data.pricePerUnit;
         });
     };
     fetchPrice();
@@ -155,92 +153,93 @@ export default function PortfolioPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-console.log(`
+    console.log(`
  name: ${JSON.stringify(name)} 
 `);
     setNewAsset((prev) => ({
       ...prev,
       [name]: value,
-      // price: parseFloat(e.target.price), 
+      // pricePerUnit: parseFloat(e.target.pricePerUnit),
       // assetName: e.target.assetName,
       // dueDate: e.target.dueDate,
-      // quantity: e.target.quantity
+      // quantityChange: e.target.quantityChange
     }));
   };
 
   // add transaction here
-  const handleAddAsset = async () => {
-    const { assetName, dueDate, quantity, price } = newAsset;
+  // const handleAddAsset = async () => {
+  //   const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
 
-    if (!assetName || !dueDate || !quantity || !price) {
-      alert("Please fill in all fields before adding the asset.");
-      return;
-    }
+  //   if (!assetName || !dueDate || !quantityChange || !pricePerUnit) {
+  //     alert("Please fill in all fields before adding the asset.");
+  //     return;
+  //   }
 
-    const token = localStorage.getItem("accessToken");
-    try {
-      const res = await fetch(`/api/portfolios/${params.id}/assets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newAsset),
-      });
+  //   const token = localStorage.getItem("accessToken");
+  //   try {
+  //     const res = await fetch(`/api/portfolios/${params.id}/assets`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(newAsset),
+  //     });
 
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => null);
-        console.error("Error response:", errorBody);
-        throw new Error("Failed to add stock");
-      }
+  //     if (!res.ok) {
+  //       const errorBody = await res.json().catch(() => null);
+  //       console.error("Error response:", errorBody);
+  //       throw new Error("Failed to add stock");
+  //     }
 
-      const updatedPortfolio = await res.json();
-      setPortfolio(updatedPortfolio);
+  //     const updatedPortfolio = await res.json();
+  //     setPortfolio(updatedPortfolio);
 
-      alert("Asset added successfully!");
-      setNewAsset({
-        assetName: "",
-        dueDate: "",
-        quantity: "",
-        // period: "",
-        price: 0,
-      });
+  //     alert("Asset added successfully!");
+  //     setNewAsset({
+  //       assetName: "",
+  //       dueDate: "",
+  //       quantityChange: "",
+  //       // period: "",
+  //       pricePerUnit: 0,
+  //     });
 
-      setSearchTerm("");
-      setSuggestions([]);
-    } catch (err) {
-      console.error(err);
-      alert("Error adding stock");
-    }
-  };
+  //     setSearchTerm("");
+  //     setSuggestions([]);
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Error adding stock");
+  //   }
+  // };
 
   // wip
   // console.log(`
-  //  newAsset: ${JSON.stringify(newAsset)} 
+  //  newAsset: ${JSON.stringify(newAsset)}
   // `);
   const handleAddTransaction = async (
     portfolioId: string,
     type: TransactionType,
     assetId?: string
   ) => {
-    const { assetName, dueDate, quantity, price } = newAsset;
+    const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
 
     console.log(`
      newAsset: ${JSON.stringify(newAsset)} 
     `);
+
     const newTransaction = {
-      pricePerUnit: price,
-      quantityChange: quantity,
+      pricePerUnit: Number(pricePerUnit),
+      quantityChange: Number(quantityChange),
       date: dueDate,
       type,
       portfolioId,
-      assetId,
       assetName,
+      ...(assetId && { assetId }),
     };
     const token = localStorage.getItem("accessToken");
 
     // console.log(`
-    //  token: ${JSON.stringify(token)} 
+    //  token: ${JSON.stringify(token)}
     // `);
 
     try {
@@ -255,7 +254,7 @@ console.log(`
       console.log(await res.json());
     } catch (error) {}
 
-    // if (!assetName || !dueDate || !quantity || !price) {
+    // if (!assetName || !dueDate || !quantityChange || !pricePerUnit) {
     //   alert("Please fill in all fields before adding the asset.");
     //   return;
     // }
@@ -284,9 +283,9 @@ console.log(`
     //   setNewAsset({
     //     assetName: "",
     //     dueDate: "",
-    //     quantity: "",
+    //     quantityChange: "",
     //     period: "",
-    //     price: 0,
+    //     pricePerUnit: 0,
     //   });
 
     //   setSearchTerm("");
@@ -299,7 +298,7 @@ console.log(`
 
   const onDeleteAsset = async (index: any) => {
     // console.log(`
-    //  index: ${JSON.stringify(index)} 
+    //  index: ${JSON.stringify(index)}
     // `);
     const token = localStorage.getItem("accessToken");
 
@@ -407,17 +406,17 @@ console.log(`
     setNewAsset({
       assetName: "",
       dueDate: "",
-      quantity: "",
+      quantityChange: "",
       // period: "",
-      price: 0,
+      pricePerUnit: 0,
     });
   };
 
   // console.log(`
-  //  portfolio: ${JSON.stringify(portfolio)} 
+  //  portfolio: ${JSON.stringify(portfolio)}
   // `);
 
-    if (!portfolio) {
+  if (!portfolio) {
     return null;
   }
 
@@ -513,8 +512,8 @@ console.log(`
                   <th scope="col">Asset</th>
                   <th scope="col">Date</th>
                   <th scope="col">Quantity</th>
-                  <th scope="col">Avg price</th>
-                  <th scope="col">Current price</th>
+                  <th scope="col">Avg pricePerUnit</th>
+                  <th scope="col">Current pricePerUnit</th>
                   <th scope="col">% change</th>
                   <th scope="col">Actions</th>
                 </tr>
@@ -541,9 +540,11 @@ console.log(`
                         {/* Original Columns (Shifted by 1 due to new expand column) */}
                         <td data-label="asset">{s.assets.asset}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
-                        <td data-label="quantity">{s.quantity}</td>
-                        <td data-label="price">{s.price}</td>
-                        <td data-label="current-price">{s.price}</td>
+                        <td data-label="quantityChange">{s.quantityChange}</td>
+                        <td data-label="pricePerUnit">{s.pricePerUnit}</td>
+                        <td data-label="current-pricePerUnit">
+                          {s.pricePerUnit}
+                        </td>
                         <td data-label="percent-change">{25}</td>
                         <td data-label="actions">
                           <button
@@ -734,7 +735,10 @@ console.log(`
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             // handleAddAsset();
-                            handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                            handleAddTransaction(
+                              portfolio?.id,
+                              TransactionType.BUY
+                            );
                           }
                         }}
                         required
@@ -773,7 +777,10 @@ console.log(`
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                          handleAddTransaction(
+                            portfolio?.id,
+                            TransactionType.BUY
+                          );
                       }}
                       required
                     />
@@ -781,13 +788,16 @@ console.log(`
                   <td>
                     <input
                       type="number"
-                      name="quantity"
-                      value={newAsset.quantity}
+                      name="quantityChange"
+                      value={newAsset.quantityChange}
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                          handleAddTransaction(
+                            portfolio?.id,
+                            TransactionType.BUY
+                          );
                       }}
                       required
                       placeholder="Quantity"
@@ -797,12 +807,15 @@ console.log(`
                     <input
                       type="number"
                       name="pricePerUnit"
-                      value={newAsset.price}
+                      value={newAsset.pricePerUnit}
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                          handleAddTransaction(
+                            portfolio?.id,
+                            TransactionType.BUY
+                          );
                       }}
                       required
                       placeholder="Price bought"
@@ -871,7 +884,7 @@ console.log(`
                           setSearchTerm(e.target.value);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleAddAsset();
+                          // if (e.key === "Enter") handleAddAsset();
                         }}
                         required
                         placeholder="Asset"
@@ -907,7 +920,7 @@ console.log(`
                       value={newAsset.dueDate}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                     />
@@ -915,11 +928,11 @@ console.log(`
                   <td>
                     <input
                       type="number"
-                      name="quantity"
-                      value={newAsset.quantity}
+                      name="quantityChange"
+                      value={newAsset.quantityChange}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                       placeholder="Quantity"
@@ -928,11 +941,11 @@ console.log(`
                   <td>
                     <input
                       type="text"
-                      name="price"
-                      value={newAsset.price}
+                      name="pricePerUnit"
+                      value={newAsset.pricePerUnit}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                       placeholder="Period"
@@ -988,7 +1001,7 @@ console.log(`
                           setSearchTerm(e.target.value);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleAddAsset();
+                          // if (e.key === "Enter") handleAddAsset();
                         }}
                         required
                         placeholder="Asset"
@@ -1024,7 +1037,7 @@ console.log(`
                       value={newAsset.dueDate}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                     />
@@ -1032,11 +1045,11 @@ console.log(`
                   <td>
                     <input
                       type="number"
-                      name="quantity"
-                      value={newAsset.quantity}
+                      name="quantityChange"
+                      value={newAsset.quantityChange}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                       placeholder="Quantity"
@@ -1045,11 +1058,11 @@ console.log(`
                   <td>
                     <input
                       type="text"
-                      name="price"
-                      value={newAsset.price}
+                      name="pricePerUnit"
+                      value={newAsset.pricePerUnit}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                       placeholder="Period"
@@ -1105,7 +1118,7 @@ console.log(`
                           setSearchTerm(e.target.value);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleAddAsset();
+                          // if (e.key === "Enter") handleAddAsset();
                         }}
                         required
                         placeholder="Asset"
@@ -1141,7 +1154,7 @@ console.log(`
                       value={newAsset.dueDate}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                     />
@@ -1149,11 +1162,11 @@ console.log(`
                   <td>
                     <input
                       type="number"
-                      name="quantity"
-                      value={newAsset.quantity}
+                      name="quantityChange"
+                      value={newAsset.quantityChange}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                       placeholder="Quantity"
@@ -1162,11 +1175,11 @@ console.log(`
                   <td>
                     <input
                       type="text"
-                      name="price"
-                      value={newAsset.price}
+                      name="pricePerUnit"
+                      value={newAsset.pricePerUnit}
                       onChange={handleChange}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleAddAsset();
+                        // if (e.key === "Enter") handleAddAsset();
                       }}
                       required
                       placeholder="Period"
