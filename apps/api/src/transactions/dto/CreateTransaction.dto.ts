@@ -1,21 +1,21 @@
 import { TransactionType } from '@prisma/client';
 import {
-  IsDecimal,
   IsDefined,
   IsEnum,
+  IsNumber,
   IsString,
   IsUUID,
   ValidateIf,
 } from 'class-validator';
 
 export class CreateTransactionDto {
-  @IsDecimal()
+  @IsNumber()
   pricePerUnit: number;
 
   @IsEnum(TransactionType)
   type: TransactionType;
 
-  @IsDecimal()
+  @IsNumber()
   quantityChange: number;
 
   @IsString()
@@ -26,12 +26,12 @@ export class CreateTransactionDto {
   @IsDefined()
   portfolioId: string;
 
-  @ValidateIf(i => i.assetId || i.assetName)
+  @ValidateIf(i => !i.assetName || i.assetId)
   @IsDefined({message: 'At least one of id or assetName must be provided'})
   @IsUUID()
   assetId?: string;
 
-  @ValidateIf(i => i.assetId || i.assetName)
+  @ValidateIf(i => !i.assetId || i.assetName)
   @IsDefined({message: 'At least one of id or assetName must be provided'})
   @IsString()
   assetName?: string;

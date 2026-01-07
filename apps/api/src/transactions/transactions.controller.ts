@@ -26,11 +26,12 @@ export class TransactionsController {
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
   addTransaction(
+    // @Body() createTransactionDTO: any
     @Body() createTransactionDTO: CreateTransactionDto
   ) {
-    console.log(`
-     add transaction 
-    `);
+console.log(`
+ createTransactionDTO: ${JSON.stringify(createTransactionDTO)} 
+`);
     return this.transactionsService.create(createTransactionDTO);
   }
 }

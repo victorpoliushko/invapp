@@ -233,8 +233,8 @@ export default function PortfolioPage() {
       date: dueDate,
       type,
       portfolioId,
-      assetName,
-      ...(assetId && { assetId }),
+      assetName: assetName || undefined,
+      assetId: assetId || undefined,
     };
     const token = localStorage.getItem("accessToken");
 
