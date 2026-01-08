@@ -230,7 +230,7 @@ export default function PortfolioPage() {
     const newTransaction = {
       pricePerUnit: Number(pricePerUnit),
       quantityChange: Number(quantityChange),
-      date: dueDate,
+      date: new Date(dueDate).toISOString(),
       type,
       portfolioId,
       assetName: assetName || undefined,
