@@ -1,21 +1,19 @@
-import { PrismaService } from "src/prisma/prisma.service";
-import { CreateTransactionDto } from "./dto/CreateTransaction.dto";
-import { TransactionsDto } from "./dto/Transations.dto";
-import { plainToInstance } from "class-transformer";
-import { Injectable } from "@nestjs/common";
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateTransactionDto } from './dto/CreateTransaction.dto';
+import { TransactionsDto } from './dto/Transations.dto';
+import { plainToInstance } from 'class-transformer';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TransactionsService {
-  constructor(
-    private prismaService: PrismaService
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   async create(input: CreateTransactionDto): Promise<TransactionsDto> {
     let assetId = input.assetId;
 
     if (!assetId && input.assetName) {
       const asset = await this.prismaService.asset.findFirst({
-        where: { asset: input.assetName }
+        where: { asset: input.assetName },
       });
 
       assetId = asset.id;
@@ -28,18 +26,29 @@ export class TransactionsService {
         date: input.date,
         pricePerUnit: input.pricePerUnit,
         portfolio: {
-          connect: { id: input.portfolioId }
+          connect: { id: input.portfolioId },
         },
         ...(assetId && {
           asset: {
             connect: {
-              id: assetId
-            }
-          }
-        })
-      }
+              id: assetId,
+            },
+          },
+        }),
+      },
     });
 
     return plainToInstance(TransactionsDto, createdTransaction);
+  }
+
+  async getById(id: string): Promise<TransactionsDto> {
+    const transaction = await this.prismaService.transaction.findUnique({
+      where: { id },
+      include: {
+        asset: true,
+        portfolio: true,
+      },
+    });
+    return plainToInstance(TransactionsDto, transaction);
   }
 }
