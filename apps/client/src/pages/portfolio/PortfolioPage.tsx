@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import type { PortfolioDto } from '../../../../api/src/portfolios/dto/portfolio.dto';
 
 export type AssetType = {
   name: string;
@@ -65,6 +66,7 @@ export default function PortfolioPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
 
+  // get portfolio info
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const fetchPortfolio = async () => {
@@ -83,6 +85,9 @@ export default function PortfolioPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
 
       const portfolio = await response.json();
+      console.log(`
+       portfolio: ${JSON.stringify(portfolio)} 
+      `);
       setPortfolio(portfolio);
     };
 
@@ -91,7 +96,7 @@ export default function PortfolioPage() {
     }
   }, [params.id]);
 
-  const [portfolio, setPortfolio] = useState<PortfolioType>();
+  const [portfolio, setPortfolio] = useState<PortfolioDto>();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -110,7 +115,7 @@ export default function PortfolioPage() {
             }
           );
           const data = await response.json();
-          s.pricePerUnit = data.pricePerUnit;
+          s.price = data.pricePerUnit;
         });
     };
     fetchPrice();
@@ -118,6 +123,7 @@ export default function PortfolioPage() {
 
   const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
 
+  // set suggestions on search
   useEffect(() => {
     if (!autocompleteEnabled) return;
     const token = localStorage.getItem("accessToken");
@@ -153,16 +159,9 @@ export default function PortfolioPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log(`
- name: ${JSON.stringify(name)} 
-`);
     setNewAsset((prev) => ({
       ...prev,
-      [name]: value,
-      // pricePerUnit: parseFloat(e.target.pricePerUnit),
-      // assetName: e.target.assetName,
-      // dueDate: e.target.dueDate,
-      // quantityChange: e.target.quantityChange
+      [name]: value
     }));
   };
 
@@ -583,7 +582,7 @@ export default function PortfolioPage() {
                                         />
                                       </button>
                                     </td>
-                                    <td>VOO</td>
+                                    <td>{}</td>
                                     <td>2025-11-24</td>
                                     <td>+15.00%</td>
                                     <td>+15.00%</td>
