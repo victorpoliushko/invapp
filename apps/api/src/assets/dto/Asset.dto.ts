@@ -1,4 +1,5 @@
 import { DataSource, AssetType } from '@prisma/client';
+import { Expose, Type } from 'class-transformer';
 import {
   IsDefined,
   IsEnum,
@@ -8,6 +9,7 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
+import { TransactionsDto } from 'src/transactions/dto/Transations.dto';
 
 export class AssetDto {
   @IsDefined()
@@ -35,6 +37,10 @@ export class AssetDto {
 
   @IsOptional()
   updatedAt?: Date;
+
+  @Type(() => TransactionsDto)
+  @Expose()
+  transactions?: TransactionsDto[];
 }
 
 export class CreateAssetDto {

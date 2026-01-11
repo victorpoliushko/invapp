@@ -46,8 +46,15 @@ export class PortfoliosService {
       include: {
         assets: {
           include: {
-            assets: true
-           }
+            assets: {
+              include: {
+                transactions: {
+                  where: { portfolioId: id },
+                  orderBy: { date: 'desc' }
+                }
+              }
+            },
+          }
         },
         transactions: true,
       },

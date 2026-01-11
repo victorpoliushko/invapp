@@ -7,35 +7,35 @@ import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from '../../../../api/src/portfolios/dto/portfolio.dto';
 
-export type AssetType = {
-  name: string;
-  assetSymbol: string;
-  exchange: string;
-  type: string;
-  pricePerUnit: number;
-};
+// export type AssetType = {
+//   name: string;
+//   assetSymbol: string;
+//   exchange: string;
+//   type: string;
+//   pricePerUnit: number;
+// };
 
-export type PortfolioType = {
-  id: string;
-  name: string;
-  userId: string;
-  assets: Array<{
-    portfolioId: string;
-    assetId: string;
-    quantityChange: number;
-    pricePerUnit: number;
-    avgBuyPrice: number;
-    assets: {
-      id: string;
-      name: string;
-      asset: string;
-      exchange: string;
-      type: string;
-      dataSource: string;
-      updatedAt: string;
-    };
-  }>;
-};
+// export type PortfolioType = {
+//   id: string;
+//   name: string;
+//   userId: string;
+//   assets: Array<{
+//     portfolioId: string;
+//     assetId: string;
+//     quantityChange: number;
+//     pricePerUnit: number;
+//     avgBuyPrice: number;
+//     assets: {
+//       id: string;
+//       name: string;
+//       asset: string;
+//       exchange: string;
+//       type: string;
+//       dataSource: string;
+//       updatedAt: string;
+//     };
+//   }>;
+// };
 
 export enum TransactionType {
   BUY = "BUY",
@@ -537,12 +537,19 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                         {/* Original Columns (Shifted by 1 due to new expand column) */}
-                        <td data-label="asset">{s.assets.asset}</td>
+                        {/* <td data-label="asset">{s.assets.asset}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantityChange}</td>
                         <td data-label="pricePerUnit">{s.pricePerUnit}</td>
                         <td data-label="current-pricePerUnit">
                           {s.pricePerUnit}
+                        </td> */}
+                                                <td data-label="asset">test name</td>
+                        <td data-label="date">test date</td>
+                        <td data-label="quantityChange">test quantity</td>
+                        <td data-label="pricePerUnit">test price</td>
+                        <td data-label="current-pricePerUnit">
+test curr price
                         </td>
                         <td data-label="percent-change">{25}</td>
                         <td data-label="actions">
@@ -560,7 +567,7 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                       </tr>
-
+            {/* {expandedAssetId === s.assetId && ( */}
                       {expandedAssetId === s.assetId && (
                         <tr className="detail-row">
                           <td colSpan={COLUMN_COUNT + 1}>
