@@ -8,7 +8,6 @@ import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AssetsService } from '../assets/assets.service';
-import { Asset } from '@prisma/client';
 import { UpdatePortfolioDto } from './dto/UpdatePortfolio.dto';
 
 interface AssetsWithPrices {

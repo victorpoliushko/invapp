@@ -43,18 +43,6 @@ export class AssetsService {
         );
       }
 
-      // const pricingUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&asset=${asset}&interval=5min&apikey=${apikey}`;
-
-      // const response = await lastValueFrom(this.httpService.get(pricingUrl));
-      // const timeSeries = response.data['Time Series (5min)'];
-
-      // if (!timeSeries) {
-      //   throw new Error('No time series data available');
-      // }
-      // const latestTimestapm = Object.keys(timeSeries)[0];
-      // const latestData = timeSeries[latestTimestapm];
-      // const price = parseFloat(latestData['4. close']);
-
       const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${asset}&apikey=${apikey}`;
 
       const response = await lastValueFrom(this.httpService.get(quoteUrl));

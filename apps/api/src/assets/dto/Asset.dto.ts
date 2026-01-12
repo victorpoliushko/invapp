@@ -6,7 +6,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   ValidateIf,
 } from 'class-validator';
 import { TransactionsDto } from 'src/transactions/dto/Transations.dto';
