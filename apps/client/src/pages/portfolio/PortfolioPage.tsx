@@ -574,6 +574,8 @@ test curr price
                             <div>
                               <table>
                                 <tbody>
+                                  {s.assets.transactions?.map(t => (
+                                  <React.Fragment key={s.assetId}>
                                   <tr>
                                     <td data-label="actions">
                                       <button
@@ -590,8 +592,8 @@ test curr price
                                       </button>
                                     </td>
                                     <td>{}</td>
-                                    <td>2025-11-24</td>
-                                    <td>+15.00%</td>
+                                    <td>{t.date}</td>
+                                    <td>{t.quantityChange}</td>
                                     <td>+15.00%</td>
                                     <td>+15.00%</td>
                                     <td>+15.00%</td>
@@ -610,6 +612,9 @@ test curr price
                                       </button>
                                     </td>
                                   </tr>
+                                  </React.Fragment>
+                                  ))}
+
                                   <tr>
                                     <td data-label="actions">
                                       <button
