@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 
 export class CreateTransactionDto {
+  @IsDefined()
   @IsNumber()
   pricePerUnit: number;
 

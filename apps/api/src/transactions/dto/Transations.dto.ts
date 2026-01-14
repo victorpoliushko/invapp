@@ -4,6 +4,7 @@ import {
   IsDecimal,
   IsDefined,
   IsEnum,
+  IsNumber,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -28,6 +29,10 @@ export class TransactionsDto {
 
   @IsDecimal()
   quantityChange: number;
+
+  @IsNumber()
+  @IsDefined()
+  pricePerUnit: number;
 
   @IsString()
   @IsDefined()

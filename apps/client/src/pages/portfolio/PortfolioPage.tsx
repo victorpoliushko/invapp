@@ -594,7 +594,7 @@ test curr price
                                     <td>{}</td>
                                     <td>{t.date}</td>
                                     <td>{t.quantityChange}</td>
-                                    <td>+15.00%</td>
+                                    <td>{t.pricePerUnit}</td>
                                     <td>+15.00%</td>
                                     <td>+15.00%</td>
                                     <td data-label="actions">
