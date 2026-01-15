@@ -576,6 +576,7 @@ test curr price
                                 <tbody>
                                   {s.assets.transactions?.map(t => (
                                   <React.Fragment key={s.assetId}>
+                                    <tr><h5>Transactions</h5></tr>
                                   <tr>
                                     <td data-label="actions">
                                       <button
