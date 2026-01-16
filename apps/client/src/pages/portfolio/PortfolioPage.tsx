@@ -573,10 +573,21 @@ test curr price
                           <td colSpan={COLUMN_COUNT + 1}>
                             <div>
                               <table>
+                                <thead>
+                                  <tr>
+                                    {/* <th></th> */}
+                                    <th scope="col">Transactions</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Asset</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Price change</th>
+                                    <th scope="col">Actions</th>
+                                  </tr>
+                                </thead>
                                 <tbody>
                                   {s.assets.transactions?.map(t => (
                                   <React.Fragment key={s.assetId}>
-                                    <tr><h5>Transactions</h5></tr>
                                   <tr>
                                     <td data-label="actions">
                                       <button
@@ -592,12 +603,11 @@ test curr price
                                         />
                                       </button>
                                     </td>
-                                    <td>{}</td>
+                                    <td>{t.type}</td>
+                                    <td>{s.assets.asset}</td>
                                     <td>{t.date}</td>
                                     <td>{t.quantityChange}</td>
                                     <td>{t.pricePerUnit}</td>
-                                    <td>+15.00%</td>
-                                    <td>+15.00%</td>
                                     <td data-label="actions">
                                       <button
                                         onClick={() => onDeleteAsset(s.assetId)}
@@ -616,7 +626,7 @@ test curr price
                                   </React.Fragment>
                                   ))}
 
-                                  <tr>
+                                  {/* <tr>
                                     <td data-label="actions">
                                       <button
                                         onClick={() => onDeleteAsset(s.assetId)}
@@ -723,7 +733,7 @@ test curr price
                                         />
                                       </button>
                                     </td>
-                                  </tr>
+                                  </tr> */}
                                 </tbody>
                               </table>
                             </div>
