@@ -96,7 +96,7 @@ export class PortfoliosService {
     return await this.assetsService.getSharePrice(exsitingAsset.asset);
   }
 
-  async addAsset(id: string, input: AddAssetInputDto): Promise<PortfolioDto> {
+  async addAssetToPortfolio(id: string, input: AddAssetInputDto): Promise<PortfolioDto> {
     const exsitingPortfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
     });
@@ -114,7 +114,7 @@ export class PortfoliosService {
       asset = await this.assetsService.createAsset({ asset: input.assetName });
     }
 
-    const existingPosition = await this.prismaService.portfolioAsset.findUnique(
+    const existingAsset = await this.prismaService.portfolioAsset.findUnique(
       {
         where: {
           portfolioId_assetId: {
@@ -122,15 +122,41 @@ export class PortfoliosService {
             assetId: asset.id,
           },
         },
+        include: {
+          assets: {
+            include: {
+              transactions: true
+            }
+          }
+        }
       },
     );
+
+    // get all transactions and add to set portfolioAsset ang price
+    const transactions = existingAsset.assets.transactions.map(t => t);
+    console.log(`
+     transactions: ${JSON.stringify(transactions)} 
+    `); 
+
+
+
+    // const existingAsset = await this.prismaService.portfolioAsset.findUnique(
+    //   {
+    //     where: {
+    //       portfolioId_assetId: {
+    //         portfolioId: id,
+    //         assetId: asset.id,
+    //       },
+    //     },
+    //   },
+    // );
 
     let newQuantity = input.quantity;
     let newAvgPrice = input.price;
 
-    if (existingPosition) {
-      const oldQuantity = existingPosition.quantity;
-      const oldAvgPrice = existingPosition.price;
+    if (existingAsset) {
+      const oldQuantity = existingAsset.quantity;
+      const oldAvgPrice = existingAsset.price;
 
       newQuantity = oldQuantity + input.quantity;
 
