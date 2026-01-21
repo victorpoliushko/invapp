@@ -79,11 +79,11 @@ export class PortfoliosController {
   @Post('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  addAsset(
+  addAssetToPortfolio(
     @Param('id') id: string,
     @Body() addAssetToPortfolioDto: AddAssetInputDto,
   ) {
-    return this.portfoliosService.addAsset(id, addAssetToPortfolioDto);
+    return this.portfoliosService.addAssetToPortfolio(id, addAssetToPortfolioDto);
   }
 
   @Delete('/:id/assets')
