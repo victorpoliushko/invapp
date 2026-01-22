@@ -3,10 +3,11 @@ import { CreateTransactionDto } from './dto/CreateTransaction.dto';
 import { TransactionsDto } from './dto/Transations.dto';
 import { plainToInstance } from 'class-transformer';
 import { Injectable } from '@nestjs/common';
+import { PortfoliosService } from 'src/portfolios/portfolios.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService, private portfoliosService: PortfoliosService) {}
 
   async create(input: CreateTransactionDto): Promise<TransactionsDto> {
     let assetId = input.assetId;
@@ -37,6 +38,8 @@ export class TransactionsService {
         }),
       },
     });
+
+    this.portfoliosService.addAssetToPortfolio(input.portfolioId, input);
 
     return plainToInstance(TransactionsDto, createdTransaction);
   }
