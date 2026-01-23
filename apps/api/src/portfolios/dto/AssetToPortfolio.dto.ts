@@ -1,5 +1,7 @@
+import { TransactionType } from '@prisma/client';
 import {
   IsDefined,
+  IsEnum,
   IsNumber,
   IsString,
   IsUUID,
@@ -19,13 +21,18 @@ export class AddAssetInputDto {
 
   @IsString()
   @IsDefined()
-  dueDate: string;
+  date: string;
 
   @IsNumber()
   @IsDefined()
-  quantity: number;
+  quantityChange: number;
 
   @IsNumber()
   @IsDefined()
-  price: number;
+  pricePerUnit: number;
+
+  @IsEnum(TransactionType, {
+    message: 'type must be "BUY" or "SELL"',
+  })
+  type: TransactionType;
 }

@@ -9,6 +9,7 @@ import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dt
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AssetsService } from '../assets/assets.service';
 import { UpdatePortfolioDto } from './dto/UpdatePortfolio.dto';
+import { TransactionType } from '@prisma/client';
 
 interface AssetsWithPrices {
   asset: string;
@@ -151,17 +152,21 @@ export class PortfoliosService {
     //   },
     // );
 
-    let newQuantity = input.quantity;
-    let newAvgPrice = input.price;
+    let newQuantity = input.quantityChange;
+    let newAvgPrice = input.pricePerUnit;
 
     if (existingAsset) {
       const oldQuantity = existingAsset.quantity;
       const oldAvgPrice = existingAsset.price;
 
-      newQuantity = oldQuantity + input.quantity;
+      if (input.type === TransactionType.BUY) {
+        newQuantity = oldQuantity + input.quantityChange;
+      }
+      else newQuantity = oldQuantity - input.quantityChange;
+      
 
       newAvgPrice = Math.round(
-        (oldAvgPrice * oldQuantity + input.price * input.quantity) /
+        (oldAvgPrice * oldQuantity + input.pricePerUnit * input.quantityChange) /
           newQuantity,
       );
     }
