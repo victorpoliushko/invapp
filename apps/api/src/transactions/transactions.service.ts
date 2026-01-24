@@ -39,6 +39,10 @@ export class TransactionsService {
       },
     });
 
+    console.log(`
+     TS createdTransaction: ${JSON.stringify(createdTransaction)} 
+    `);
+
     this.portfoliosService.addAssetToPortfolio(input.portfolioId, input);
 
     return plainToInstance(TransactionsDto, createdTransaction);
