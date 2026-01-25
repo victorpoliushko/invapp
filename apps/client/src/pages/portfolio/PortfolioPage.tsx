@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
-import type { PortfolioDto } from '../../../../api/src/portfolios/dto/portfolio.dto';
+import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 
 // export type AssetType = {
 //   name: string;
@@ -161,7 +161,7 @@ export default function PortfolioPage() {
     const { name, value } = e.target;
     setNewAsset((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -537,21 +537,12 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                         {/* Original Columns (Shifted by 1 due to new expand column) */}
-                        {/* <td data-label="asset">{s.assets.asset}</td>
+                        <td data-label="asset">{s.assets.asset}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
-                        <td data-label="quantityChange">{s.quantityChange}</td>
-                        <td data-label="pricePerUnit">{s.pricePerUnit}</td>
-                        <td data-label="current-pricePerUnit">
-                          {s.pricePerUnit}
-                        </td> */}
-                                                <td data-label="asset">test name</td>
-                        <td data-label="date">test date</td>
-                        <td data-label="quantityChange">test quantity</td>
-                        <td data-label="pricePerUnit">test price</td>
-                        <td data-label="current-pricePerUnit">
-test curr price
-                        </td>
-                        <td data-label="percent-change">{25}</td>
+                        <td data-label="quantityChange">{s.quantity}</td>
+                        <td data-label="pricePerUnit">{s.avgBuyPrice}</td>
+                        <td data-label="current-pricePerUnit">{s.price}</td>
+                        <td data-label="asset">test name</td>
                         <td data-label="actions">
                           <button
                             onClick={() => onDeleteAsset(s.assetId)}
@@ -567,7 +558,6 @@ test curr price
                           </button>
                         </td>
                       </tr>
-            {/* {expandedAssetId === s.assetId && ( */}
                       {expandedAssetId === s.assetId && (
                         <tr className="detail-row">
                           <td colSpan={COLUMN_COUNT + 1}>
@@ -586,44 +576,48 @@ test curr price
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {s.assets.transactions?.map(t => (
-                                  <React.Fragment key={s.assetId}>
-                                  <tr>
-                                    <td data-label="actions">
-                                      <button
-                                        onClick={() => onDeleteAsset(s.assetId)}
-                                        title={`Remove ${s.assets.asset}`}
-                                      >
-                                        <img
-                                          className="edit-icon"
-                                          src={editIcon}
-                                          alt="edit-icon"
-                                          height={30}
-                                          width={30}
-                                        />
-                                      </button>
-                                    </td>
-                                    <td>{t.type}</td>
-                                    <td>{s.assets.asset}</td>
-                                    <td>{t.date}</td>
-                                    <td>{t.quantityChange}</td>
-                                    <td>{t.pricePerUnit}</td>
-                                    <td data-label="actions">
-                                      <button
-                                        onClick={() => onDeleteAsset(s.assetId)}
-                                        title={`Remove ${s.assets.asset}`}
-                                      >
-                                        <img
-                                          className="delete-icon"
-                                          src={deleteIcon}
-                                          alt="delete-icon"
-                                          height={30}
-                                          width={30}
-                                        />
-                                      </button>
-                                    </td>
-                                  </tr>
-                                  </React.Fragment>
+                                  {s.assets.transactions?.map((t) => (
+                                    <React.Fragment key={s.assetId}>
+                                      <tr>
+                                        <td data-label="actions">
+                                          <button
+                                            onClick={() =>
+                                              onDeleteAsset(s.assetId)
+                                            }
+                                            title={`Remove ${s.assets.asset}`}
+                                          >
+                                            <img
+                                              className="edit-icon"
+                                              src={editIcon}
+                                              alt="edit-icon"
+                                              height={30}
+                                              width={30}
+                                            />
+                                          </button>
+                                        </td>
+                                        <td>{t.type}</td>
+                                        <td>{s.assets.asset}</td>
+                                        <td>{t.date}</td>
+                                        <td>{t.quantityChange}</td>
+                                        <td>{t.pricePerUnit}</td>
+                                        <td data-label="actions">
+                                          <button
+                                            onClick={() =>
+                                              onDeleteAsset(s.assetId)
+                                            }
+                                            title={`Remove ${s.assets.asset}`}
+                                          >
+                                            <img
+                                              className="delete-icon"
+                                              src={deleteIcon}
+                                              alt="delete-icon"
+                                              height={30}
+                                              width={30}
+                                            />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    </React.Fragment>
                                   ))}
 
                                   {/* <tr>
