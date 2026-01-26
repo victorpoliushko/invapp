@@ -84,8 +84,8 @@ model PortfolioAsset {
   portfolioId String
   assetId     String
 
-  // quantity Float
-  // price    Float?
+  quantity Float
+  price    Float?
 
   portfolio Portfolio @relation(fields: [portfolioId], references: [id])
   assets    Asset     @relation(fields: [assetId], references: [id])

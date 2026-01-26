@@ -114,10 +114,6 @@ export class PortfoliosService {
 
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
-    console.log(`
-     PS found asset: ${JSON.stringify(asset)} 
-    `);
-
     if (!asset) {
       asset = await this.assetsService.createAsset({ asset: input.assetName });
     }

@@ -165,66 +165,13 @@ export default function PortfolioPage() {
     }));
   };
 
-  // add transaction here
-  // const handleAddAsset = async () => {
-  //   const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
 
-  //   if (!assetName || !dueDate || !quantityChange || !pricePerUnit) {
-  //     alert("Please fill in all fields before adding the asset.");
-  //     return;
-  //   }
-
-  //   const token = localStorage.getItem("accessToken");
-  //   try {
-  //     const res = await fetch(`/api/portfolios/${params.id}/assets`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(newAsset),
-  //     });
-
-  //     if (!res.ok) {
-  //       const errorBody = await res.json().catch(() => null);
-  //       console.error("Error response:", errorBody);
-  //       throw new Error("Failed to add stock");
-  //     }
-
-  //     const updatedPortfolio = await res.json();
-  //     setPortfolio(updatedPortfolio);
-
-  //     alert("Asset added successfully!");
-  //     setNewAsset({
-  //       assetName: "",
-  //       dueDate: "",
-  //       quantityChange: "",
-  //       // period: "",
-  //       pricePerUnit: 0,
-  //     });
-
-  //     setSearchTerm("");
-  //     setSuggestions([]);
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Error adding stock");
-  //   }
-  // };
-
-  // wip
-  // console.log(`
-  //  newAsset: ${JSON.stringify(newAsset)}
-  // `);
   const handleAddTransaction = async (
     portfolioId: string,
     type: TransactionType,
     assetId?: string
   ) => {
     const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
-
-    console.log(`
-     newAsset: ${JSON.stringify(newAsset)} 
-    `);
 
     const newTransaction = {
       pricePerUnit: Number(pricePerUnit),
@@ -540,8 +487,8 @@ export default function PortfolioPage() {
                         <td data-label="asset">{s.assets.asset}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantity}</td>
-                        <td data-label="pricePerUnit">{s.avgBuyPrice}</td>
                         <td data-label="current-pricePerUnit">{s.price}</td>
+                        <td data-label="pricePerUnit">{}</td>
                         <td data-label="asset">test name</td>
                         <td data-label="actions">
                           <button
