@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { AddAssetInputDto } from './dto/AssetToPortfolio.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
@@ -241,7 +241,7 @@ export class PortfoliosService {
   }
 
   async getPortfolioBalance(id: string, currency: Currency): Promise<any> {
-    const portfolios = await this.prismaService.portfolio.findMany({
+    const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
         assets: {
@@ -252,30 +252,21 @@ export class PortfoliosService {
       },
     });
 
-    const portfoliosWithAssetsPrice = await Promise.all(
-      portfolios.map(async (portfolio) => {
-        const assetsWithPrices = await Promise.all(
-          portfolio.assets.map(async (portfolioAssets) => {
-            const price = await this.assetsService.getSharePrice(
-              portfolioAssets.assets.asset,
-            );
-            return {
-              asset: portfolioAssets.assets.asset,
-              price,
-              currency,
-              quantity: portfolioAssets.quantity,
-            };
-          }),
-        );
+    if (!portfolio) throw new NotFoundException('Portfolio not found');
+
+    const prices = await Promise.all(
+      portfolio.assets.map(async (pa) => {
+        const price = await this.assetsService.getSharePrice(pa.assets.asset);
+
         return {
-          ...portfolios,
-          assets: assetsWithPrices,
-          totalPrice: this.calculateAssetsTotalPrice(assetsWithPrices),
+          assetId: pa.assetId,
+          symbol: pa.assets.asset,
+          actualPrice: price,
         };
       }),
     );
 
-    return portfoliosWithAssetsPrice;
+    return prices;
   }
 
   calculateAssetsTotalPrice(assets: AssetsWithPrices[]) {
