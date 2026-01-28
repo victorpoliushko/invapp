@@ -23,4 +23,8 @@ export class PortfolioAssetDto {
   @ValidateNested()
   @Type(() => AssetDto)
   assets: AssetDto;
+
+  @IsOptional()
+  @IsNumber()
+  currentPrice?: number;
 }

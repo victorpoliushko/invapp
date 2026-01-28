@@ -6,6 +6,7 @@ import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
+import { fetchPortfolio, fetchPortfolioPrices } from "../../api";
 
 // export type AssetType = {
 //   name: string;
@@ -165,7 +166,6 @@ export default function PortfolioPage() {
     }));
   };
 
-
   const handleAddTransaction = async (
     portfolioId: string,
     type: TransactionType,
@@ -199,47 +199,6 @@ export default function PortfolioPage() {
       });
       console.log(await res.json());
     } catch (error) {}
-
-    // if (!assetName || !dueDate || !quantityChange || !pricePerUnit) {
-    //   alert("Please fill in all fields before adding the asset.");
-    //   return;
-    // }
-
-    // const token = localStorage.getItem("accessToken");
-    // try {
-    //   const res = await fetch(`/api/portfolios/${params.id}/assets`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify(newAsset),
-    //   });
-
-    //   if (!res.ok) {
-    //     const errorBody = await res.json().catch(() => null);
-    //     console.error("Error response:", errorBody);
-    //     throw new Error("Failed to add stock");
-    //   }
-
-    //   const updatedPortfolio = await res.json();
-    //   setPortfolio(updatedPortfolio);
-
-    //   alert("Asset added successfully!");
-    //   setNewAsset({
-    //     assetName: "",
-    //     dueDate: "",
-    //     quantityChange: "",
-    //     period: "",
-    //     pricePerUnit: 0,
-    //   });
-
-    //   setSearchTerm("");
-    //   setSuggestions([]);
-    // } catch (err) {
-    //   console.error(err);
-    //   alert("Error adding stock");
-    // }
   };
 
   const onDeleteAsset = async (index: any) => {
@@ -335,6 +294,26 @@ export default function PortfolioPage() {
       }
     }
     alert("Portfolio not found");
+  };
+
+  const loadPortfolioData = async () => {
+    const portfolioData = await fetchPortfolio(portfolio?.id);
+    setPortfolio(portfolioData);
+    const priceData = await fetchPortfolioPrices(portfolio?.id);
+    setPortfolio((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        assets: prev.assets.map((asset) => {
+          const match = priceData.find((p) => p.assetId === asset.assetId);
+          return {
+            ...asset,
+            currentPrice: match ? match.actualPrice : undefined,
+          };
+        }),
+      };
+    });
   };
 
   const [expandedAssetId, setExpandedAssetId] = useState(null);
