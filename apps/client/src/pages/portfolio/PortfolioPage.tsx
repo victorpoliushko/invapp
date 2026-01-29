@@ -184,10 +184,6 @@ export default function PortfolioPage() {
     };
     const token = localStorage.getItem("accessToken");
 
-    // console.log(`
-    //  token: ${JSON.stringify(token)}
-    // `);
-
     try {
       const res = await fetch(`/api/transactions`, {
         method: "POST",
@@ -202,9 +198,6 @@ export default function PortfolioPage() {
   };
 
   const onDeleteAsset = async (index: any) => {
-    // console.log(`
-    //  index: ${JSON.stringify(index)}
-    // `);
     const token = localStorage.getItem("accessToken");
 
     try {
