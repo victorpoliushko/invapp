@@ -1,4 +1,4 @@
-const apiRequest = async (path: string) => {
+const apiRequest = async (path: String) => {
   const token = localStorage.getItem('accessToken');
   const response = await fetch(`${process.env.BASE_URL}${path}`, {
     headers: {
@@ -11,5 +11,5 @@ const apiRequest = async (path: string) => {
   return response.json();
 };
 
-export const fetchPortfolio = (id: string) => apiRequest(`/portfolios/${id}`);
-export const fetchPortfolioPrices = (id: string) => apiRequest(`/portfolios/${id}/balance`);
+export const fetchPortfolio = (id: String) => apiRequest(`/portfolios/${id}`);
+export const fetchPortfolioPrices = (id: String) => apiRequest(`/portfolios/${id}/balance`);
