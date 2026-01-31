@@ -1,6 +1,8 @@
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const apiRequest = async (path: String) => {
   const token = localStorage.getItem('accessToken');
-  const response = await fetch(`${process.env.BASE_URL}${path}`, {
+  const response = await fetch(`${BASE_URL}${path}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
