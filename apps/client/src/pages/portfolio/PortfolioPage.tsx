@@ -88,6 +88,7 @@ export default function PortfolioPage() {
       const portfolio = await response.json();
 
       setPortfolio(portfolio);
+      loadPortfolioData(params.id);
     };
 
     if (params.id) {
@@ -287,16 +288,16 @@ export default function PortfolioPage() {
     alert("Portfolio not found");
   };
 
-  const loadPortfolioData = async () => {
+  const loadPortfolioData = async (portfolioId: string) => {
     console.log(`
-     loadPortfolioData executed}
+     loadPortfolioData executed: ${portfolioId}
     `);
-    if (!portfolio?.id) {
+    if (portfolioId) {
       throw new Error("Portfolio not found");
     }
-    const portfolioData = await fetchPortfolio(portfolio.id);
+    const portfolioData = await fetchPortfolio(portfolioId);
     setPortfolio(portfolioData);
-    const priceData = await fetchPortfolioPrices(portfolio.id);
+    const priceData = await fetchPortfolioPrices(portfolioId);
     console.log(`
      priceData: ${JSON.stringify(priceData)} 
     `);
@@ -316,11 +317,10 @@ export default function PortfolioPage() {
     });
   };
 
-  loadPortfolioData();
 
-      //   console.log(`
-      //  portfolio: ${JSON.stringify(portfolio)} 
-      // `);
+        console.log(`
+       portfolio: ${JSON.stringify(portfolio)} 
+      `);
 
   const [expandedAssetId, setExpandedAssetId] = useState(null);
 
