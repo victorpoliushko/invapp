@@ -288,15 +288,16 @@ export default function PortfolioPage() {
     alert("Portfolio not found");
   };
 
-  const loadPortfolioData = async (portfolioId: string) => {
+  const loadPortfolioData = async (portfolioId?: string) => {
     console.log(`
      loadPortfolioData executed: ${portfolioId}
     `);
-    if (portfolioId) {
+    if (!portfolioId) {
       throw new Error("Portfolio not found");
     }
     const portfolioData = await fetchPortfolio(portfolioId);
     setPortfolio(portfolioData);
+
     const priceData = await fetchPortfolioPrices(portfolioId);
     console.log(`
      priceData: ${JSON.stringify(priceData)} 
@@ -308,6 +309,9 @@ export default function PortfolioPage() {
         ...prev,
         assets: prev.assets.map((asset) => {
           const match = priceData.find((p) => p.assetId === asset.assetId);
+          console.log(`
+           match: ${JSON.stringify(match)} 
+          `);
           return {
             ...asset,
             currentPrice: match ? match.actualPrice : undefined,
@@ -318,9 +322,9 @@ export default function PortfolioPage() {
   };
 
 
-        console.log(`
-       portfolio: ${JSON.stringify(portfolio)} 
-      `);
+  // console.log(`
+  //   portfolio: ${JSON.stringify(portfolio)} 
+  // `);
 
   const [expandedAssetId, setExpandedAssetId] = useState(null);
 

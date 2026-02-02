@@ -1,4 +1,7 @@
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';;
+
+
+console.log("Current BASE_URL is:", BASE_URL); 
 
 const apiRequest = async (path: String) => {
   const token = localStorage.getItem('accessToken');
@@ -8,8 +11,13 @@ const apiRequest = async (path: String) => {
       'Content-Type': 'application/json',
     },
   });
+const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Expected JSON but got ${contentType}. Check if the URL ${BASE_URL} is correct!`);
+  }
 
   if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+  
   return response.json();
 };
 
