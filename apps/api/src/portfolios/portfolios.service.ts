@@ -241,6 +241,9 @@ export class PortfoliosService {
   }
 
   async getPortfolioBalance(id: string, currency: Currency): Promise<any> {
+    console.log(`
+     a 
+    `);
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {

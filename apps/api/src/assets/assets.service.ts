@@ -17,55 +17,83 @@ export class AssetsService {
     private prismaService: PrismaService,
   ) {}
 
+  // async getSharePrice(asset: string): Promise<number> {
+
+  //   console.log(`
+  //    asset: ${JSON.stringify(asset)} 
+  //   `);
+  //   try {
+  //     const apikey = this.configService.get<string>('API_KEY');
+
+  //     const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;
+  //     const matchingResponse = await lastValueFrom(
+  //       this.httpService.get(matchingUrl),
+  //     );
+
+  //     const matches = matchingResponse.data?.bestMatches || [];
+
+
+  //     if (
+  //       matches.length <= 0 ||
+  //       !matches.some(
+  //         (match) =>
+  //           match['1. symbol'].trim().toUpperCase() ===
+  //           asset.trim().toUpperCase(),
+  //       )
+  //     ) {
+  //       throw new HttpException(
+  //         getReasonPhrase(StatusCodes.NOT_FOUND),
+  //         StatusCodes.NOT_FOUND,
+  //       );
+  //     }
+
+  //     const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${asset}&apikey=${apikey}`;
+
+  //     const response = await lastValueFrom(this.httpService.get(quoteUrl));
+  //     const globalQuote = response.data['Global Quote'];
+
+  //     if (!globalQuote || Object.keys(globalQuote).length === 0) {
+  //       throw new Error('No quote data available');
+  //     }
+
+  //     const price = parseFloat(
+  //       globalQuote['05. price'] || globalQuote['08. previous close'],
+  //     );
+
+  //     return price;
+  //   } catch (error) {
+  //     console.log(error);
+  //     console.error('API error:', error.response?.data);
+  //     throw new HttpException(
+  //       getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+  //       StatusCodes.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
+
   async getSharePrice(asset: string): Promise<number> {
-    try {
-      const apikey = this.configService.get<string>('API_KEY');
+  try {
+    const apikey = this.configService.get<string>('API_KEY');
+    const symbol = asset.trim().toUpperCase();
 
-      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;
-      const matchingResponse = await lastValueFrom(
-        this.httpService.get(matchingUrl),
-      );
+    const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apikey}`;
+    
+    const response = await lastValueFrom(this.httpService.get(quoteUrl));
+    const globalQuote = response.data['Global Quote'];
 
-      const matches = matchingResponse.data?.bestMatches || [];
-
-
-      if (
-        matches.length <= 0 ||
-        !matches.some(
-          (match) =>
-            match['1. symbol'].trim().toUpperCase() ===
-            asset.trim().toUpperCase(),
-        )
-      ) {
-        throw new HttpException(
-          getReasonPhrase(StatusCodes.NOT_FOUND),
-          StatusCodes.NOT_FOUND,
-        );
-      }
-
-      const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${asset}&apikey=${apikey}`;
-
-      const response = await lastValueFrom(this.httpService.get(quoteUrl));
-      const globalQuote = response.data['Global Quote'];
-
-      if (!globalQuote || Object.keys(globalQuote).length === 0) {
-        throw new Error('No quote data available');
-      }
-
-      const price = parseFloat(
-        globalQuote['05. price'] || globalQuote['08. previous close'],
-      );
-
-      return price;
-    } catch (error) {
-      console.log(error);
-      console.error('API error:', error.response?.data);
-      throw new HttpException(
-        getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
-        StatusCodes.INTERNAL_SERVER_ERROR,
-      );
+    if (!globalQuote || Object.keys(globalQuote).length === 0 || !globalQuote['05. price']) {
+      console.warn(`Quote not found for: ${symbol}. Returning 0.`);
+      return 0; 
     }
+
+    const price = parseFloat(globalQuote['05. price']);
+    return price;
+
+  } catch (error) {
+    console.error(`API error for ${asset}:`, error.message);
+    return 0; 
   }
+}
 
   async findAssetByName(asset: string): Promise<AssetDto> {
     return await this.prismaService.asset.findFirst({ where: { asset }});
