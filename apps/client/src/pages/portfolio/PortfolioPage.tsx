@@ -288,38 +288,51 @@ export default function PortfolioPage() {
     alert("Portfolio not found");
   };
 
-  const loadPortfolioData = async (portfolioId?: string) => {
-    console.log(`
-     loadPortfolioData executed: ${portfolioId}
-    `);
-    if (!portfolioId) {
-      throw new Error("Portfolio not found");
+const loadPortfolioData = async (portfolioId?: string) => {
+  if (!portfolioId) return;
+
+  const portfolioData = await fetchPortfolio(portfolioId);
+  setPortfolio(portfolioData);
+
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  for (const asset of portfolioData.assets) {
+    try {
+      const token = localStorage.getItem("accessToken");
+      
+      const response = await fetchWithRedirect(
+        `http://localhost:5173/api/assets/pricePerUnit?asset=${asset.assets.asset}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      const livePrice = data.pricePerUnit;
+
+      setPortfolio((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          assets: prev.assets.map((a) =>
+            a.assetId === asset.assetId 
+              ? { ...a, currentPrice: livePrice } 
+              : a
+          ),
+        };
+      });
+
+      await delay(12500); 
+
+    } catch (err) {
+      console.error(`Failed to fetch price for ${asset.assets.asset}`, err);
     }
-    const portfolioData = await fetchPortfolio(portfolioId);
-    setPortfolio(portfolioData);
-
-    const priceData = await fetchPortfolioPrices(portfolioId);
-    console.log(`
-     priceData: ${JSON.stringify(priceData)} 
-    `);
-    setPortfolio((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        assets: prev.assets.map((asset) => {
-          const match = priceData.find((p) => p.assetId === asset.assetId);
-          console.log(`
-           match: ${JSON.stringify(match)} 
-          `);
-          return {
-            ...asset,
-            currentPrice: match ? match.actualPrice : undefined,
-          };
-        }),
-      };
-    });
-  };
+  }
+};
 
 
   // console.log(`
@@ -477,7 +490,7 @@ export default function PortfolioPage() {
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantity}</td>
                         <td data-label="current-pricePerUnit">{s.price}</td>
-                        <td data-label="pricePerUnit">{}</td>
+                        <td data-label="pricePerUnit">{s.currentPrice}</td>
                         <td data-label="asset">test name</td>
                         <td data-label="actions">
                           <button
