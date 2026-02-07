@@ -288,55 +288,53 @@ export default function PortfolioPage() {
     alert("Portfolio not found");
   };
 
-const loadPortfolioData = async (portfolioId?: string) => {
-  if (!portfolioId) return;
+  const loadPortfolioData = async (portfolioId?: string) => {
+    if (!portfolioId) return;
 
-  const portfolioData = await fetchPortfolio(portfolioId);
-  setPortfolio(portfolioData);
+    const portfolioData = await fetchPortfolio(portfolioId);
+    setPortfolio(portfolioData);
 
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-  for (const asset of portfolioData.assets) {
-    try {
-      const token = localStorage.getItem("accessToken");
-      
-      const response = await fetchWithRedirect(
-        `http://localhost:5173/api/assets/pricePerUnit?asset=${asset.assets.asset}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    for (const asset of portfolioData.assets) {
+      try {
+        const token = localStorage.getItem("accessToken");
 
-      const data = await response.json();
-      const livePrice = data.pricePerUnit;
+        const response = await fetchWithRedirect(
+          `http://localhost:5173/api/assets/pricePerUnit?asset=${asset.assets.asset}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setPortfolio((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          assets: prev.assets.map((a) =>
-            a.assetId === asset.assetId 
-              ? { ...a, currentPrice: livePrice } 
-              : a
-          ),
-        };
-      });
+        const data = await response.json();
+        const livePrice = data.pricePerUnit;
 
-      await delay(12500); 
+        setPortfolio((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            assets: prev.assets.map((a) =>
+              a.assetId === asset.assetId
+                ? { ...a, currentPrice: livePrice }
+                : a
+            ),
+          };
+        });
 
-    } catch (err) {
-      console.error(`Failed to fetch price for ${asset.assets.asset}`, err);
+        await delay(12500);
+      } catch (err) {
+        console.error(`Failed to fetch price for ${asset.assets.asset}`, err);
+      }
     }
-  }
-};
-
+  };
 
   // console.log(`
-  //   portfolio: ${JSON.stringify(portfolio)} 
+  //   portfolio: ${JSON.stringify(portfolio)}
   // `);
 
   const [expandedAssetId, setExpandedAssetId] = useState(null);
@@ -360,9 +358,208 @@ const loadPortfolioData = async (portfolioId?: string) => {
     });
   };
 
-  // console.log(`
-  //  portfolio: ${JSON.stringify(portfolio)}
-  // `);
+  console.log(`
+   portfolio: ${JSON.stringify(portfolio)}
+  `);
+
+  [
+    {
+      id: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+      name: "Katrusia super portfolio 22",
+      userId: "13ee5312-1a96-4ed2-a271-da54b338b708",
+      assets: [
+        {
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "6c4220af-c081-406f-bfee-8f1d866d09e7",
+          quantity: 5,
+          price: 200,
+          assets: {
+            id: "6c4220af-c081-406f-bfee-8f1d866d09e7",
+            asset: "GOOG",
+            name: null,
+            type: null,
+            exchange: null,
+            dataSource: null,
+            updatedAt: "2025-12-06T09:12:40.521Z",
+            transactions: [],
+          },
+        },
+        {
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "52601abc-a44e-4a3c-b3a1-a095d88daa0a",
+          quantity: 1,
+          price: 30,
+          assets: {
+            id: "52601abc-a44e-4a3c-b3a1-a095d88daa0a",
+            asset: "CCLAF",
+            name: null,
+            type: null,
+            exchange: null,
+            dataSource: null,
+            updatedAt: "2025-12-09T10:19:12.777Z",
+            transactions: [],
+          },
+        },
+        {
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9d86eeaa-f619-41e7-9f95-9f7f1b6ec517",
+          quantity: 3,
+          price: 3,
+          assets: {
+            id: "9d86eeaa-f619-41e7-9f95-9f7f1b6ec517",
+            asset: "VV5.FRK",
+            name: null,
+            type: null,
+            exchange: null,
+            dataSource: null,
+            updatedAt: "2025-12-09T10:20:28.431Z",
+            transactions: [],
+          },
+        },
+        {
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "6d9632f0-f807-4aee-963c-2b62636353ed",
+          quantity: 2,
+          price: 56,
+          assets: {
+            id: "6d9632f0-f807-4aee-963c-2b62636353ed",
+            asset: "J0C.FRK",
+            name: null,
+            type: null,
+            exchange: null,
+            dataSource: null,
+            updatedAt: "2025-12-09T10:22:41.168Z",
+            transactions: [],
+          },
+        },
+        {
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "cbc443a6-a316-4616-baf5-ed3aad386dee",
+          quantity: 4,
+          price: 67,
+          assets: {
+            id: "cbc443a6-a316-4616-baf5-ed3aad386dee",
+            asset: "N09.FRK",
+            name: null,
+            type: null,
+            exchange: null,
+            dataSource: null,
+            updatedAt: "2025-12-17T15:26:59.159Z",
+            transactions: [],
+          },
+        },
+        {
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+          quantity: 8,
+          price: 7,
+          assets: {
+            id: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+            asset: "VOO",
+            name: null,
+            type: null,
+            exchange: null,
+            dataSource: null,
+            updatedAt: "2025-11-24T14:18:21.556Z",
+            transactions: [
+              {
+                id: "754042a1-b593-485f-94c4-975258aba67c",
+                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+                type: "BUY",
+                quantityChange: 2,
+                pricePerUnit: 2,
+                date: "2026-01-25T00:00:00.000Z",
+              },
+              {
+                id: "a9d72498-c0cd-4bea-a40a-491c835f23d1",
+                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+                type: "BUY",
+                quantityChange: 6,
+                pricePerUnit: 8,
+                date: "2026-01-24T00:00:00.000Z",
+              },
+              {
+                id: "efe73b76-270e-4aec-a20d-2c99bd9301c0",
+                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+                type: "BUY",
+                quantityChange: 6,
+                pricePerUnit: 8,
+                date: "2026-01-24T00:00:00.000Z",
+              },
+              {
+                id: "7a26565e-48a4-4f0e-a935-fee2c34c5d69",
+                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+                type: "BUY",
+                quantityChange: 25,
+                pricePerUnit: 33,
+                date: "2026-01-16T00:00:00.000Z",
+              },
+              {
+                id: "37c198e8-76d7-43a1-a549-81b559620fe4",
+                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+                type: "BUY",
+                quantityChange: 22,
+                pricePerUnit: 23,
+                date: "2026-01-08T00:00:00.000Z",
+              },
+            ],
+          },
+        },
+      ],
+      transactions: [
+        {
+          id: "37c198e8-76d7-43a1-a549-81b559620fe4",
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+          type: "BUY",
+          quantityChange: 22,
+          pricePerUnit: 23,
+          date: "2026-01-08T00:00:00.000Z",
+        },
+        {
+          id: "7a26565e-48a4-4f0e-a935-fee2c34c5d69",
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+          type: "BUY",
+          quantityChange: 25,
+          pricePerUnit: 33,
+          date: "2026-01-16T00:00:00.000Z",
+        },
+        {
+          id: "a9d72498-c0cd-4bea-a40a-491c835f23d1",
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+          type: "BUY",
+          quantityChange: 6,
+          pricePerUnit: 8,
+          date: "2026-01-24T00:00:00.000Z",
+        },
+        {
+          id: "efe73b76-270e-4aec-a20d-2c99bd9301c0",
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+          type: "BUY",
+          quantityChange: 6,
+          pricePerUnit: 8,
+          date: "2026-01-24T00:00:00.000Z",
+        },
+        {
+          id: "754042a1-b593-485f-94c4-975258aba67c",
+          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
+          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
+          type: "BUY",
+          quantityChange: 2,
+          pricePerUnit: 2,
+          date: "2026-01-25T00:00:00.000Z",
+        },
+      ],
+    },
+  ];
 
   if (!portfolio) {
     return null;

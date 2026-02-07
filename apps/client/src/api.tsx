@@ -1,3 +1,5 @@
+import { PortfolioDto } from "../../api/src/portfolios/dto/portfolio.dto";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';;
 
 
@@ -21,5 +23,5 @@ const contentType = response.headers.get("content-type");
   return response.json();
 };
 
-export const fetchPortfolio = (id: String) => apiRequest(`/portfolios/${id}`);
+export const fetchPortfolio = (id: String): Promise<PortfolioDto> => apiRequest(`/portfolios/${id}`);
 export const fetchPortfolioPrices = (id: String) => apiRequest(`/portfolios/${id}/balance`);

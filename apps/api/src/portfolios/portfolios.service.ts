@@ -115,7 +115,7 @@ export class PortfoliosService {
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
     if (!asset) {
-      asset = await this.assetsService.createAsset({ asset: input.assetName });
+      asset = await this.assetsService.createAsset({ name: input.assetName });
     }
 
     console.log(`

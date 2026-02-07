@@ -58,7 +58,7 @@ enum DataSource {
 
 model Asset {
   id         String      @id @default(uuid())
-  asset      String      @unique
+  ticker      String      @unique
   name       String?
   type       AssetType?
   exchange   String?
@@ -76,7 +76,7 @@ model Portfolio {
   user   User?  @relation(fields: [userId], references: [id])
   userId String
 
-  assets       PortfolioAsset[]
+  portfolioAssets       PortfolioAsset[]
   transactions Transaction[]
 }
 

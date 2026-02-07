@@ -21,7 +21,7 @@ export class AssetDto {
 
   @IsString()
   @IsNotEmpty()
-  asset: string;
+  ticker: string;
 
   @IsString()
   @IsNotEmpty()
@@ -46,7 +46,7 @@ export class CreateAssetDto {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  asset: string;
+  ticker: string;
 
   @IsOptional()
   @IsString()
@@ -80,7 +80,7 @@ export class UpdateAssetDto {
   @ValidateIf(i => i.id || i.asset)
   @IsDefined({message: 'At least one of id or asset must be provided'})
   @IsString()
-  asset?: string;
+  ticker?: string;
 
   @IsOptional()
   @IsString()

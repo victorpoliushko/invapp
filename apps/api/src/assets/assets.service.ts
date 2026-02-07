@@ -101,8 +101,8 @@ export class AssetsService {
     }
   }
 
-  async findAssetByName(asset: string): Promise<AssetDto> {
-    return await this.prismaService.asset.findFirst({ where: { asset } });
+  async findAssetByName(ticker: string): Promise<AssetDto> {
+    return await this.prismaService.asset.findFirst({ where: { ticker } });
   }
 
   async getAssets(paginationDTO: PaginationDTO): Promise<AssetDto[]> {
@@ -117,7 +117,7 @@ export class AssetsService {
     return await this.prismaService.asset.create({
       data: {
         id,
-        asset: input.asset,
+        ticker: input.ticker,
         name: input.name,
         type: input.type,
         exchange: input.exchange,
@@ -128,7 +128,7 @@ export class AssetsService {
 
   async updateAsset(input: UpdateAssetDto): Promise<Asset> {
     return await this.prismaService.asset.update({
-      where: input.id ? { id: input.id } : { asset: input.asset },
+      where: input.id ? { id: input.id } : { ticker: input.ticker },
       data: input,
     });
   }
