@@ -6,7 +6,7 @@ import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
-import { fetchPortfolio, fetchPortfolioPrices } from "../../api";
+import { fetchPortfolio } from "../../api";
 
 // export type AssetType = {
 //   name: string;
@@ -103,7 +103,7 @@ export default function PortfolioPage() {
 
     const fetchPrice = async () => {
       portfolio &&
-        portfolio.assets.forEach(async (s) => {
+        portfolio.portfolioAssets.forEach(async (s) => {
           const response = await fetchWithRedirect(
             `http://localhost:5173/api/assets/pricePerUnit?asset=${s.assets.asset}`,
             {
@@ -296,7 +296,7 @@ export default function PortfolioPage() {
 
     const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-    for (const asset of portfolioData.assets) {
+    for (const asset of portfolioData.portfolioAssets) {
       try {
         const token = localStorage.getItem("accessToken");
 
@@ -318,7 +318,7 @@ export default function PortfolioPage() {
           if (!prev) return prev;
           return {
             ...prev,
-            assets: prev.assets.map((a) =>
+            assets: prev.portfolioAssets.map((a) =>
               a.assetId === asset.assetId
                 ? { ...a, currentPrice: livePrice }
                 : a
@@ -328,7 +328,7 @@ export default function PortfolioPage() {
 
         await delay(12500);
       } catch (err) {
-        console.error(`Failed to fetch price for ${asset.assets.asset}`, err);
+        console.error(`Failed to fetch price for ${asset.assets.ticker}`, err);
       }
     }
   };
