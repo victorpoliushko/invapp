@@ -14,7 +14,7 @@ export class TransactionsService {
 
     if (!assetId && input.assetName) {
       const asset = await this.prismaService.asset.findFirst({
-        where: { asset: input.assetName },
+        where: { ticker: input.assetName },
       });
 
       assetId = asset.id;

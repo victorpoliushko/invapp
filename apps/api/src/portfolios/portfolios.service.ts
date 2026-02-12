@@ -44,7 +44,7 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
-        assets: {
+        portfolioAssets: {
           include: {
             assets: {
               include: {
@@ -68,7 +68,7 @@ export class PortfoliosService {
       data: {
         name: input.name,
       },
-      include: { assets: { include: { assets: true } } },
+      include: { portfolioAssets: { include: { assets: true } } },
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
@@ -82,7 +82,7 @@ export class PortfoliosService {
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
-      include: { assets: { include: { assets: true } } },
+      include: { portfolioAssets: { include: { assets: true } } },
     });
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
@@ -91,10 +91,10 @@ export class PortfoliosService {
     const exsitingAsset = await this.prismaService.asset.findUnique({
       where: asset[0].id
         ? { id: asset[0].id }
-        : { asset: asset[0].assetSymbol },
+        : { ticker: asset[0].assetSymbol },
     });
 
-    return await this.assetsService.getSharePrice(exsitingAsset.asset);
+    return await this.assetsService.getSharePrice(exsitingAsset.ticker);
   }
 
   async addAssetToPortfolio(
@@ -115,7 +115,7 @@ export class PortfoliosService {
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
     if (!asset) {
-      asset = await this.assetsService.createAsset({ name: input.assetName });
+      asset = await this.assetsService.createAsset({ ticker: input.assetName });
     }
 
     console.log(`
@@ -208,7 +208,7 @@ export class PortfoliosService {
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { assets: { include: { assets: true } } },
+        include: { portfolioAssets: { include: { assets: true } } },
       });
 
     console.log(`
@@ -234,7 +234,7 @@ export class PortfoliosService {
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { assets: { include: { assets: true } } },
+        include: { portfolioAssets: { include: { assets: true } } },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
@@ -244,7 +244,7 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
-        assets: {
+        portfolioAssets: {
           include: {
             assets: true,
           },
@@ -254,16 +254,16 @@ export class PortfoliosService {
 
     if (!portfolio) throw new NotFoundException('Portfolio not found');
     const prices = [];
-    for (const pa of portfolio.assets) {
-      console.log(`Fetching price for ${pa.assets.asset}...`);
-      const price = await this.assetsService.getSharePrice(pa.assets.asset);
+    for (const pa of portfolio.portfolioAssets) {
+      console.log(`Fetching price for ${pa.assets.ticker}...`);
+      const price = await this.assetsService.getSharePrice(pa.assets.ticker);
       console.log(`
        price: ${JSON.stringify(price)} 
       `);
 
       prices.push({
         assetId: pa.assetId,
-        symbol: pa.assets.asset,
+        symbol: pa.assets.ticker,
         actualPrice: price,
       });
 
