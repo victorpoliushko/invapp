@@ -3,6 +3,9 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
+  console.log(`
+   aaaaa} 
+  `);
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
