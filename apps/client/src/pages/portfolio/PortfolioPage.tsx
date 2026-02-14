@@ -362,204 +362,6 @@ export default function PortfolioPage() {
    portfolio: ${JSON.stringify(portfolio)}
   `);
 
-  [
-    {
-      id: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-      name: "Katrusia super portfolio 22",
-      userId: "13ee5312-1a96-4ed2-a271-da54b338b708",
-      assets: [
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "6c4220af-c081-406f-bfee-8f1d866d09e7",
-          quantity: 5,
-          price: 200,
-          assets: {
-            id: "6c4220af-c081-406f-bfee-8f1d866d09e7",
-            asset: "GOOG",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-12-06T09:12:40.521Z",
-            transactions: [],
-          },
-        },
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "52601abc-a44e-4a3c-b3a1-a095d88daa0a",
-          quantity: 1,
-          price: 30,
-          assets: {
-            id: "52601abc-a44e-4a3c-b3a1-a095d88daa0a",
-            asset: "CCLAF",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-12-09T10:19:12.777Z",
-            transactions: [],
-          },
-        },
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9d86eeaa-f619-41e7-9f95-9f7f1b6ec517",
-          quantity: 3,
-          price: 3,
-          assets: {
-            id: "9d86eeaa-f619-41e7-9f95-9f7f1b6ec517",
-            asset: "VV5.FRK",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-12-09T10:20:28.431Z",
-            transactions: [],
-          },
-        },
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "6d9632f0-f807-4aee-963c-2b62636353ed",
-          quantity: 2,
-          price: 56,
-          assets: {
-            id: "6d9632f0-f807-4aee-963c-2b62636353ed",
-            asset: "J0C.FRK",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-12-09T10:22:41.168Z",
-            transactions: [],
-          },
-        },
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "cbc443a6-a316-4616-baf5-ed3aad386dee",
-          quantity: 4,
-          price: 67,
-          assets: {
-            id: "cbc443a6-a316-4616-baf5-ed3aad386dee",
-            asset: "N09.FRK",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-12-17T15:26:59.159Z",
-            transactions: [],
-          },
-        },
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          quantity: 8,
-          price: 7,
-          assets: {
-            id: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-            asset: "VOO",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-11-24T14:18:21.556Z",
-            transactions: [
-              {
-                id: "754042a1-b593-485f-94c4-975258aba67c",
-                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-                type: "BUY",
-                quantityChange: 2,
-                pricePerUnit: 2,
-                date: "2026-01-25T00:00:00.000Z",
-              },
-              {
-                id: "a9d72498-c0cd-4bea-a40a-491c835f23d1",
-                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-                type: "BUY",
-                quantityChange: 6,
-                pricePerUnit: 8,
-                date: "2026-01-24T00:00:00.000Z",
-              },
-              {
-                id: "efe73b76-270e-4aec-a20d-2c99bd9301c0",
-                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-                type: "BUY",
-                quantityChange: 6,
-                pricePerUnit: 8,
-                date: "2026-01-24T00:00:00.000Z",
-              },
-              {
-                id: "7a26565e-48a4-4f0e-a935-fee2c34c5d69",
-                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-                type: "BUY",
-                quantityChange: 25,
-                pricePerUnit: 33,
-                date: "2026-01-16T00:00:00.000Z",
-              },
-              {
-                id: "37c198e8-76d7-43a1-a549-81b559620fe4",
-                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-                type: "BUY",
-                quantityChange: 22,
-                pricePerUnit: 23,
-                date: "2026-01-08T00:00:00.000Z",
-              },
-            ],
-          },
-        },
-      ],
-      transactions: [
-        {
-          id: "37c198e8-76d7-43a1-a549-81b559620fe4",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          type: "BUY",
-          quantityChange: 22,
-          pricePerUnit: 23,
-          date: "2026-01-08T00:00:00.000Z",
-        },
-        {
-          id: "7a26565e-48a4-4f0e-a935-fee2c34c5d69",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          type: "BUY",
-          quantityChange: 25,
-          pricePerUnit: 33,
-          date: "2026-01-16T00:00:00.000Z",
-        },
-        {
-          id: "a9d72498-c0cd-4bea-a40a-491c835f23d1",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          type: "BUY",
-          quantityChange: 6,
-          pricePerUnit: 8,
-          date: "2026-01-24T00:00:00.000Z",
-        },
-        {
-          id: "efe73b76-270e-4aec-a20d-2c99bd9301c0",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          type: "BUY",
-          quantityChange: 6,
-          pricePerUnit: 8,
-          date: "2026-01-24T00:00:00.000Z",
-        },
-        {
-          id: "754042a1-b593-485f-94c4-975258aba67c",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          type: "BUY",
-          quantityChange: 2,
-          pricePerUnit: 2,
-          date: "2026-01-25T00:00:00.000Z",
-        },
-      ],
-    },
-  ];
 
   if (!portfolio) {
     return null;
@@ -665,7 +467,7 @@ export default function PortfolioPage() {
               </thead>
               <tbody>
                 {portfolio &&
-                  portfolio.assets.map((s) => (
+                  portfolio.portfolioAssets.map((s) => (
                     <React.Fragment key={s.assetId}>
                       <tr>
                         {/* 1A. EXPAND/COLLAPSE COLUMN */}
@@ -683,7 +485,7 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                         {/* Original Columns (Shifted by 1 due to new expand column) */}
-                        <td data-label="asset">{s.assets.asset}</td>
+                        <td data-label="asset">{s.assets.ticker}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantity}</td>
                         <td data-label="current-pricePerUnit">{s.price}</td>
@@ -692,7 +494,7 @@ export default function PortfolioPage() {
                         <td data-label="actions">
                           <button
                             onClick={() => onDeleteAsset(s.assetId)}
-                            title={`Remove ${s.assets.asset}`}
+                            title={`Remove ${s.assets.ticker}`}
                           >
                             <img
                               className="delete-icon"
@@ -730,7 +532,7 @@ export default function PortfolioPage() {
                                             onClick={() =>
                                               onDeleteAsset(s.assetId)
                                             }
-                                            title={`Remove ${s.assets.asset}`}
+                                            title={`Remove ${s.assets.ticker}`}
                                           >
                                             <img
                                               className="edit-icon"
@@ -742,7 +544,7 @@ export default function PortfolioPage() {
                                           </button>
                                         </td>
                                         <td>{t.type}</td>
-                                        <td>{s.assets.asset}</td>
+                                        <td>{t.asset.ticker}</td>
                                         <td>{t.date}</td>
                                         <td>{t.quantityChange}</td>
                                         <td>{t.pricePerUnit}</td>
@@ -751,7 +553,7 @@ export default function PortfolioPage() {
                                             onClick={() =>
                                               onDeleteAsset(s.assetId)
                                             }
-                                            title={`Remove ${s.assets.asset}`}
+                                            title={`Remove ${s.assets.ticker}`}
                                           >
                                             <img
                                               className="delete-icon"
