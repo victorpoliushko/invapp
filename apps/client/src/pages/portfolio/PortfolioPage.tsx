@@ -105,7 +105,7 @@ export default function PortfolioPage() {
       portfolio &&
         portfolio.portfolioAssets.forEach(async (s) => {
           const response = await fetchWithRedirect(
-            `http://localhost:5173/api/assets/pricePerUnit?asset=${s.assets.asset}`,
+            `http://localhost:5173/api/assets/pricePerUnit?asset=${s.assets.ticker}`,
             {
               method: "GET",
               headers: {
@@ -290,6 +290,9 @@ export default function PortfolioPage() {
 
   const loadPortfolioData = async (portfolioId?: string) => {
     if (!portfolioId) return;
+    console.log(`
+     loadPortfolioData
+    `);
 
     const portfolioData = await fetchPortfolio(portfolioId);
     setPortfolio(portfolioData);
@@ -301,7 +304,7 @@ export default function PortfolioPage() {
         const token = localStorage.getItem("accessToken");
 
         const response = await fetchWithRedirect(
-          `http://localhost:5173/api/assets/pricePerUnit?asset=${asset.assets.asset}`,
+          `http://localhost:5173/api/assets/pricePerUnit?asset=${asset.assets.ticker}`,
           {
             method: "GET",
             headers: {
@@ -312,6 +315,9 @@ export default function PortfolioPage() {
         );
 
         const data = await response.json();
+        console.log(`
+         data: ${JSON.stringify(data)} 
+        `);
         const livePrice = data.pricePerUnit;
 
         setPortfolio((prev) => {
@@ -358,9 +364,9 @@ export default function PortfolioPage() {
     });
   };
 
-  console.log(`
-   portfolio: ${JSON.stringify(portfolio)}
-  `);
+    // console.log(`
+    //  portfolio: ${JSON.stringify(portfolio)}
+    // `);
 
 
   if (!portfolio) {
@@ -524,8 +530,13 @@ export default function PortfolioPage() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {s.assets.transactions?.map((t) => (
-                                    <React.Fragment key={s.assetId}>
+                                  {s.assets.transactions?.map((t) => 
+                                  {
+                                    console.log(`
+                                     transactions: ${JSON.stringify(s.assets.transactions)} 
+                                    `);
+                                    return (
+<React.Fragment key={s.assetId}>
                                       <tr>
                                         <td data-label="actions">
                                           <button
@@ -566,7 +577,52 @@ export default function PortfolioPage() {
                                         </td>
                                       </tr>
                                     </React.Fragment>
-                                  ))}
+                                    )
+                                  } 
+                                  // (
+                                    // <React.Fragment key={s.assetId}>
+                                    //   <tr>
+                                    //     <td data-label="actions">
+                                    //       <button
+                                    //         onClick={() =>
+                                    //           onDeleteAsset(s.assetId)
+                                    //         }
+                                    //         title={`Remove ${s.assets.ticker}`}
+                                    //       >
+                                    //         <img
+                                    //           className="edit-icon"
+                                    //           src={editIcon}
+                                    //           alt="edit-icon"
+                                    //           height={30}
+                                    //           width={30}
+                                    //         />
+                                    //       </button>
+                                    //     </td>
+                                    //     <td>{t.type}</td>
+                                    //     <td>{t.asset.ticker}</td>
+                                    //     <td>{t.date}</td>
+                                    //     <td>{t.quantityChange}</td>
+                                    //     <td>{t.pricePerUnit}</td>
+                                    //     <td data-label="actions">
+                                    //       <button
+                                    //         onClick={() =>
+                                    //           onDeleteAsset(s.assetId)
+                                    //         }
+                                    //         title={`Remove ${s.assets.ticker}`}
+                                    //       >
+                                    //         <img
+                                    //           className="delete-icon"
+                                    //           src={deleteIcon}
+                                    //           alt="delete-icon"
+                                    //           height={30}
+                                    //           width={30}
+                                    //         />
+                                    //       </button>
+                                    //     </td>
+                                    //   </tr>
+                                    // </React.Fragment>
+                                  // )
+                                  )}
 
                                   {/* <tr>
                                     <td data-label="actions">
