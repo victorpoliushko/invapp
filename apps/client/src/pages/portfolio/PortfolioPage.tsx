@@ -304,7 +304,7 @@ export default function PortfolioPage() {
         const token = localStorage.getItem("accessToken");
 
         const response = await fetchWithRedirect(
-          `http://localhost:5173/api/assets/pricePerUnit?asset=${asset.assets.ticker}`,
+          `http://localhost:5173/api/assets/price?asset=${asset.assets.ticker}`,
           {
             method: "GET",
             headers: {
@@ -324,7 +324,7 @@ export default function PortfolioPage() {
           if (!prev) return prev;
           return {
             ...prev,
-            assets: prev.portfolioAssets.map((a) =>
+            assets: prev.portfolioAssets.map(a =>
               a.assetId === asset.assetId
                 ? { ...a, currentPrice: livePrice }
                 : a
