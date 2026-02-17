@@ -192,7 +192,6 @@ export default function PortfolioPage() {
         },
         body: JSON.stringify(newTransaction),
       });
-      console.log(await res.json());
     } catch (error) {}
   };
 
@@ -315,10 +314,15 @@ export default function PortfolioPage() {
         );
 
         const data = await response.json();
+
         console.log(`
          data: ${JSON.stringify(data)} 
         `);
-        const livePrice = data.pricePerUnit;
+        const livePrice = data.price;
+
+        console.log(`
+         livePrice: ${JSON.stringify(livePrice)} 
+        `);
 
         setPortfolio((prev) => {
           if (!prev) return prev;
@@ -331,6 +335,10 @@ export default function PortfolioPage() {
             ),
           };
         });
+
+        console.log(`
+         portfolio: ${JSON.stringify(portfolio)} 
+        `);
 
         await delay(12500);
       } catch (err) {
