@@ -8,6 +8,7 @@ import { CreateAssetDto, AssetDto, UpdateAssetDto } from './dto/Asset.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
 import { v4 as uuidv4 } from 'uuid';
+import finnhub from 'finnhub';
 
 @Injectable()
 export class AssetsService {
@@ -99,6 +100,16 @@ export class AssetsService {
       console.error(`API error for ${asset}:`, error.message);
       return 0;
     }
+  }
+
+  async testFinnhub() {
+    const finnhub_api_key = this.configService.get<string>('FINNHUB_API_KEY');
+    const finnhubClient = new finnhub.DefaultApi(finnhub_api_key);
+
+    finnhubClient.stockCandles("AAPL", "D", 1590988249, 1591852249, (error, data, response) => {
+        console.log(data)
+    });
+
   }
 
   async findAssetByName(ticker: string): Promise<AssetDto> {
