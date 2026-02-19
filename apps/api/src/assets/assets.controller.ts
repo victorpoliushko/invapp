@@ -7,6 +7,11 @@ import { PaginationDTO } from './dto/pagination.dto';
 export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {};
 
+  @Get('test-finhub')
+  async testFinhub() {
+    return this.assetsService.testFinnhub();
+  }
+  
   @Get('price')
   async getSharePrice(@Query('asset') asset: string): Promise<{price: number}> {
     const price = await this.assetsService.getSharePrice(asset);
@@ -27,4 +32,5 @@ export class AssetsController {
   async searchAsset(@Query('q') query: string) {
     return this.assetsService.findAssetInAPI(query);
   }
+
 }
