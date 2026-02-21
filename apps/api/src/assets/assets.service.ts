@@ -8,8 +8,7 @@ import { CreateAssetDto, AssetDto, UpdateAssetDto } from './dto/Asset.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
 import { v4 as uuidv4 } from 'uuid';
-// import { finnhub } from 'finnhub';
-const finnhub = require('finnhub');
+import * as finnhub from 'finnhub';
 
 @Injectable()
 export class AssetsService {
@@ -103,29 +102,21 @@ export class AssetsService {
     }
   }
 
-  async testFinnhub() {
-    // const finnhub_api_key = this.configService.get<string>('FINNHUB_API_KEY');
-    // console.log(`
-    //  finnhub_api_key: ${JSON.stringify(finnhub_api_key)} 
-    // `);
-    // const finnhubClient = new finnhub.DefaultApi(finnhub_api_key);
-    // console.log(`
-    //  finnhubClient: ${JSON.stringify(finnhubClient)} 
-    // `);
-
-    // finnhubClient.stockCandles("AAPL", "D", 1590988249, 1591852249, (error, data, response) => {
-    //     console.log(data)
-    // });
-
+async testFinnhub() {
     const finnhub_api_key = this.configService.get<string>('FINNHUB_API_KEY');
-    const api_key = finnhub.ApiClient.instance.authentications[finnhub_api_key];
-api_key.apiKey = "d69vv3pr01qsjlb974tgd69vv3pr01qsjlb974u0"
-const finnhubClient = new finnhub.DefaultApi()
 
-finnhubClient.symbolSearch('AAPL', (error, data, response) => {
-  console.log(data)
-});
+    const api_key = finnhub.ApiClient.instance.authentications['api_key'];
+    api_key.apiKey = finnhub_api_key;
 
+    const finnhubClient = new finnhub.DefaultApi();
+
+    finnhubClient.symbolSearch('AAPL', (error, data) => {
+      if (error) {
+        console.error('Finnhub Error:', error);
+        return;
+      }
+      console.log('Finnhub Data:', data);
+    });
   }
 
   async findAssetByName(ticker: string): Promise<AssetDto> {
