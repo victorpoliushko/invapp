@@ -8,7 +8,7 @@ import { CreateAssetDto, AssetDto, UpdateAssetDto } from './dto/Asset.dto';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { PaginationDTO } from './dto/pagination.dto';
 import { v4 as uuidv4 } from 'uuid';
-import * as finnhub from 'finnhub';
+import finnhub from 'finnhub';
 
 @Injectable()
 export class AssetsService {
@@ -103,6 +103,7 @@ export class AssetsService {
   }
 
 async testFinnhub() {
+  console.log(finnhub);
     const finnhub_api_key = this.configService.get<string>('FINNHUB_API_KEY');
 
     const api_key = finnhub.ApiClient.instance.authentications['api_key'];
