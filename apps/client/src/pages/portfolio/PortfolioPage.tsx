@@ -289,9 +289,9 @@ export default function PortfolioPage() {
 
   const loadPortfolioData = async (portfolioId?: string) => {
     if (!portfolioId) return;
-    console.log(`
-     loadPortfolioData
-    `);
+    // console.log(`
+    //  loadPortfolioData
+    // `);
 
     const portfolioData = await fetchPortfolio(portfolioId);
     setPortfolio(portfolioData);
@@ -303,7 +303,7 @@ export default function PortfolioPage() {
         const token = localStorage.getItem("accessToken");
 
         const response = await fetchWithRedirect(
-          `http://localhost:5173/api/assets/price?asset=${asset.assets.ticker}`,
+          `http://localhost:5173/api/assets/test-finnhub?symbol=${asset.assets.ticker}`,
           {
             method: "GET",
             headers: {
@@ -315,10 +315,10 @@ export default function PortfolioPage() {
 
         const data = await response.json();
 
-        console.log(`
-         data: ${JSON.stringify(data)} 
-        `);
-        const livePrice = data.price;
+        // console.log(`
+        //  data: ${JSON.stringify(data)} 
+        // `);
+        const livePrice = data.c;
 
         console.log(`
          livePrice: ${JSON.stringify(livePrice)} 

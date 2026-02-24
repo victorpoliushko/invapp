@@ -102,9 +102,9 @@ export class AssetsService {
     }
   }
 
-async testFinnhub() {
+async testFinnhub(symbol: string) {
   const finnhub_api_key = this.configService.get<string>('FINNHUB_API_KEY');
-const url = `https://finnhub.io/api/v1/search?q=AAPL&token=${finnhub_api_key}`;
+const url = `https://finnhub.io/api/v1//quote?symbol=${symbol}&token=${finnhub_api_key}`;
 const response = await lastValueFrom(this.httpService.get(url));
 return response.data;
 }

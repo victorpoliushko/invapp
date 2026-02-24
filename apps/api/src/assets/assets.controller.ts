@@ -8,8 +8,8 @@ export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {};
 
   @Get('test-finnhub')
-  async testFinhub() {
-    return this.assetsService.testFinnhub();
+  async testFinhub(@Query('symbol') symbol: string) {
+    return this.assetsService.testFinnhub(symbol);
   }
 
   @Get('price')
