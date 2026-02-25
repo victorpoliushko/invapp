@@ -313,19 +313,24 @@ export default function PortfolioPage() {
         const data = await response.json();
 
         setPortfolio((prev) => {
+          console.log(`
+           prev: ${JSON.stringify(prev)} 
+          `);
           if (!prev) return prev;
+
+          const updatedAssets = prev.portfolioAssets.map((a) =>
+            a.assetId === asset.assetId
+              ? { ...a, currentPrice: data.c || data.result?.[0]?.description }
+              : a
+          );
           return {
             ...prev,
-            assets: prev.portfolioAssets.map(a =>
-              a.assetId === asset.assetId
-                ? { ...a, currentPrice: data.c }
-                : a
-            ),
+            portfolioAssets: updatedAssets,
           };
         });
 
         console.log(`
-         portfolio: ${JSON.stringify(portfolio)} 
+         portfolio: ${portfolio} 
         `);
 
         await delay(12500);
@@ -360,10 +365,9 @@ export default function PortfolioPage() {
     });
   };
 
-    // console.log(`
-    //  portfolio: ${JSON.stringify(portfolio)}
-    // `);
-
+  // console.log(`
+  //  portfolio: ${JSON.stringify(portfolio)}
+  // `);
 
   if (!portfolio) {
     return null;
@@ -526,56 +530,56 @@ export default function PortfolioPage() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {s.assets.transactions?.map((t) => 
-                                  {
-                                    console.log(`
+                                  {s.assets.transactions?.map(
+                                    (t) => {
+                                      console.log(`
                                      transactions: ${JSON.stringify(s.assets.transactions)} 
                                     `);
-                                    return (
-<React.Fragment key={s.assetId}>
-                                      <tr>
-                                        <td data-label="actions">
-                                          <button
-                                            onClick={() =>
-                                              onDeleteAsset(s.assetId)
-                                            }
-                                            title={`Remove ${s.assets.ticker}`}
-                                          >
-                                            <img
-                                              className="edit-icon"
-                                              src={editIcon}
-                                              alt="edit-icon"
-                                              height={30}
-                                              width={30}
-                                            />
-                                          </button>
-                                        </td>
-                                        <td>{t.type}</td>
-                                        <td>{t.asset.ticker}</td>
-                                        <td>{t.date}</td>
-                                        <td>{t.quantityChange}</td>
-                                        <td>{t.pricePerUnit}</td>
-                                        <td data-label="actions">
-                                          <button
-                                            onClick={() =>
-                                              onDeleteAsset(s.assetId)
-                                            }
-                                            title={`Remove ${s.assets.ticker}`}
-                                          >
-                                            <img
-                                              className="delete-icon"
-                                              src={deleteIcon}
-                                              alt="delete-icon"
-                                              height={30}
-                                              width={30}
-                                            />
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    </React.Fragment>
-                                    )
-                                  } 
-                                  // (
+                                      return (
+                                        <React.Fragment key={s.assetId}>
+                                          <tr>
+                                            <td data-label="actions">
+                                              <button
+                                                onClick={() =>
+                                                  onDeleteAsset(s.assetId)
+                                                }
+                                                title={`Remove ${s.assets.ticker}`}
+                                              >
+                                                <img
+                                                  className="edit-icon"
+                                                  src={editIcon}
+                                                  alt="edit-icon"
+                                                  height={30}
+                                                  width={30}
+                                                />
+                                              </button>
+                                            </td>
+                                            <td>{t.type}</td>
+                                            <td>{t.asset.ticker}</td>
+                                            <td>{t.date}</td>
+                                            <td>{t.quantityChange}</td>
+                                            <td>{t.pricePerUnit}</td>
+                                            <td data-label="actions">
+                                              <button
+                                                onClick={() =>
+                                                  onDeleteAsset(s.assetId)
+                                                }
+                                                title={`Remove ${s.assets.ticker}`}
+                                              >
+                                                <img
+                                                  className="delete-icon"
+                                                  src={deleteIcon}
+                                                  alt="delete-icon"
+                                                  height={30}
+                                                  width={30}
+                                                />
+                                              </button>
+                                            </td>
+                                          </tr>
+                                        </React.Fragment>
+                                      );
+                                    }
+                                    // (
                                     // <React.Fragment key={s.assetId}>
                                     //   <tr>
                                     //     <td data-label="actions">
@@ -617,7 +621,7 @@ export default function PortfolioPage() {
                                     //     </td>
                                     //   </tr>
                                     // </React.Fragment>
-                                  // )
+                                    // )
                                   )}
 
                                   {/* <tr>
