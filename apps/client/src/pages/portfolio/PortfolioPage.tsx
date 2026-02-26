@@ -49,6 +49,9 @@ export default function PortfolioPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<AssetType[]>([]);
+  const [loadingPrices, setLoadingPrices] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState<{
@@ -297,6 +300,7 @@ export default function PortfolioPage() {
 
     for (const asset of portfolioData.portfolioAssets) {
       try {
+        setLoadingPrices(prev => ({ ...prev, [asset.assetId]: true }));
         const token = localStorage.getItem("accessToken");
 
         const response = await fetchWithRedirect(
@@ -313,9 +317,6 @@ export default function PortfolioPage() {
         const data = await response.json();
 
         setPortfolio((prev) => {
-          console.log(`
-           prev: ${JSON.stringify(prev)} 
-          `);
           if (!prev) return prev;
 
           const updatedAssets = prev.portfolioAssets.map((a) =>
@@ -328,21 +329,15 @@ export default function PortfolioPage() {
             portfolioAssets: updatedAssets,
           };
         });
-
-        console.log(`
-         portfolio: ${portfolio} 
-        `);
-
-        await delay(12500);
       } catch (err) {
         console.error(`Failed to fetch price for ${asset.assets.ticker}`, err);
+      } finally {
+        setLoadingPrices((prev) => ({ ...prev, [asset.assetId]: false }));
       }
+
+      await delay(12500);
     }
   };
-
-  // console.log(`
-  //   portfolio: ${JSON.stringify(portfolio)}
-  // `);
 
   const [expandedAssetId, setExpandedAssetId] = useState(null);
 
@@ -494,7 +489,13 @@ export default function PortfolioPage() {
                         <td data-label="asset">{s.assets.ticker}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantity}</td>
-                        <td data-label="current-pricePerUnit">{s.price}</td>
+                        <td data-label="current-pricePerUnit">
+                          {loadingPrices[s.assetId] ? (
+                            <div>Loading</div>
+                          ) : (
+                            s.price
+                          )}
+                        </td>
                         <td data-label="pricePerUnit">{s.currentPrice}</td>
                         <td data-label="asset">test name</td>
                         <td data-label="actions">
