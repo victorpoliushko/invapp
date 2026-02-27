@@ -50,7 +50,7 @@ export default function PortfolioPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<AssetType[]>([]);
   const [loadingPrices, setLoadingPrices] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
@@ -82,7 +82,7 @@ export default function PortfolioPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok)
@@ -115,7 +115,7 @@ export default function PortfolioPage() {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-            }
+            },
           );
           const data = await response.json();
           s.price = data.pricePerUnit;
@@ -145,7 +145,7 @@ export default function PortfolioPage() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok) throw new Error("Failed to fetch asset suggestions");
@@ -171,7 +171,7 @@ export default function PortfolioPage() {
   const handleAddTransaction = async (
     portfolioId: string,
     type: TransactionType,
-    assetId?: string
+    assetId?: string,
   ) => {
     const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
 
@@ -300,7 +300,7 @@ export default function PortfolioPage() {
 
     for (const asset of portfolioData.portfolioAssets) {
       try {
-        setLoadingPrices(prev => ({ ...prev, [asset.assetId]: true }));
+        setLoadingPrices((prev) => ({ ...prev, [asset.assetId]: true }));
         const token = localStorage.getItem("accessToken");
 
         const response = await fetchWithRedirect(
@@ -311,8 +311,10 @@ export default function PortfolioPage() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
+
+        if (!response.ok) throw new Error("Failed to fetch price");
 
         const data = await response.json();
 
@@ -322,13 +324,14 @@ export default function PortfolioPage() {
           const updatedAssets = prev.portfolioAssets.map((a) =>
             a.assetId === asset.assetId
               ? { ...a, currentPrice: data.c || data.result?.[0]?.description }
-              : a
+              : a,
           );
           return {
             ...prev,
             portfolioAssets: updatedAssets,
           };
         });
+
       } catch (err) {
         console.error(`Failed to fetch price for ${asset.assets.ticker}`, err);
       } finally {
@@ -490,10 +493,10 @@ export default function PortfolioPage() {
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantity}</td>
                         <td data-label="current-pricePerUnit">
-                          {loadingPrices[s.assetId] ? (
-                            <div>Loading</div>
-                          ) : (
+                          {!loadingPrices[s.assetId] ? (
                             s.price
+                          ) : (
+                            <div>Loading</div>
                           )}
                         </td>
                         <td data-label="pricePerUnit">{s.currentPrice}</td>
@@ -579,7 +582,7 @@ export default function PortfolioPage() {
                                           </tr>
                                         </React.Fragment>
                                       );
-                                    }
+                                    },
                                     // (
                                     // <React.Fragment key={s.assetId}>
                                     //   <tr>
@@ -758,7 +761,7 @@ export default function PortfolioPage() {
                             // handleAddAsset();
                             handleAddTransaction(
                               portfolio?.id,
-                              TransactionType.BUY
+                              TransactionType.BUY,
                             );
                           }
                         }}
@@ -800,7 +803,7 @@ export default function PortfolioPage() {
                           // handleAddAsset();
                           handleAddTransaction(
                             portfolio?.id,
-                            TransactionType.BUY
+                            TransactionType.BUY,
                           );
                       }}
                       required
@@ -817,7 +820,7 @@ export default function PortfolioPage() {
                           // handleAddAsset();
                           handleAddTransaction(
                             portfolio?.id,
-                            TransactionType.BUY
+                            TransactionType.BUY,
                           );
                       }}
                       required
@@ -835,7 +838,7 @@ export default function PortfolioPage() {
                           // handleAddAsset();
                           handleAddTransaction(
                             portfolio?.id,
-                            TransactionType.BUY
+                            TransactionType.BUY,
                           );
                       }}
                       required
