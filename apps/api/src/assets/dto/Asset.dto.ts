@@ -1,5 +1,5 @@
 import { DataSource, AssetType } from '@prisma/client';
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
   IsDefined,
   IsEnum,
@@ -35,6 +35,8 @@ export class AssetDto {
   dataSource: DataSource;
 
   @IsOptional()
+  @Expose()
+  @Transform(({ value }) => value.toISOString().split('T')[0])
   updatedAt?: Date;
 
   @Type(() => TransactionsDto)

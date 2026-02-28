@@ -1,5 +1,5 @@
 import { TransactionType } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
   IsDecimal,
   IsDefined,
@@ -36,6 +36,8 @@ export class TransactionsDto {
 
   @IsString()
   @IsDefined()
+  @Expose()
+  @Transform(({ value }) => value.toISOString().split('T')[0])
   date: string;
 
   @Type(() => PortfolioDto)

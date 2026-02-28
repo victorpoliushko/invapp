@@ -1,4 +1,5 @@
 import { TransactionType } from '@prisma/client';
+import { Expose, Transform } from 'class-transformer';
 import {
   IsDefined,
   IsEnum,
@@ -21,6 +22,8 @@ export class AddAssetInputDto {
 
   @IsString()
   @IsDefined()
+  @Expose()
+  @Transform(({ value }) => value.toISOString().split('T')[0])
   date: string;
 
   @IsNumber()

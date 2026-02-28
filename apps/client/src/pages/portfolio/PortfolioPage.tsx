@@ -559,7 +559,7 @@ export default function PortfolioPage() {
                                               </button>
                                             </td>
                                             <td>{t.type}</td>
-                                            <td>{t.asset.ticker}</td>
+                                            <td>{s.assets.ticker}</td>
                                             <td>{t.date}</td>
                                             <td>{t.quantityChange}</td>
                                             <td>{t.pricePerUnit}</td>
