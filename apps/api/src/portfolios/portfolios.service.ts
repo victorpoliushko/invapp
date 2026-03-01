@@ -142,6 +142,89 @@ export class PortfoliosService {
      PS existing portfolio-asset: ${JSON.stringify(existingAsset)} 
     `);
 
+    [
+      {
+        portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+        assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+        quantity: 4,
+        price: 100,
+        assets: {
+          id: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+          ticker: 'VOO',
+          name: null,
+          type: null,
+          exchange: null,
+          dataSource: null,
+          updatedAt: '2025-11-24T14:18:21.556Z',
+          transactions: [
+            {
+              id: '37c198e8-76d7-43a1-a549-81b559620fe4',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 22,
+              pricePerUnit: 23,
+              date: '2026-01-08T00:00:00.000Z',
+            },
+            {
+              id: '7a26565e-48a4-4f0e-a935-fee2c34c5d69',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 25,
+              pricePerUnit: 33,
+              date: '2026-01-16T00:00:00.000Z',
+            },
+            {
+              id: 'a9d72498-c0cd-4bea-a40a-491c835f23d1',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 6,
+              pricePerUnit: 8,
+              date: '2026-01-24T00:00:00.000Z',
+            },
+            {
+              id: 'efe73b76-270e-4aec-a20d-2c99bd9301c0',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 6,
+              pricePerUnit: 8,
+              date: '2026-01-24T00:00:00.000Z',
+            },
+            {
+              id: '754042a1-b593-485f-94c4-975258aba67c',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 2,
+              pricePerUnit: 2,
+              date: '2026-01-25T00:00:00.000Z',
+            },
+            {
+              id: '4a7d3570-1187-47fc-9dd3-1d3a6a259a76',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 4,
+              pricePerUnit: 100,
+              date: '2026-03-01T00:00:00.000Z',
+            },
+            {
+              id: 'abf2415a-ec8e-4818-abf2-50c6ed5639c0',
+              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              type: 'BUY',
+              quantityChange: 4,
+              pricePerUnit: 100,
+              date: '2026-03-01T00:00:00.000Z',
+            },
+          ],
+        },
+      },
+    ];
+
     // get all transactions and add to set portfolioAsset ang price
     // const transactions = existingAsset.assets.transactions.map(t => t);
 
@@ -156,12 +239,15 @@ export class PortfoliosService {
     //   },
     // );
 
-    console.log(`
-     PS input: ${JSON.stringify(input)} 
-    `);
+    // console.log(`
+    //  PS input: ${JSON.stringify(input)}
+    // `);
 
     let newQuantity = input.quantityChange;
     let newAvgPrice = input.pricePerUnit;
+
+          let totalCost = 0;
+      let quantity = 0;
 
     if (existingAsset) {
       // const oldQuantity = existingAsset.quantity;
@@ -176,8 +262,7 @@ export class PortfoliosService {
       //   (oldAvgPrice * oldQuantity + input.pricePerUnit * input.quantityChange) /
       //     newQuantity,
       // );
-      let totalCost = 0;
-      let quantity = 0;
+
       existingAsset.assets.transactions.map((t) => {
         if (t.type === TransactionType.BUY) {
           totalCost += t.quantityChange * t.pricePerUnit;
@@ -196,11 +281,11 @@ export class PortfoliosService {
 
     await this.prismaService.portfolioAsset.upsert({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
-      update: { quantity: newQuantity, price: newAvgPrice },
+      update: { quantity, price: newAvgPrice },
       create: {
         portfolioId: id,
         assetId: asset.id,
-        quantity: newQuantity,
+        quantity,
         price: newAvgPrice,
       },
     });
@@ -214,6 +299,46 @@ export class PortfoliosService {
     console.log(`
       PS updatedPortfolio: ${JSON.stringify(updatedPortfolio)} 
       `);
+
+    [
+      {
+        id: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+        name: 'Katrusia super portfolio 22',
+        userId: '13ee5312-1a96-4ed2-a271-da54b338b708',
+        portfolioAssets: [
+          {
+            portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+            assetId: '6c4220af-c081-406f-bfee-8f1d866d09e7',
+            quantity: 4,
+            price: 320,
+            assets: {
+              id: '6c4220af-c081-406f-bfee-8f1d866d09e7',
+              ticker: 'GOOG',
+              name: null,
+              type: null,
+              exchange: null,
+              dataSource: null,
+              updatedAt: '2025-12-06T09:12:40.521Z',
+            },
+          },
+          {
+            portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
+            assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+            quantity: 4,
+            price: 100,
+            assets: {
+              id: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
+              ticker: 'VOO',
+              name: null,
+              type: null,
+              exchange: null,
+              dataSource: null,
+              updatedAt: '2025-11-24T14:18:21.556Z',
+            },
+          },
+        ],
+      },
+    ];
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
