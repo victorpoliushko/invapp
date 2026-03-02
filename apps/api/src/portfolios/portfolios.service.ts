@@ -296,50 +296,6 @@ export class PortfoliosService {
         include: { portfolioAssets: { include: { assets: true } } },
       });
 
-    console.log(`
-      PS updatedPortfolio: ${JSON.stringify(updatedPortfolio)} 
-      `);
-
-    [
-      {
-        id: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-        name: 'Katrusia super portfolio 22',
-        userId: '13ee5312-1a96-4ed2-a271-da54b338b708',
-        portfolioAssets: [
-          {
-            portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-            assetId: '6c4220af-c081-406f-bfee-8f1d866d09e7',
-            quantity: 4,
-            price: 320,
-            assets: {
-              id: '6c4220af-c081-406f-bfee-8f1d866d09e7',
-              ticker: 'GOOG',
-              name: null,
-              type: null,
-              exchange: null,
-              dataSource: null,
-              updatedAt: '2025-12-06T09:12:40.521Z',
-            },
-          },
-          {
-            portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-            assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-            quantity: 4,
-            price: 100,
-            assets: {
-              id: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              ticker: 'VOO',
-              name: null,
-              type: null,
-              exchange: null,
-              dataSource: null,
-              updatedAt: '2025-11-24T14:18:21.556Z',
-            },
-          },
-        ],
-      },
-    ];
-
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
