@@ -309,7 +309,14 @@ export class PortfoliosService {
           portfolioId: id,
           assetId: input.assetId,
         },
-      },
+      }
+    });
+
+    await this.prismaService.transaction.deleteMany({
+      where: {
+        portfolioId: id,
+        assetId: input.assetId
+      }
     });
 
     const updatedPortfolio =

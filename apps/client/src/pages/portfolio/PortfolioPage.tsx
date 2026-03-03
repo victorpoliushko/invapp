@@ -196,6 +196,7 @@ export default function PortfolioPage() {
         body: JSON.stringify(newTransaction),
       });
     } catch (error) {}
+    loadPortfolioData();
   };
 
   const onDeleteAsset = async (index: any) => {
