@@ -114,116 +114,39 @@ export class PortfoliosService {
 
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
+    // dogshit, refactor later
     if (!asset) {
+      console.log('createing asset');
       asset = await this.assetsService.createAsset({ ticker: input.assetName });
+      await this.prismaService.portfolioAsset.create({
+        data: {
+          assets: { connect: { id: asset.id } },
+          portfolio: { connect: { id } },
+          quantity: 0,
+        },
+      });
     }
 
-    console.log(`
-     PS created asset: ${JSON.stringify(asset)} 
-    `);
-
-    const existingAsset = await this.prismaService.portfolioAsset.findUnique({
-      where: {
-        portfolioId_assetId: {
-          portfolioId: id,
-          assetId: asset.id,
-        },
-      },
-      include: {
-        assets: {
-          include: {
-            transactions: true,
+    const existingPortfolioAsset =
+      await this.prismaService.portfolioAsset.findUnique({
+        where: {
+          portfolioId_assetId: {
+            portfolioId: id,
+            assetId: asset.id,
           },
         },
-      },
-    });
+        include: {
+          assets: {
+            include: {
+              transactions: true,
+            },
+          },
+        },
+      });
 
     console.log(`
-     PS existing portfolio-asset: ${JSON.stringify(existingAsset)} 
+     existingPortfolioAsset: ${JSON.stringify(existingPortfolioAsset)} 
     `);
-
-    [
-      {
-        portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-        assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-        quantity: 4,
-        price: 100,
-        assets: {
-          id: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-          ticker: 'VOO',
-          name: null,
-          type: null,
-          exchange: null,
-          dataSource: null,
-          updatedAt: '2025-11-24T14:18:21.556Z',
-          transactions: [
-            {
-              id: '37c198e8-76d7-43a1-a549-81b559620fe4',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 22,
-              pricePerUnit: 23,
-              date: '2026-01-08T00:00:00.000Z',
-            },
-            {
-              id: '7a26565e-48a4-4f0e-a935-fee2c34c5d69',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 25,
-              pricePerUnit: 33,
-              date: '2026-01-16T00:00:00.000Z',
-            },
-            {
-              id: 'a9d72498-c0cd-4bea-a40a-491c835f23d1',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 6,
-              pricePerUnit: 8,
-              date: '2026-01-24T00:00:00.000Z',
-            },
-            {
-              id: 'efe73b76-270e-4aec-a20d-2c99bd9301c0',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 6,
-              pricePerUnit: 8,
-              date: '2026-01-24T00:00:00.000Z',
-            },
-            {
-              id: '754042a1-b593-485f-94c4-975258aba67c',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 2,
-              pricePerUnit: 2,
-              date: '2026-01-25T00:00:00.000Z',
-            },
-            {
-              id: '4a7d3570-1187-47fc-9dd3-1d3a6a259a76',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 4,
-              pricePerUnit: 100,
-              date: '2026-03-01T00:00:00.000Z',
-            },
-            {
-              id: 'abf2415a-ec8e-4818-abf2-50c6ed5639c0',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 4,
-              pricePerUnit: 100,
-              date: '2026-03-01T00:00:00.000Z',
-            },
-          ],
-        },
-      },
-    ];
 
     // get all transactions and add to set portfolioAsset ang price
     // const transactions = existingAsset.assets.transactions.map(t => t);
@@ -249,7 +172,7 @@ export class PortfoliosService {
     let totalCost = 0;
     let quantity = 0;
 
-    if (existingAsset) {
+    if (existingPortfolioAsset) {
       // const oldQuantity = existingAsset.quantity;
       // const oldAvgPrice = existingAsset.price;
 
@@ -263,84 +186,30 @@ export class PortfoliosService {
       //     newQuantity,
       // );
 
-      existingAsset.assets.transactions.filter(t => t.portfolioId === id).map((t) => {
-        if (t.type === TransactionType.BUY) {
-          totalCost += t.quantityChange * t.pricePerUnit;
-          quantity += t.quantityChange;
-        }
-        if (t.type === TransactionType.SELL) {
-          totalCost -= t.quantityChange * t.pricePerUnit;
-          quantity -= t.quantityChange;
-        }
-        // if (existingAsset.assets.transactions.length === 1) {
-        //   quantity = t.quantityChange
-        // }
-        // if (quantity === 0) {
-        //   totalCost = 0;
-        //   quantity = 0;
-        // }
-      });
-    }
+      existingPortfolioAsset.assets.transactions
+        .filter((t) => t.portfolioId === id)
+        .map((t) => {
+          if (t.type === TransactionType.BUY) {
+            totalCost += t.quantityChange * t.pricePerUnit;
+            quantity += t.quantityChange;
+          }
+          if (t.type === TransactionType.SELL) {
+            totalCost -= t.quantityChange * t.pricePerUnit;
+            quantity -= t.quantityChange;
+          }
+          // if (existingAsset.assets.transactions.length === 1) {
+          //   quantity = t.quantityChange
+          // }
+          // if (quantity === 0) {
+          //   totalCost = 0;
+          //   quantity = 0;
+          // }
+        });
+    } 
 
-    console.log(`
-     existingAsset: ${JSON.stringify(existingAsset)} 
-    `);
-
-    [
-      {
-        portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-        assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-        quantity: 8,
-        price: 450,
-        assets: {
-          id: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-          ticker: 'VOO',
-          name: null,
-          type: null,
-          exchange: null,
-          dataSource: null,
-          updatedAt: '2025-11-24T14:18:21.556Z',
-          transactions: [
-            {
-              id: '94153628-bc17-4b8e-a95f-dfd87afa9e16',
-              portfolioId: '074f5269-2081-4fd9-bfa8-b3fd2825f94d',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 5,
-              pricePerUnit: 50,
-              date: '2026-03-02T00:00:00.000Z',
-            },
-            {
-              id: 'e73a1b9e-d318-4669-8019-adb290b48758',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 2,
-              pricePerUnit: 500,
-              date: '2026-03-03T00:00:00.000Z',
-            },
-            {
-              id: 'f5a116af-d027-4134-b04a-bff3ce56460c',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 1,
-              pricePerUnit: 450,
-              date: '2026-03-04T00:00:00.000Z',
-            },
-            {
-              id: 'ae560f53-7eb2-44e0-994e-edd7a2751846',
-              portfolioId: '140f5933-6f4b-424f-86c3-3f350a2b1293',
-              assetId: '9a4d67b9-1c7f-4379-8ee8-9d2f327d8418',
-              type: 'BUY',
-              quantityChange: 2,
-              pricePerUnit: 500,
-              date: '2026-03-04T00:00:00.000Z',
-            },
-          ],
-        },
-      },
-    ];
+    // console.log(`
+    //  existingAsset: ${JSON.stringify(existingPortfolioAsset)} 
+    // `);
 
     await this.prismaService.portfolioAsset.upsert({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
