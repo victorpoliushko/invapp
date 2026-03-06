@@ -114,111 +114,48 @@ export class PortfoliosService {
 
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
-    // dogshit, refactor later
     if (!asset) {
-      console.log('createing asset');
       asset = await this.assetsService.createAsset({ ticker: input.assetName });
-      await this.prismaService.portfolioAsset.create({
+    }
+
+    let portfolioAsset = await this.prismaService.portfolioAsset.findUnique({
+      where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
+    });
+
+    if (!portfolioAsset) {
+      portfolioAsset = await this.prismaService.portfolioAsset.create({
         data: {
-          assets: { connect: { id: asset.id } },
-          portfolio: { connect: { id } },
+          assetId: asset.id,
+          portfolioId: id,
           quantity: 0,
         },
       });
     }
 
-    const existingPortfolioAsset =
-      await this.prismaService.portfolioAsset.findUnique({
-        where: {
-          portfolioId_assetId: {
-            portfolioId: id,
-            assetId: asset.id,
-          },
-        },
-        include: {
-          assets: {
-            include: {
-              transactions: true,
-            },
-          },
-        },
-      });
+    const allTransactions = await this.prismaService.transaction.findMany({
+      where: { portfolioId: id, assetId: asset.id },
+    });
 
-    console.log(`
-     existingPortfolioAsset: ${JSON.stringify(existingPortfolioAsset)} 
-    `);
-
-    // get all transactions and add to set portfolioAsset ang price
-    // const transactions = existingAsset.assets.transactions.map(t => t);
-
-    // const existingAsset = await this.prismaService.portfolioAsset.findUnique(
-    //   {
-    //     where: {
-    //       portfolioId_assetId: {
-    //         portfolioId: id,
-    //         assetId: asset.id,
-    //       },
-    //     },
-    //   },
-    // );
-
-    // console.log(`
-    //  PS input: ${JSON.stringify(input)}
-    // `);
-
-    let newQuantity = input.quantityChange;
-    let newAvgPrice = input.pricePerUnit;
-
+    let totalQuantity = 0;
     let totalCost = 0;
-    let quantity = 0;
 
-    if (existingPortfolioAsset) {
-      // const oldQuantity = existingAsset.quantity;
-      // const oldAvgPrice = existingAsset.price;
+    allTransactions.forEach((t) => {
+      if (t.type === TransactionType.BUY) {
+        totalQuantity += t.quantityChange;
+        totalCost += t.quantityChange * t.pricePerUnit;
+      } else {
+        totalQuantity -= t.quantityChange;
+        totalCost -= t.quantityChange * t.pricePerUnit;
+      }
+    });
 
-      // if (input.type === TransactionType.BUY) {
-      //   newQuantity = oldQuantity + input.quantityChange;
-      // }
-      // else newQuantity = oldQuantity - input.quantityChange;
+    const avgPrice = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
-      // newAvgPrice = Math.round(
-      //   (oldAvgPrice * oldQuantity + input.pricePerUnit * input.quantityChange) /
-      //     newQuantity,
-      // );
-
-      existingPortfolioAsset.assets.transactions
-        .filter((t) => t.portfolioId === id)
-        .map((t) => {
-          if (t.type === TransactionType.BUY) {
-            totalCost += t.quantityChange * t.pricePerUnit;
-            quantity += t.quantityChange;
-          }
-          if (t.type === TransactionType.SELL) {
-            totalCost -= t.quantityChange * t.pricePerUnit;
-            quantity -= t.quantityChange;
-          }
-          // if (existingAsset.assets.transactions.length === 1) {
-          //   quantity = t.quantityChange
-          // }
-          // if (quantity === 0) {
-          //   totalCost = 0;
-          //   quantity = 0;
-          // }
-        });
-    } 
-
-    // console.log(`
-    //  existingAsset: ${JSON.stringify(existingPortfolioAsset)} 
-    // `);
-
-    await this.prismaService.portfolioAsset.upsert({
+    await this.prismaService.portfolioAsset.update({
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
-      update: { quantity, price: newAvgPrice },
-      create: {
-        portfolioId: id,
-        assetId: asset.id,
-        quantity,
-        price: newAvgPrice,
+      data: {
+        quantity: totalQuantity,
+        price: avgPrice,
       },
     });
 
