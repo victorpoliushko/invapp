@@ -155,7 +155,7 @@ export class PortfoliosService {
       where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
       data: {
         quantity: totalQuantity,
-        price: avgPrice,
+        price: Math.round(avgPrice),
       },
     });
 

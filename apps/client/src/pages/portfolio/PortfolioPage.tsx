@@ -195,8 +195,11 @@ export default function PortfolioPage() {
         },
         body: JSON.stringify(newTransaction),
       });
-    } catch (error) {}
-    loadPortfolioData();
+      clearInputs();
+      await loadPortfolioData(params.id);
+    } catch (error) {
+      alert("Could not add transaction");
+    }
   };
 
   const onDeleteAsset = async (index: any) => {
