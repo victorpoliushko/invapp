@@ -465,7 +465,7 @@ export default function PortfolioPage() {
                 <tr>
                   <th></th>
                   <th scope="col">Asset</th>
-                  <th scope="col">Date</th>
+                  <th scope="col">Last transaction</th>
                   <th scope="col">Quantity</th>
                   <th scope="col">Avg pricePerUnit</th>
                   <th scope="col">Current pricePerUnit</th>
@@ -487,12 +487,11 @@ export default function PortfolioPage() {
                                 ? "Collapse Details"
                                 : "Expand Details"
                             }
-                            style={{ marginRight: "10px" }} // Added a small style for spacing
+                            style={{ marginRight: "10px" }}
                           >
                             {expandedAssetId === s.assetId ? "▼" : "►"}
                           </button>
                         </td>
-                        {/* Original Columns (Shifted by 1 due to new expand column) */}
                         <td data-label="asset">{s.assets.ticker}</td>
                         <td data-label="date">{s.assets.updatedAt}</td>
                         <td data-label="quantityChange">{s.quantity}</td>

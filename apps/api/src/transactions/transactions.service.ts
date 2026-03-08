@@ -7,7 +7,10 @@ import { PortfoliosService } from 'src/portfolios/portfolios.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private prismaService: PrismaService, private portfoliosService: PortfoliosService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private portfoliosService: PortfoliosService,
+  ) {}
 
   async create(input: CreateTransactionDto): Promise<TransactionsDto> {
     let assetId = input.assetId;
@@ -39,10 +42,6 @@ export class TransactionsService {
       },
     });
 
-    console.log(`
-     TS createdTransaction: ${JSON.stringify(createdTransaction)} 
-    `);
-
     this.portfoliosService.addAssetToPortfolio(input.portfolioId, input);
 
     return plainToInstance(TransactionsDto, createdTransaction);
@@ -57,5 +56,9 @@ export class TransactionsService {
       },
     });
     return plainToInstance(TransactionsDto, transaction);
+  }
+
+  async delete(id: string) {
+    await this.prismaService.transaction.delete({ where: { id } });
   }
 }

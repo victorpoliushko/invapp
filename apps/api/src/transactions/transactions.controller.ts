@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   UseGuards,
   UsePipes,
@@ -27,11 +29,15 @@ export class TransactionsController {
   @UsePipes(new ValidationPipe())
   addTransaction(
     // @Body() createTransactionDTO: any
-    @Body() createTransactionDTO: CreateTransactionDto
+    @Body() createTransactionDTO: CreateTransactionDto,
   ) {
-console.log(`
- createTransactionDTO: ${JSON.stringify(createTransactionDTO)} 
-`);
     return this.transactionsService.create(createTransactionDTO);
+  }
+
+  @Delete()
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe())
+  removeTransaction(@Param() id: string) {
+    return this.transactionsService.delete(id);
   }
 }
