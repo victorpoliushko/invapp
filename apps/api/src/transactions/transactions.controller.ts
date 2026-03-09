@@ -37,7 +37,7 @@ export class TransactionsController {
   @Delete()
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  removeTransaction(@Param() id: string) {
-    return this.transactionsService.delete(id);
+  removeTransaction(@Body() data: {id: string }) {
+    return this.transactionsService.delete(data.id);
   }
 }

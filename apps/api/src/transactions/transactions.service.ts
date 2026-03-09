@@ -59,6 +59,9 @@ export class TransactionsService {
   }
 
   async delete(id: string) {
+    console.log(`
+     id: ${JSON.stringify(id)} 
+    `);
     await this.prismaService.transaction.delete({ where: { id } });
   }
 }

@@ -231,6 +231,26 @@ export default function PortfolioPage() {
     }
   };
 
+  const onDeleteTransaction = async (
+    id: string
+  ) => {
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const res = await fetch(`/api/transactions`, {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+      await loadPortfolioData(params.id);
+    } catch (error) {
+      alert("Could not delete transaction");
+    }
+  };
+
   const onUpdatePortfolio = async (portfolioId: any, updatedName: string) => {
     if (!updatedName.trim() || updatedName === portfolio?.name) {
       setIsEditing(false);
@@ -539,9 +559,6 @@ export default function PortfolioPage() {
                                 <tbody>
                                   {s.assets.transactions?.map(
                                     (t) => {
-                                      console.log(`
-                                     transactions: ${JSON.stringify(s.assets.transactions)} 
-                                    `);
                                       return (
                                         <React.Fragment key={s.assetId}>
                                           <tr>
@@ -568,10 +585,8 @@ export default function PortfolioPage() {
                                             <td>{t.pricePerUnit}</td>
                                             <td data-label="actions">
                                               <button
-                                                onClick={() =>
-                                                  onDeleteAsset(s.assetId)
-                                                }
-                                                title={`Remove ${s.assets.ticker}`}
+                                                onClick={() => onDeleteTransaction(t.id)}
+                                                title={`Remove transaction ${t.id}`}
                                               >
                                                 <img
                                                   className="delete-icon"
