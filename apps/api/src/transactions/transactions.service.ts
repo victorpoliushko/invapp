@@ -59,51 +59,33 @@ export class TransactionsService {
   }
 
   async delete(id: string) {
-    const transaction = await this.prismaService.transaction.findFirst({
-      where: { id },
-    });
-    const portfolioAsset = await this.prismaService.portfolioAsset.findFirst({
-      where: {
-        assetId: transaction.assetId,
-        portfolioId: transaction.portfolioId,
-      },
-    });
-    await this.prismaService.portfolioAsset.update({
-      where: {
-        assetId: transaction.assetId,
-        portfolioId: transaction.portfolioId,
-      },
-      data: {
-        quantity: portfolioAsset.quantity - transaction.quantityChange,
-      },
-    });
-    await this.prismaService.transaction.delete({ where: { id } });
-
-    // const allTransactions = await this.prismaService.transaction.findMany({
-    //   where: { portfolioId: id, assetId: asset.id },
+    // const transaction = await this.prismaService.transaction.findFirst({
+    //   where: { id },
     // });
-
-    // let totalQuantity = 0;
-    // let totalCost = 0;
-
-    // allTransactions.forEach((t) => {
-    //   if (t.type === TransactionType.BUY) {
-    //     totalQuantity += t.quantityChange;
-    //     totalCost += t.quantityChange * t.pricePerUnit;
-    //   } else {
-    //     totalQuantity -= t.quantityChange;
-    //     totalCost -= t.quantityChange * t.pricePerUnit;
-    //   }
-    // });
-
-    // const avgPrice = totalQuantity > 0 ? totalCost / totalQuantity : 0;
-
-    // await this.prismaService.portfolioAsset.update({
-    //   where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
-    //   data: {
-    //     quantity: totalQuantity,
-    //     price: Math.round(avgPrice),
+    
+    // const portfolioAsset = await this.prismaService.portfolioAsset.findFirst({
+    //   where: {
+    //     assetId: transaction.assetId,
+    //     portfolioId: transaction.portfolioId,
     //   },
     // });
+
+    // const costOfRemovedTransactions = transaction.quantityChange * transaction.pricePerUnit;
+    // const remaningTotalCost = portfolioAsset.price - costOfRemovedTransactions;
+    // const remaningQuantity = remaningTotalCost
+
+    // await this.prismaService.portfolioAsset.update({
+    //   where: {
+    //     portfolioId_assetId: {
+    //       assetId: transaction.assetId,
+    //       portfolioId: transaction.portfolioId,
+    //     },
+    //   },
+    //   data: {
+    //     quantity: portfolioAsset.quantity - transaction.quantityChange,
+    //     price: portfolioAsset.price
+    //   },
+    // });
+    await this.prismaService.transaction.delete({ where: { id } });
   }
 }
