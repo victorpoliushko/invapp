@@ -371,7 +371,6 @@ export default function PortfolioPage() {
   const toggleExpand = (assetId: string) => {
     setExpandedAssetId(assetId === expandedAssetId ? null : assetId);
   };
-  const COLUMN_COUNT = 7;
 
   const clearInputs = () => {
     setSearchTerm("");
