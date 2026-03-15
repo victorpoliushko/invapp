@@ -7,6 +7,7 @@ import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 import { fetchPortfolio } from "../../api";
+import { ExpandedPortfolioAsset } from "./ExpandedPortfolioAsset";
 
 // export type AssetType = {
 //   name: string;
@@ -44,6 +45,8 @@ export enum TransactionType {
 }
 
 export default function PortfolioPage() {
+  const COLUMN_COUNT = 7;
+
   const params = useParams<{ id: string }>();
   const fetchWithRedirect = useFetchWithRedirect();
 
@@ -538,6 +541,7 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                       </tr>
+                      <ExpandedPortfolioAsset portfolioAsset={s} />
                       {expandedAssetId === s.assetId && (
                         <tr className="detail-row">
                           <td colSpan={COLUMN_COUNT + 1}>
