@@ -59,33 +59,43 @@ export class TransactionsService {
   }
 
   async delete(id: string) {
-    // const transaction = await this.prismaService.transaction.findFirst({
-    //   where: { id },
-    // });
-    
-    // const portfolioAsset = await this.prismaService.portfolioAsset.findFirst({
-    //   where: {
-    //     assetId: transaction.assetId,
-    //     portfolioId: transaction.portfolioId,
-    //   },
-    // });
+    return await this.prismaService.$transaction(async (trx) => {
+      const transaction = await trx.transaction.findUniqueOrThrow({
+        where: { id },
+      });
 
-    // const costOfRemovedTransactions = transaction.quantityChange * transaction.pricePerUnit;
-    // const remaningTotalCost = portfolioAsset.price - costOfRemovedTransactions;
-    // const remaningQuantity = remaningTotalCost
+      const { portfolioId, assetId } = transaction;
 
-    // await this.prismaService.portfolioAsset.update({
-    //   where: {
-    //     portfolioId_assetId: {
-    //       assetId: transaction.assetId,
-    //       portfolioId: transaction.portfolioId,
-    //     },
-    //   },
-    //   data: {
-    //     quantity: portfolioAsset.quantity - transaction.quantityChange,
-    //     price: portfolioAsset.price
-    //   },
-    // });
-    await this.prismaService.transaction.delete({ where: { id } });
+      await trx.transaction.delete({ where: { id } });
+
+      const remainingTransactions = await trx.transaction.findMany({
+        where: { portfolioId, assetId },
+      });
+
+      let totalQuantityBought = 0;
+      let totalQuantitySold = 0;
+      let totalCostBasis = 0;
+
+      remainingTransactions.forEach((t) => {
+        if (t.type === 'BUY') {
+          totalQuantityBought += t.quantityChange;
+          totalCostBasis += t.quantityChange * t.pricePerUnit;
+        } else if (t.type === 'SELL') {
+          totalQuantitySold += t.quantityChange;
+        }
+      });
+
+      const currentQuantity = totalQuantityBought - totalQuantitySold;
+      const avgBuyPrice =
+        totalQuantityBought > 0 ? totalCostBasis / totalQuantityBought : 0;
+
+      await trx.portfolioAsset.update({
+        where: { portfolioId_assetId: { portfolioId, assetId } },
+        data: {
+          quantity: currentQuantity,
+          price: avgBuyPrice,
+        },
+      });
+    });
   }
 }
