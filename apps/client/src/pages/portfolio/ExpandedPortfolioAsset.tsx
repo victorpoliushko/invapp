@@ -9,7 +9,7 @@ import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 export function ExpandedPortfolioAsset({
   portfolioAsset,
   setPortfolio,
-  setLoadingPrices
+  setLoadingPrices,
 }: {
   portfolioAsset: PortfolioAssetDto;
   setPortfolio: any;
@@ -17,8 +17,8 @@ export function ExpandedPortfolioAsset({
 }) {
   const COLUMN_COUNT = 7;
   const params = useParams<{ id: string }>();
-    const fetchWithRedirect = useFetchWithRedirect();
-  
+  const fetchWithRedirect = useFetchWithRedirect();
+
   const loadPortfolioData = async (portfolioId?: string) => {
     if (!portfolioId) return;
 
@@ -60,7 +60,6 @@ export function ExpandedPortfolioAsset({
             portfolioAssets: updatedAssets,
           };
         });
-
       } catch (err) {
         console.error(`Failed to fetch price for ${asset.assets.ticker}`, err);
       } finally {
@@ -70,9 +69,7 @@ export function ExpandedPortfolioAsset({
       await delay(12500);
     }
   };
-    const onDeleteTransaction = async (
-    id: string
-  ) => {
+  const onDeleteTransaction = async (id: string) => {
     const token = localStorage.getItem("accessToken");
 
     try {
@@ -108,48 +105,50 @@ export function ExpandedPortfolioAsset({
               </tr>
             </thead>
             <tbody>
-              {portfolioAsset.assets.transactions?.map(
-                (t) => {
-                  return (
-                    <React.Fragment key={portfolioAsset.assetId}>
-                      <tr>
-                        <td data-label="actions">
-                          <button
-                            title={`Edit ${portfolioAsset.assets.ticker}`}
-                          >
-                            <img
-                              className="edit-icon"
-                              src={editIcon}
-                              alt="edit-icon"
-                              height={30}
-                              width={30}
-                            />
-                          </button>
-                        </td>
-                        <td>{t.type}</td>
-                        <td>{portfolioAsset.assets.ticker}</td>
-                        <td>{t.date}</td>
-                        <td>{t.quantityChange}</td>
-                        <td>{t.pricePerUnit}</td>
-                        <td data-label="actions">
-                          <button
-                            onClick={() => onDeleteTransaction(t.id)}
-                            title={`Remove transaction ${t.id}`}
-                          >
-                            <img
-                              className="delete-icon"
-                              src={deleteIcon}
-                              alt="delete-icon"
-                              height={30}
-                              width={30}
-                            />
-                          </button>
-                        </td>
-                      </tr>
-                    </React.Fragment>
-                  );
-                },
-              )}
+              {portfolioAsset.assets.transactions?.map((t) => {
+                return (
+                  <React.Fragment key={portfolioAsset.assetId}>
+                    <tr>
+                      <td data-label="actions">
+                        <button title={`Edit ${portfolioAsset.assets.ticker}`}>
+                          <img
+                            className="edit-icon"
+                            src={editIcon}
+                            alt="edit-icon"
+                            height={30}
+                            width={30}
+                          />
+                        </button>
+                      </td>
+                      <td
+                        style={{
+                          color: t.type === 'BUY' ? "green" : "red"
+                        }}
+                      >
+                        {t.type}
+                      </td>
+                      <td>{portfolioAsset.assets.ticker}</td>
+                      <td>{t.date}</td>
+                      <td>{t.quantityChange}</td>
+                      <td>{t.pricePerUnit}</td>
+                      <td data-label="actions">
+                        <button
+                          onClick={() => onDeleteTransaction(t.id)}
+                          title={`Remove transaction ${t.id}`}
+                        >
+                          <img
+                            className="delete-icon"
+                            src={deleteIcon}
+                            alt="delete-icon"
+                            height={30}
+                            width={30}
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>

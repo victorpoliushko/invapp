@@ -489,7 +489,7 @@ export default function PortfolioPage() {
                   <th scope="col">Asset</th>
                   <th scope="col">Last transaction</th>
                   <th scope="col">Quantity</th>
-                  <th scope="col">Avg pricePerUnit</th>
+                  <th scope="col">Avg price</th>
                   <th scope="col">Current pricePerUnit</th>
                   <th scope="col">% change</th>
                   <th scope="col">Actions</th>
@@ -550,7 +550,7 @@ export default function PortfolioPage() {
                     <div className="asset-autocomplete">
                       <input
                         type="text"
-                        name="asset"
+                        name="Asset"
                         value={searchTerm}
                         onChange={(e) => {
                           setAutocompleteEnabled(true);
