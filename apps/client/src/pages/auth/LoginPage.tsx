@@ -32,11 +32,11 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
-      
+
       login(data.userId, data.accessToken, data.refreshToken);
 
       setSuccessMessage(
-        "You are successfully logged in. Redirecting to the main page..."
+        "You are successfully logged in. Redirecting to the main page...",
       );
 
       setTimeout(() => {
@@ -58,7 +58,7 @@ export default function LoginPage() {
       <div>
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="input-group">
             <label>Username</label>
             <input
               type="text"
@@ -67,7 +67,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div>
+          <div className="input-group">
             <label>Password</label>
             <input
               type="password"
@@ -75,18 +75,21 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          <div className="buttons">
+            <button className="signin-button" onClick={handeGoogleLogin}>
+              Log in with Google
+            </button>
+            
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-          {error && <p>{error}</p>}
-          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+            {error && <p>{error}</p>}
+            {successMessage && (
+              <p style={{ color: "green" }}>{successMessage}</p>
+            )}
+            <button className="signin-button" type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </div>
         </form>
-
-        <button className="signin-button" onClick={handeGoogleLogin}>
-          Sign in SSO
-        </button>
       </div>
     </section>
   );
