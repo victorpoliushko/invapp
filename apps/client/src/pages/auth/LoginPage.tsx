@@ -76,7 +76,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="buttons">
-            <button className="signin-button" onClick={handeGoogleLogin}>
+            <button className="signin-button"  type="button" onClick={handeGoogleLogin}>
               Log in with Google
             </button>
             
