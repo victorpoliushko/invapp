@@ -55,6 +55,7 @@ export default function PortfolioPage() {
   const [loadingPrices, setLoadingPrices] = useState<Record<string, boolean>>(
     {},
   );
+  const [transationType, setTransationType] = useState(TransactionType.BUY);
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState<{
@@ -545,7 +546,16 @@ export default function PortfolioPage() {
                     </React.Fragment>
                   ))}
                 <tr>
-                  <td></td>
+                  <td>
+                    <select 
+                      value={transationType} 
+                      onChange={(e) => setTransationType(e.target.value as TransactionType)}
+                      className="transaction-dropdown"
+                    >
+                      <option value="buy">BUY</option>
+                      <option value="sell">SELL</option>
+                    </select>
+                  </td>
                   <td>
                     <div className="asset-autocomplete">
                       <input
@@ -561,7 +571,7 @@ export default function PortfolioPage() {
                             // handleAddAsset();
                             handleAddTransaction(
                               portfolio?.id,
-                              TransactionType.BUY,
+                              transationType,
                             );
                           }
                         }}
@@ -603,7 +613,7 @@ export default function PortfolioPage() {
                           // handleAddAsset();
                           handleAddTransaction(
                             portfolio?.id,
-                            TransactionType.BUY,
+                            transationTypeY,
                           );
                       }}
                       required
@@ -620,7 +630,7 @@ export default function PortfolioPage() {
                           // handleAddAsset();
                           handleAddTransaction(
                             portfolio?.id,
-                            TransactionType.BUY,
+                            transationType,
                           );
                       }}
                       required
@@ -638,7 +648,7 @@ export default function PortfolioPage() {
                           // handleAddAsset();
                           handleAddTransaction(
                             portfolio?.id,
-                            TransactionType.BUY,
+                            transationType,
                           );
                       }}
                       required
