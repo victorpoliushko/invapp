@@ -235,9 +235,7 @@ export default function PortfolioPage() {
     }
   };
 
-  const onDeleteTransaction = async (
-    id: string
-  ) => {
+  const onDeleteTransaction = async (id: string) => {
     const token = localStorage.getItem("accessToken");
 
     try {
@@ -359,7 +357,6 @@ export default function PortfolioPage() {
             portfolioAssets: updatedAssets,
           };
         });
-
       } catch (err) {
         console.error(`Failed to fetch price for ${asset.assets.ticker}`, err);
       } finally {
@@ -436,41 +433,41 @@ export default function PortfolioPage() {
             )}
           </>
         ) : (
-          <h1 className="assets-h1">{portfolio?.name}</h1>
+          <div className="">
+            <h1 className="assets-h1">{portfolio?.name}</h1>
+            <button
+              onClick={() => {
+                if (isEditing) {
+                  onUpdatePortfolio(portfolio.id, newName);
+                } else {
+                  setNewName(portfolio.name || "");
+                  setIsEditing(true);
+                }
+              }}
+              title={isEditing ? "Save changes" : "Edit portfolio name"}
+            >
+              <img
+                className="edit-icon"
+                src={editIcon}
+                alt={isEditing ? "Save icon" : "Edit icon"}
+                height={30}
+                width={30}
+              />
+            </button>
+            <button
+              onClick={() => onDeletePortfolio(portfolio?.id)}
+              title={`Remove portfolio`}
+            >
+              <img
+                className="delete-icon"
+                src={deleteIcon}
+                alt="delete-icon"
+                height={30}
+                width={30}
+              />
+            </button>
+          </div>
         )}
-        {portfolio?.id && (
-          <button
-            onClick={() => {
-              if (isEditing) {
-                onUpdatePortfolio(portfolio.id, newName);
-              } else {
-                setNewName(portfolio.name || "");
-                setIsEditing(true);
-              }
-            }}
-            title={isEditing ? "Save changes" : "Edit portfolio name"}
-          >
-            <img
-              className="edit-icon"
-              src={editIcon}
-              alt={isEditing ? "Save icon" : "Edit icon"}
-              height={30}
-              width={30}
-            />
-          </button>
-        )}
-        <button
-          onClick={() => onDeletePortfolio(portfolio?.id)}
-          title={`Remove portfolio`}
-        >
-          <img
-            className="delete-icon"
-            src={deleteIcon}
-            alt="delete-icon"
-            height={30}
-            width={30}
-          />
-        </button>
 
         <div className="assets">
           <input
@@ -542,14 +539,22 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                       </tr>
-                      {expandedAssetId === s.assetId && <ExpandedPortfolioAsset portfolioAsset={s} setPortfolio={setPortfolio} setLoadingPrices={setLoadingPrices} />}
+                      {expandedAssetId === s.assetId && (
+                        <ExpandedPortfolioAsset
+                          portfolioAsset={s}
+                          setPortfolio={setPortfolio}
+                          setLoadingPrices={setLoadingPrices}
+                        />
+                      )}
                     </React.Fragment>
                   ))}
                 <tr>
                   <td>
-                    <select 
-                      value={transationType} 
-                      onChange={(e) => setTransationType(e.target.value as TransactionType)}
+                    <select
+                      value={transationType}
+                      onChange={(e) =>
+                        setTransationType(e.target.value as TransactionType)
+                      }
                       className="transaction-dropdown"
                     >
                       <option value="buy">BUY</option>
@@ -569,10 +574,7 @@ export default function PortfolioPage() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             // handleAddAsset();
-                            handleAddTransaction(
-                              portfolio?.id,
-                              transationType,
-                            );
+                            handleAddTransaction(portfolio?.id, transationType);
                           }
                         }}
                         required
@@ -611,10 +613,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(
-                            portfolio?.id,
-                            transationTypeY,
-                          );
+                          handleAddTransaction(portfolio?.id, transationTypeY);
                       }}
                       required
                     />
@@ -628,10 +627,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(
-                            portfolio?.id,
-                            transationType,
-                          );
+                          handleAddTransaction(portfolio?.id, transationType);
                       }}
                       required
                       placeholder="Quantity"
@@ -646,10 +642,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(
-                            portfolio?.id,
-                            transationType,
-                          );
+                          handleAddTransaction(portfolio?.id, transationType);
                       }}
                       required
                       placeholder="Price bought"
