@@ -433,39 +433,41 @@ export default function PortfolioPage() {
             )}
           </>
         ) : (
-          <div className="">
+          <div className="row-container">
             <h1 className="assets-h1">{portfolio?.name}</h1>
-            <button
-              onClick={() => {
-                if (isEditing) {
-                  onUpdatePortfolio(portfolio.id, newName);
-                } else {
-                  setNewName(portfolio.name || "");
-                  setIsEditing(true);
-                }
-              }}
-              title={isEditing ? "Save changes" : "Edit portfolio name"}
-            >
-              <img
-                className="edit-icon"
-                src={editIcon}
-                alt={isEditing ? "Save icon" : "Edit icon"}
-                height={30}
-                width={30}
-              />
-            </button>
-            <button
-              onClick={() => onDeletePortfolio(portfolio?.id)}
-              title={`Remove portfolio`}
-            >
-              <img
-                className="delete-icon"
-                src={deleteIcon}
-                alt="delete-icon"
-                height={30}
-                width={30}
-              />
-            </button>
+            <div className="title-button-stack">
+              <button
+                onClick={() => {
+                  if (isEditing) {
+                    onUpdatePortfolio(portfolio.id, newName);
+                  } else {
+                    setNewName(portfolio.name || "");
+                    setIsEditing(true);
+                  }
+                }}
+                title={isEditing ? "Save changes" : "Edit portfolio name"}
+              >
+                <img
+                  className="edit-icon"
+                  src={editIcon}
+                  alt={isEditing ? "Save icon" : "Edit icon"}
+                  height={30}
+                  width={30}
+                />
+              </button>
+              <button
+                onClick={() => onDeletePortfolio(portfolio?.id)}
+                title={`Remove portfolio`}
+              >
+                <img
+                  className="delete-icon"
+                  src={deleteIcon}
+                  alt="delete-icon"
+                  height={30}
+                  width={30}
+                />
+              </button>
+            </div>
           </div>
         )}
 

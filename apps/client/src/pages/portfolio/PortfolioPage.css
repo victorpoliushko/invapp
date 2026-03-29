@@ -66,9 +66,9 @@
 }
 
 .assets-h1 {
-  align-self: start;
+  /* align-self: start;
   margin: 2rem 0 0 0;
-  padding: 0;
+  padding: 0; */
 }
 
 table {
@@ -194,4 +194,21 @@ table th {
   table td:last-child {
     border-bottom: 0;
   }
+}
+
+.row-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.title-button-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.title-button-stack button {
+  cursor: pointer;
 }
