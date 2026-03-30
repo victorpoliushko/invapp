@@ -7,11 +7,11 @@ import { TransactionsDto } from "src/transactions/dto/Transations.dto";
 export class PortfolioDto {
   @IsDefined()
   @IsNotEmpty()
-  id: String;
+  id: string;
 
   @IsDefined()
   @IsNotEmpty()
-  name: String;
+  name: string;
 
   @IsDefined()
   @ValidateNested()

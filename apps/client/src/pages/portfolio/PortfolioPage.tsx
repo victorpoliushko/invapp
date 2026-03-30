@@ -45,8 +45,6 @@ export enum TransactionType {
 }
 
 export default function PortfolioPage() {
-  const COLUMN_COUNT = 7;
-
   const params = useParams<{ id: string }>();
   const fetchWithRedirect = useFetchWithRedirect();
 
@@ -55,7 +53,6 @@ export default function PortfolioPage() {
   const [loadingPrices, setLoadingPrices] = useState<Record<string, boolean>>(
     {},
   );
-  const [transationType, setTransationType] = useState(TransactionType.BUY);
 
   const [selectedTab, setSelectedTab] = useState("tab-stocks");
   const [newAsset, setNewAsset] = useState<{
@@ -367,7 +364,7 @@ export default function PortfolioPage() {
     }
   };
 
-  const [expandedAssetId, setExpandedAssetId] = useState(null);
+  const [expandedAssetId, setExpandedAssetId] = useState<string | null>(null);
 
   const toggleExpand = (assetId: string) => {
     setExpandedAssetId(assetId === expandedAssetId ? null : assetId);
@@ -552,18 +549,6 @@ export default function PortfolioPage() {
                   ))}
                 <tr>
                   <td>
-                    <select
-                      value={transationType}
-                      onChange={(e) =>
-                        setTransationType(e.target.value as TransactionType)
-                      }
-                      className="transaction-dropdown"
-                    >
-                      <option value="buy">BUY</option>
-                      <option value="sell">SELL</option>
-                    </select>
-                  </td>
-                  <td>
                     <div className="asset-autocomplete">
                       <input
                         type="text"
@@ -575,8 +560,7 @@ export default function PortfolioPage() {
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            // handleAddAsset();
-                            handleAddTransaction(portfolio?.id, transationType);
+                            handleAddTransaction(portfolio?.id, TransactionType.BUY);
                           }
                         }}
                         required
@@ -614,8 +598,7 @@ export default function PortfolioPage() {
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
-                          // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, transationTypeY);
+                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
                       }}
                       required
                     />
@@ -628,8 +611,7 @@ export default function PortfolioPage() {
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
-                          // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, transationType);
+                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
                       }}
                       required
                       placeholder="Quantity"
@@ -644,7 +626,7 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, transationType);
+                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
                       }}
                       required
                       placeholder="Price bought"
