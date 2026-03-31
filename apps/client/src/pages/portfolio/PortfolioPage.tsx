@@ -9,13 +9,13 @@ import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.
 import { fetchPortfolio } from "../../api";
 import { ExpandedPortfolioAsset } from "./ExpandedPortfolioAsset";
 
-// export type AssetType = {
-//   name: string;
-//   assetSymbol: string;
-//   exchange: string;
-//   type: string;
-//   pricePerUnit: number;
-// };
+export type AssetType = {
+  name: string;
+  assetSymbol: string;
+  exchange: string;
+  type: string;
+  pricePerUnit: number;
+};
 
 // export type PortfolioType = {
 //   id: string;
@@ -512,7 +512,7 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                         <td data-label="asset">{s.assets.ticker}</td>
-                        <td data-label="date">{s.assets.updatedAt}</td>
+                        <td data-label="date">{s.assets.updatedAt ? new Date(s.assets.updatedAt).toLocaleDateString() : "N/A"}</td>
                         <td data-label="quantityChange">{s.quantity}</td>
                         <td data-label="current-pricePerUnit">
                           {!loadingPrices[s.assetId] ? (
@@ -521,7 +521,7 @@ export default function PortfolioPage() {
                             <div>Loading</div>
                           )}
                         </td>
-                        <td data-label="pricePerUnit">{s.currentPrice}</td>
+                        <td data-label="pricePerUnit">{s.price}</td>
                         <td data-label="asset">test name</td>
                         <td data-label="actions">
                           <button
