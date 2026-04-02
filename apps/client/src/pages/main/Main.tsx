@@ -1,4 +1,5 @@
 import "../../App.css";
+import MarketTicker from "../../components/marketData";
 
 export const MainPage = () => {
   return (
@@ -29,7 +30,9 @@ export const MainPage = () => {
       </section>
 
       <section className="stocks-section section-container">
-        <h1>Stocks</h1>
+        <h1>Market data</h1>
+        <MarketTicker />
+        {/* <h1>Stocks</h1>
         <div className="stocks-wrapper">
           <div className="stocks-div flex-container">
             <div className="stock-item">
@@ -84,7 +87,7 @@ export const MainPage = () => {
               <span>-2%</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </section>
 
       <section className="realestate-section section-container section-flex-container">
