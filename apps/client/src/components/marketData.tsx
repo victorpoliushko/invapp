@@ -4,6 +4,7 @@ export default function MarketTicker() {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const currentContainer = container.current;
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-tickers.js";
     script.type = "text/javascript";
@@ -22,6 +23,12 @@ export default function MarketTicker() {
       // "height": "100%"
     });
     container.current?.appendChild(script);
+
+    return () => {
+    if (currentContainer) {
+      currentContainer.innerHTML = "";
+    }
+  };
   }, []);
 
   return (
