@@ -1,9 +1,15 @@
 import "../../App.css";
 import MarketTicker from "../../components/marketData";
+import MarketHeatmap from "../../components/marketHeatmap";
+import MarketNews from "../../components/marketNews";
 
 export const MainPage = () => {
   return (
     <>
+      <div className="">
+        <MarketHeatmap />
+        <MarketNews />
+      </div>
       <section className="news-section section-container section-flex-container">
         <h1>News</h1>
         <div className="news-div">
@@ -94,46 +100,46 @@ export const MainPage = () => {
         <h1>Real estate</h1>
         <div className="realestate-city">
           <div className="realestate-city-cols">
-          <div className="realestate-city-col">
-            <div className="realestate-city-item">
-              <div className="realestate-city-item-top">
-                <p>Lviv, Yaneva 23 50</p>
+            <div className="realestate-city-col">
+              <div className="realestate-city-item">
+                <div className="realestate-city-item-top">
+                  <p>Lviv, Yaneva 23 50</p>
+                </div>
+                <div className="realestate-city-item-bottom">
+                  <p>1 bedroom</p>
+                  <p>$75k</p>
+                </div>
               </div>
-              <div className="realestate-city-item-bottom">
-                <p>1 bedroom</p>
-                <p>$75k</p>
-              </div>
-            </div>
-            <div className="realestate-city-item">
-              <div className="realestate-city-item-top">
-                <p>Lviv, Yaneva 23 50</p>
-              </div>
-              <div className="realestate-city-item-bottom">
-                <p>1 bedroom</p>
-                <p>$75k</p>
-              </div>
-            </div>
-          </div>
-          <div className="realestate-city-col">
-            <div className="realestate-city-item">
-              <div className="realestate-city-item-top">
-                <p>Lviv, Yaneva 23 50</p>
-              </div>
-              <div className="realestate-city-item-bottom">
-                <p>1 bedroom</p>
-                <p>$75k</p>
+              <div className="realestate-city-item">
+                <div className="realestate-city-item-top">
+                  <p>Lviv, Yaneva 23 50</p>
+                </div>
+                <div className="realestate-city-item-bottom">
+                  <p>1 bedroom</p>
+                  <p>$75k</p>
+                </div>
               </div>
             </div>
-            <div className="realestate-city-item">
-              <div className="realestate-city-item-top">
-                <p>Lviv, Yaneva 23 50</p>
+            <div className="realestate-city-col">
+              <div className="realestate-city-item">
+                <div className="realestate-city-item-top">
+                  <p>Lviv, Yaneva 23 50</p>
+                </div>
+                <div className="realestate-city-item-bottom">
+                  <p>1 bedroom</p>
+                  <p>$75k</p>
+                </div>
               </div>
-              <div className="realestate-city-item-bottom">
-                <p>1 bedroom</p>
-                <p>$75k</p>
+              <div className="realestate-city-item">
+                <div className="realestate-city-item-top">
+                  <p>Lviv, Yaneva 23 50</p>
+                </div>
+                <div className="realestate-city-item-bottom">
+                  <p>1 bedroom</p>
+                  <p>$75k</p>
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </section>
