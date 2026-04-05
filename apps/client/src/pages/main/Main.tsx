@@ -7,12 +7,13 @@ export const MainPage = () => {
   return (
     <>
       <div className="">
-        <MarketHeatmap />
-        <MarketNews />
+        {/* <MarketHeatmap /> */}
+        
       </div>
       <section className="news-section section-container section-flex-container">
-        <h1>News</h1>
-        <div className="news-div">
+        {/* <h1>News</h1> */}
+        <MarketNews />
+        {/* <div className="news-div">
           <div className="news-item">
             <h3>
               VOO Continues Strong Performance Amid S&P 500 Records The Vanguard
@@ -32,7 +33,7 @@ export const MainPage = () => {
               Wall Street's increasing appetite for the asset.
             </h3>
           </div>
-        </div>
+        </div> */}
       </section>
 
       <section className="stocks-section section-container">

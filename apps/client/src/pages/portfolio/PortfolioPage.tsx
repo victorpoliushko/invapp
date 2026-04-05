@@ -548,6 +548,7 @@ export default function PortfolioPage() {
                     </React.Fragment>
                   ))}
                 <tr>
+                  <td></td>
                   <td>
                     <div className="asset-autocomplete">
                       <input
