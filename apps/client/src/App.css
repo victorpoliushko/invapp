@@ -222,6 +222,7 @@ body {
   flex-direction: column;
   background-color: #424242;
   border-radius: 20px;
+  height: 600px;
 }
 
 .news-section h1 {
