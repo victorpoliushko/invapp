@@ -512,7 +512,11 @@ export default function PortfolioPage() {
                           </button>
                         </td>
                         <td data-label="asset">{s.assets.ticker}</td>
-                        <td data-label="date">{s.assets.updatedAt ? new Date(s.assets.updatedAt).toLocaleDateString() : "N/A"}</td>
+                        <td data-label="date">
+                          {s.assets.updatedAt
+                            ? new Date(s.assets.updatedAt).toLocaleDateString()
+                            : "N/A"}
+                        </td>
                         <td data-label="quantityChange">{s.quantity}</td>
                         <td data-label="current-pricePerUnit">
                           {!loadingPrices[s.assetId] ? (
@@ -526,6 +530,13 @@ export default function PortfolioPage() {
                         <td data-label="actions">
                           <button
                             onClick={() => onDeleteAsset(s.assetId)}
+                            // onClick={() =>
+                            //   handleAddTransaction(
+                            //     portfolio.id,
+                            //     TransactionType.SELL,
+                            //     s.assetId,
+                            //   )
+                            // }
                             title={`Remove ${s.assets.ticker}`}
                           >
                             <img
@@ -561,7 +572,10 @@ export default function PortfolioPage() {
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                            handleAddTransaction(
+                              portfolio?.id,
+                              TransactionType.BUY,
+                            );
                           }
                         }}
                         required
@@ -599,7 +613,10 @@ export default function PortfolioPage() {
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
-                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                          handleAddTransaction(
+                            portfolio?.id,
+                            TransactionType.BUY,
+                          );
                       }}
                       required
                     />
@@ -612,7 +629,10 @@ export default function PortfolioPage() {
                       onChange={handleChange}
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
-                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                          handleAddTransaction(
+                            portfolio?.id,
+                            TransactionType.BUY,
+                          );
                       }}
                       required
                       placeholder="Quantity"
@@ -620,6 +640,7 @@ export default function PortfolioPage() {
                   </td>
                   <td>
                     <input
+                      style={{ width: "100px" }}
                       type="number"
                       name="pricePerUnit"
                       value={newAsset.pricePerUnit}
@@ -627,7 +648,10 @@ export default function PortfolioPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter")
                           // handleAddAsset();
-                          handleAddTransaction(portfolio?.id, TransactionType.BUY);
+                          handleAddTransaction(
+                            portfolio?.id,
+                            TransactionType.BUY,
+                          );
                       }}
                       required
                       placeholder="Price bought"
