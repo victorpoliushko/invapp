@@ -1,0 +1,41 @@
+import { useState } from "react";
+import editIcon from "../../assets/pencil-svgrepo-com.svg";
+
+export default function TransactionButton() {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<number | null>(null);
+
+  const handleRemove = () => {
+    setIsEditing(false);
+    setInputValue(null);
+  };
+
+  // const handleRemoveAll = () => {
+  //   // delete asset here
+  //   setIsEditing(false);
+  //   setInputValue(null);
+  // }
+
+  if (!isEditing) {
+    return (
+      <div className="">
+        <button onClick={() => setIsEditing(true)}>
+        <img
+          className="edit-icon"
+          src={editIcon}
+          alt={isEditing ? "Save icon" : "Edit icon"}
+          height={30}
+          width={30}
+        />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="">
+      <input type="number" value={Number(inputValue)} onChange={(e) => setInputValue(Number(e.target.value))} autoFocus />
+      <button>Remove</button>
+    </div>
+  )
+}
