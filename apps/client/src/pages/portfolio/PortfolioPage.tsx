@@ -8,6 +8,7 @@ import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 import { fetchPortfolio } from "../../api";
 import { ExpandedPortfolioAsset } from "./ExpandedPortfolioAsset";
+import TransactionButton from "../../components/transactionButton";
 
 export type AssetType = {
   name: string;
@@ -527,8 +528,10 @@ export default function PortfolioPage() {
                         </td>
                         <td data-label="pricePerUnit">{s.price}</td>
                         <td data-label="asset">test name</td>
-                        <td data-label="actions">
-                          <button
+                        <td data-label="actions" className="actions">
+                          <TransactionButton />
+                          <div className="">
+                            <button
                             onClick={() => onDeleteAsset(s.assetId)}
                             // onClick={() =>
                             //   handleAddTransaction(
@@ -547,6 +550,8 @@ export default function PortfolioPage() {
                               width={30}
                             />
                           </button>
+                          </div>
+                          
                         </td>
                       </tr>
                       {expandedAssetId === s.assetId && (

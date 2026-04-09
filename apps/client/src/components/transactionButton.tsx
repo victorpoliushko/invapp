@@ -1,5 +1,5 @@
 import { useState } from "react";
-import editIcon from "../../assets/pencil-svgrepo-com.svg";
+import editIcon from "../assets/pencil-svgrepo-com.svg";
 
 export default function TransactionButton() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -8,6 +8,7 @@ export default function TransactionButton() {
   const handleRemove = () => {
     setIsEditing(false);
     setInputValue(null);
+    // sell transaction here
   };
 
   // const handleRemoveAll = () => {
@@ -35,7 +36,7 @@ export default function TransactionButton() {
   return (
     <div className="">
       <input type="number" value={Number(inputValue)} onChange={(e) => setInputValue(Number(e.target.value))} autoFocus />
-      <button>Remove</button>
+      <button onClick={() => handleRemove()}>Remove</button>
     </div>
   )
 }
