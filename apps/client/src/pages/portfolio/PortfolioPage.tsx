@@ -529,7 +529,7 @@ export default function PortfolioPage() {
                         <td data-label="pricePerUnit">{s.price}</td>
                         <td data-label="asset">test name</td>
                         <td data-label="actions" className="actions">
-                          <TransactionButton />
+                          <TransactionButton assetId={s.assetId} />
                           <div className="">
                             <button
                             onClick={() => onDeleteAsset(s.assetId)}
