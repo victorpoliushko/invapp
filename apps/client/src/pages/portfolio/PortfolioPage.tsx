@@ -7,7 +7,7 @@ import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 import { fetchPortfolio } from "../../api";
-import { ExpandedPortfolioAsset } from "./ExpandedPortfolioAsset";
+import { AssetTransactions } from "../../components/portfolio/AssetTransactions";
 import TransactionButton from "../../components/transactionButton";
 
 export type AssetType = {
@@ -555,7 +555,7 @@ export default function PortfolioPage() {
                         </td>
                       </tr>
                       {expandedAssetId === s.assetId && (
-                        <ExpandedPortfolioAsset
+                        <AssetTransactions
                           portfolioAsset={s}
                           setPortfolio={setPortfolio}
                           setLoadingPrices={setLoadingPrices}

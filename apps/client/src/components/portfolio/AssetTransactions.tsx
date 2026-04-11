@@ -6,7 +6,7 @@ import { fetchPortfolio } from "../../api";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
-export function ExpandedPortfolioAsset({
+export function AssetTransactions({
   portfolioAsset,
   setPortfolio,
   setLoadingPrices,
