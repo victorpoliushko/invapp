@@ -1,4 +1,6 @@
-import React, { createContext } from "react";
+import React, { createContext, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
 
 interface PortfolioContextType {
   portfolio: any;
@@ -10,3 +12,25 @@ interface PortfolioContextType {
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
+
+export const PortfolioProvider = ({ children }: { children: React.ReactNode }) => {
+  const { id } = useParams<{ id: string }>();
+  const [portfolio, setPortfolio] = useState<any>();
+  const [loadingPrices, setLoadingPrices] = useState({});
+  const fetchWithRedirect = useFetchWithRedirect();
+  const token = localStorage.getItem("accessToken");
+
+  const refreshData = async () => {
+    if (!id) return;
+    const res = await fetchWithRedirect(`http://localhost:5173/api/portfolios/${id}`, {
+      headers: { 
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    setPortfolio(data);
+  }
+
+  
+};
