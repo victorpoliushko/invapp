@@ -1,77 +1,19 @@
 import React from "react";
 import { PortfolioAssetDto } from "../../../../api/src/portfolios/dto/PortfolioAsset.dto";
+import { usePortfolio } from "../../context/PortfolioContext";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
-import { useParams } from "react-router-dom";
-import { fetchPortfolio } from "../../api";
-import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
 export function AssetTransactions({
   portfolioAsset,
-  setPortfolio,
-  setLoadingPrices,
 }: {
   portfolioAsset: PortfolioAssetDto;
-  setPortfolio: any;
-  setLoadingPrices: any;
 }) {
   const COLUMN_COUNT = 7;
-  const params = useParams<{ id: string }>();
-  const fetchWithRedirect = useFetchWithRedirect();
+  const { refreshData } = usePortfolio();
+  const token = localStorage.getItem("accessToken");
 
-  const loadPortfolioData = async (portfolioId?: string) => {
-    if (!portfolioId) return;
-
-    const portfolioData = await fetchPortfolio(portfolioId);
-    setPortfolio(portfolioData);
-
-    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-    for (const asset of portfolioData.portfolioAssets) {
-      try {
-        setLoadingPrices((prev) => ({ ...prev, [asset.assetId]: true }));
-        const token = localStorage.getItem("accessToken");
-
-        const response = await fetchWithRedirect(
-          `http://localhost:5173/api/assets/test-finnhub?symbol=${asset.assets.ticker}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch price");
-
-        const data = await response.json();
-
-        setPortfolio((prev) => {
-          if (!prev) return prev;
-
-          const updatedAssets = prev.portfolioAssets.map((a) =>
-            a.assetId === asset.assetId
-              ? { ...a, currentPrice: data.c || data.result?.[0]?.description }
-              : a,
-          );
-          return {
-            ...prev,
-            portfolioAssets: updatedAssets,
-          };
-        });
-      } catch (err) {
-        console.error(`Failed to fetch price for ${asset.assets.ticker}`, err);
-      } finally {
-        setLoadingPrices((prev) => ({ ...prev, [asset.assetId]: false }));
-      }
-
-      await delay(12500);
-    }
-  };
   const onDeleteTransaction = async (id: string) => {
-    const token = localStorage.getItem("accessToken");
-
     try {
       const res = await fetch(`/api/transactions`, {
         method: "DELETE",
@@ -81,7 +23,10 @@ export function AssetTransactions({
         },
         body: JSON.stringify({ id }),
       });
-      await loadPortfolioData(params.id);
+
+      if (!res.ok) throw new Error("Delete failed");
+      
+      await refreshData();
     } catch (error) {
       alert("Could not delete transaction");
     }
@@ -90,65 +35,41 @@ export function AssetTransactions({
   return (
     <tr className="detail-row">
       <td colSpan={COLUMN_COUNT + 1}>
-        <div>
-          <table>
+        <div className="transactions-container">
+          <table className="transactions-subtable">
             <thead>
               <tr>
-                {/* <th></th> */}
-                <th scope="col">Transactions</th>
+                <th scope="col">Actions</th>
                 <th scope="col">Type</th>
                 <th scope="col">Asset</th>
                 <th scope="col">Date</th>
                 <th scope="col">Quantity</th>
-                <th scope="col">Price change</th>
-                <th scope="col">Actions</th>
+                <th scope="col">Price</th>
+                <th scope="col">Delete</th>
               </tr>
             </thead>
             <tbody>
-              {portfolioAsset.assets.transactions?.map((t) => {
-                return (
-                  <React.Fragment key={portfolioAsset.assetId}>
-                    <tr>
-                      <td data-label="actions">
-                        <button title={`Edit ${portfolioAsset.assets.ticker}`}>
-                          <img
-                            className="edit-icon"
-                            src={editIcon}
-                            alt="edit-icon"
-                            height={30}
-                            width={30}
-                          />
-                        </button>
-                      </td>
-                      <td
-                        style={{
-                          color: t.type === 'BUY' ? "green" : "red"
-                        }}
-                      >
-                        {t.type}
-                      </td>
-                      <td>{portfolioAsset.assets.ticker}</td>
-                      <td>{t.date}</td>
-                      <td>{t.quantityChange}</td>
-                      <td>{t.pricePerUnit}</td>
-                      <td data-label="actions">
-                        <button
-                          onClick={() => onDeleteTransaction(t.id)}
-                          title={`Remove transaction ${t.id}`}
-                        >
-                          <img
-                            className="delete-icon"
-                            src={deleteIcon}
-                            alt="delete-icon"
-                            height={30}
-                            width={30}
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
+              {portfolioAsset.assets.transactions?.map((t) => (
+                <tr key={t.id}>
+                  <td>
+                    <button title={`Edit`}>
+                      <img src={editIcon} height={20} width={20} alt="edit" />
+                    </button>
+                  </td>
+                  <td style={{ color: t.type === "BUY" ? "#4caf50" : "#e57373" }}>
+                    {t.type}
+                  </td>
+                  <td>{portfolioAsset.assets.ticker}</td>
+                  <td>{new Date(t.date).toLocaleDateString()}</td>
+                  <td>{t.quantityChange}</td>
+                  <td>{t.pricePerUnit}</td>
+                  <td>
+                    <button onClick={() => onDeleteTransaction(t.id)}>
+                      <img src={deleteIcon} height={20} width={20} alt="delete" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
