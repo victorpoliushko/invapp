@@ -8,7 +8,7 @@ import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import type { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 import { fetchPortfolio } from "../../api";
 import { AssetTransactions } from "../../components/portfolio/AssetTransactions";
-import TransactionButton from "../../components/transactionButton";
+import TransactionButton from "../../components/portfolio/TransactionButton";
 
 export type AssetType = {
   name: string;

@@ -1,7 +1,15 @@
 import { PortfolioProvider, usePortfolio } from "../../context/PortfolioContext";
 import { AssetTable } from "../../components/portfolio/AssetTable";
 
-function PortfolioContent() {
+export default function PortfolioPage() {
+  return (
+    <PortfolioProvider>
+      <PortfolioContent />
+    </PortfolioProvider>
+  );
+}
+
+export function PortfolioContent() {
   const { portfolio } = usePortfolio();
   if (!portfolio) return <div>Loading...</div>;
 
@@ -16,10 +24,3 @@ function PortfolioContent() {
   );
 }
 
-export default function PortfolioPage() {
-  return (
-    <PortfolioProvider>
-      <PortfolioContent />
-    </PortfolioProvider>
-  );
-}

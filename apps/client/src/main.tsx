@@ -12,6 +12,7 @@ import { MainPage } from "./pages/main/Main.tsx";
 import { AuthProvider } from "./AuthContext.tsx";
 import { Layout } from "./Layout.tsx";
 import AuthCallback from "./pages/auth/AuthCallback.tsx";
+import { PortfolioContent } from "./pages/portfolio/NewPortfolioPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,27 +22,31 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
         path: "/main",
-        element: <MainPage />
+        element: <MainPage />,
       },
       {
         path: "/app",
-        element: <App />
+        element: <App />,
       },
       {
         path: "/login",
-        element: <LoginPage />
+        element: <LoginPage />,
       },
       {
         path: `/portfolios/user/:userId`,
         element: <PortfoliosPage />,
       },
+      // {
+      //   path: `/portfolios/:id`,
+      //   element: <PortfolioPage />,
+      // },
       {
         path: `/portfolios/:id`,
-        element: <PortfolioPage />,
+        element: <PortfolioContent />,
       },
       {
         path: "/portfolios/:portfolioId/ai-suggestions",
@@ -49,7 +54,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/auth-redirect",
-        element: <AuthCallback />
+        element: <AuthCallback />,
       },
     ],
   },
@@ -60,5 +65,5 @@ createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
-  </StrictMode>
+  </StrictMode>,
 );
