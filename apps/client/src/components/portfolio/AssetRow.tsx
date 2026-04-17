@@ -1,5 +1,5 @@
 import { usePortfolio } from "../../context/PortfolioContext";
-import { TransactionButton } from "./TransactionButton";
+import TransactionButton from "./TransactionButton";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
 export const AssetRow = ({ asset, onExpand, isExpanded }: any) => {

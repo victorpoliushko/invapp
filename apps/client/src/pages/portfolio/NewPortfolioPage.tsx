@@ -1,5 +1,5 @@
-import { PortfolioProvider, usePortfolio } from "../../context/PortfolioContext";
-import { AssetTable } from "../../components/portfolio/AssetTable";
+import { PortfolioProvider} from "../../context/PortfolioContext";
+import { PortfolioContent } from "../../components/portfolio/PortfolioContent";
 
 export default function PortfolioPage() {
   return (
@@ -8,19 +8,3 @@ export default function PortfolioPage() {
     </PortfolioProvider>
   );
 }
-
-export function PortfolioContent() {
-  const { portfolio } = usePortfolio();
-  if (!portfolio) return <div>Loading...</div>;
-
-  return (
-    <section className="assets-section">
-      <h1>{portfolio.name}</h1>
-      {/* Tab Radio Inputs here */}
-      <div className="tab">
-        <AssetTable assets={portfolio.portfolioAssets} />
-      </div>
-    </section>
-  );
-}
-

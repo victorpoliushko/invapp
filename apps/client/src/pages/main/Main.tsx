@@ -1,6 +1,5 @@
 import "../../App.css";
 import MarketTicker from "../../components/marketData";
-import MarketHeatmap from "../../components/marketHeatmap";
 import MarketNews from "../../components/marketNews";
 
 export const MainPage = () => {

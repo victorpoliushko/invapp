@@ -12,7 +12,7 @@ import { MainPage } from "./pages/main/Main.tsx";
 import { AuthProvider } from "./AuthContext.tsx";
 import { Layout } from "./Layout.tsx";
 import AuthCallback from "./pages/auth/AuthCallback.tsx";
-import { PortfolioContent } from "./pages/portfolio/NewPortfolioPage.tsx";
+import { PortfolioContent } from "./components/portfolio/PortfolioContent.tsx";
 
 const router = createBrowserRouter([
   {
