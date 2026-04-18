@@ -13,6 +13,8 @@ import { AuthProvider } from "./AuthContext.tsx";
 import { Layout } from "./Layout.tsx";
 import AuthCallback from "./pages/auth/AuthCallback.tsx";
 import { PortfolioContent } from "./components/portfolio/PortfolioContent.tsx";
+import { PortfolioProvider } from "./context/PortfolioContext.tsx";
+import NewPortfolioPage from "./pages/portfolio/NewPortfolioPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -46,7 +48,7 @@ const router = createBrowserRouter([
       // },
       {
         path: `/portfolios/:id`,
-        element: <PortfolioContent />,
+        element: <NewPortfolioPage />,
       },
       {
         path: "/portfolios/:portfolioId/ai-suggestions",
@@ -63,7 +65,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
     </AuthProvider>
   </StrictMode>,
 );
