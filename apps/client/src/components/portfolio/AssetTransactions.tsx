@@ -3,6 +3,7 @@ import { PortfolioAssetDto } from "../../../../api/src/portfolios/dto/PortfolioA
 import { usePortfolio } from "../../context/PortfolioContext";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import "../../pages/portfolio/PortfolioPage.css";
 
 export function AssetTransactions({
   portfolioAsset,

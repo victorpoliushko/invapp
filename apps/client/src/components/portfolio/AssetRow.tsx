@@ -1,6 +1,7 @@
 import { usePortfolio } from "../../context/PortfolioContext";
 import TransactionButton from "./TransactionButton";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import "../../pages/portfolio/PortfolioPage.css";
 
 export const AssetRow = ({ asset, onExpand, isExpanded }: any) => {
   const { deleteAsset, loadingPrices } = usePortfolio();
