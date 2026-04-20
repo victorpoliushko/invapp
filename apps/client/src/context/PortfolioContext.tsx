@@ -26,6 +26,29 @@ export const PortfolioProvider = ({
   const fetchWithRedirect = useFetchWithRedirect();
   const token = localStorage.getItem("accessToken");
 
+  const updatePortfolioName = async (newName: string) => {
+    if (!newName.trim() || newName === portfolio?.name) return;
+    
+    const token = localStorage.getItem("accessToken");
+    try {
+      const res = await fetch(`/api/portfolios/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newName }),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setPortfolio(updated);
+      }
+    } catch (err) {
+      console.error("Update failed", err);
+    }
+  };
+  
   const refreshData = async () => {
     if (!id) return;
     const res = await fetchWithRedirect(
