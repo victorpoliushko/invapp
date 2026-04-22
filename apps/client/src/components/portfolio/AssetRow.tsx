@@ -12,6 +12,7 @@ export const AssetRow = ({ asset, onExpand, isExpanded }: any) => {
         <button onClick={onExpand}>{isExpanded ? "▼" : "►"}</button>
       </td>
       <td>{asset.assets.ticker}</td>
+      <td>'some date'</td>
       <td>{asset.quantity}</td>
       <td>{loadingPrices[asset.assetId] ? "..." : asset.price}</td>
       <td className="actions">

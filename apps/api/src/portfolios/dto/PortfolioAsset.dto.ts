@@ -1,6 +1,7 @@
-import { IsDefined, IsNumber, IsOptional, ValidateNested } from "class-validator";
+import { IsArray, IsDefined, IsNumber, IsOptional, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { AssetDto } from "../../assets/dto/Asset.dto";
+import { TransactionsDto } from "src/transactions/dto/Transations.dto";
 
 export class PortfolioAssetDto {
   @IsDefined()
@@ -22,5 +23,10 @@ export class PortfolioAssetDto {
 
   @ValidateNested()
   @Type(() => AssetDto)
-  assets: AssetDto;
+  assets: AssetDto[];
+
+  @IsArray()
+  @ValidateNested({each: true})
+  @Type(() => TransactionsDto)
+  transactions: TransactionsDto[];
 }

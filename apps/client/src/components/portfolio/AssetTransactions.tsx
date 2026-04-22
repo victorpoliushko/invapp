@@ -1,14 +1,14 @@
 import React from "react";
-import { PortfolioAssetDto } from "../../../../api/src/portfolios/dto/PortfolioAsset.dto";
+import { TransactionsDto } from "../../../../api/src/transactions/dto/Transations.dto";
 import { usePortfolio } from "../../context/PortfolioContext";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 
 export function AssetTransactions({
-  portfolioAsset,
+  portfolioAssetTransactions,
 }: {
-  portfolioAsset: PortfolioAssetDto;
+  portfolioAssetTransactions: TransactionsDto[];
 }) {
   const COLUMN_COUNT = 7;
   const { refreshData } = usePortfolio();
@@ -50,22 +50,22 @@ export function AssetTransactions({
               </tr>
             </thead>
             <tbody>
-              {portfolioAsset.assets.transactions?.map((t) => (
-                <tr key={t.id}>
+              {portfolioAssetTransactions?.map((transaction) => (
+                <tr key={transaction.id}>
                   <td>
                     <button title={`Edit`}>
                       <img src={editIcon} height={20} width={20} alt="edit" />
                     </button>
                   </td>
-                  <td style={{ color: t.type === "BUY" ? "#4caf50" : "#e57373" }}>
-                    {t.type}
+                  <td style={{ color: transaction.type === "BUY" ? "#4caf50" : "#e57373" }}>
+                    {transaction.type}
                   </td>
-                  <td>{portfolioAsset.assets.ticker}</td>
-                  <td>{new Date(t.date).toLocaleDateString()}</td>
-                  <td>{t.quantityChange}</td>
-                  <td>{t.pricePerUnit}</td>
+                  <td>{transaction.asset.ticker}</td>
+                  <td>{new Date(transaction.date).toLocaleDateString()}</td>
+                  <td>{transaction.quantityChange}</td>
+                  <td>{transaction.pricePerUnit}</td>
                   <td>
-                    <button onClick={() => onDeleteTransaction(t.id)}>
+                    <button onClick={() => onDeleteTransaction(transaction.id)}>
                       <img src={deleteIcon} height={20} width={20} alt="delete" />
                     </button>
                   </td>

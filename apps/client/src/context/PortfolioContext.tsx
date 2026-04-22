@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
+import { PortfolioDto } from "../../../api/src/portfolios/dto/portfolio.dto";
 
 interface PortfolioContextType {
-  portfolio: any;
+  portfolio: PortfolioDto;
   loadingPrices: Record<string, boolean>;
   addTransaction: (type: string, assetId: string, data: any) => Promise<void>;
   deleteAsset: (assetId: string) => Promise<void>;
@@ -48,7 +49,7 @@ export const PortfolioProvider = ({
       console.error("Update failed", err);
     }
   };
-  
+
   const refreshData = async () => {
     if (!id) return;
     const res = await fetchWithRedirect(
