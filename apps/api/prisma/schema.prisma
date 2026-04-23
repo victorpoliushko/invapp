@@ -58,7 +58,7 @@ enum DataSource {
 
 model Asset {
   id         String      @id @default(uuid())
-  ticker      String      @unique
+  ticker     String      @unique
   name       String?
   type       AssetType?
   exchange   String?
@@ -76,8 +76,8 @@ model Portfolio {
   user   User?  @relation(fields: [userId], references: [id])
   userId String
 
-  portfolioAssets       PortfolioAsset[]
-  transactions Transaction[]
+  portfolioAssets PortfolioAsset[]
+  transactions    Transaction[]
 }
 
 model PortfolioAsset {
@@ -87,8 +87,9 @@ model PortfolioAsset {
   quantity Float
   price    Float?
 
-  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
-  assets    Asset     @relation(fields: [assetId], references: [id])
+  portfolio   Portfolio   @relation(fields: [portfolioId], references: [id])
+  assets      Asset       @relation(fields: [assetId], references: [id])
+  transaction Transaction @relation(fields: [portfolioId, assetId], references: [portfolioId, assetId])
 
   @@id([portfolioId, assetId])
 }
@@ -124,8 +125,9 @@ model Transaction {
   pricePerUnit   Float
   date           DateTime
 
-  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
-  asset     Asset     @relation(fields: [assetId], references: [id])
+  portfolio       Portfolio        @relation(fields: [portfolioId], references: [id])
+  asset           Asset            @relation(fields: [assetId], references: [id])
+  portfolioAssets PortfolioAsset[]
 
   @@index([id, portfolioId, assetId])
 }

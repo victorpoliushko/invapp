@@ -4,7 +4,7 @@ import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
 import { PortfolioDto } from "../../../api/src/portfolios/dto/portfolio.dto";
 
 interface PortfolioContextType {
-  portfolio: PortfolioDto;
+  portfolio: PortfolioDto | undefined;
   loadingPrices: Record<string, boolean>;
   addTransaction: (type: string, assetId: string, data: any) => Promise<void>;
   deleteAsset: (assetId: string) => Promise<void>;
@@ -22,7 +22,7 @@ export const PortfolioProvider = ({
   children: React.ReactNode;
 }) => {
   const { id } = useParams<{ id: string }>();
-  const [portfolio, setPortfolio] = useState<any>();
+  const [portfolio, setPortfolio] = useState<PortfolioDto | undefined>();
   const [loadingPrices, setLoadingPrices] = useState({});
   const fetchWithRedirect = useFetchWithRedirect();
   const token = localStorage.getItem("accessToken");

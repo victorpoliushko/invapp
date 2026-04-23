@@ -15,66 +15,6 @@ export function PortfolioContent() {
     if (portfolio) setNewName(portfolio.name);
   }, [portfolio]);
 
-  console.log(`
-   portfolio: ${JSON.stringify(portfolio)} 
-  `);
-
-  [
-    {
-      id: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-      name: "Katrusia super portfolio 22",
-      userId: "13ee5312-1a96-4ed2-a271-da54b338b708",
-      portfolioAssets: [
-        {
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          quantity: 10,
-          price: 100,
-          assets: {
-            id: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-            ticker: "VOO",
-            name: null,
-            type: null,
-            exchange: null,
-            dataSource: null,
-            updatedAt: "2025-11-24",
-            transactions: [
-              {
-                id: "18244817-0cef-421c-891e-063c5722c44c",
-                portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-                assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-                type: "BUY",
-                quantityChange: 10,
-                pricePerUnit: 100,
-                date: "2026-04-09",
-              },
-            ],
-          },
-        },
-      ],
-      transactions: [
-        {
-          id: "67df6742-0fcf-4b10-b0e7-a8278ae3c01b",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "6c4220af-c081-406f-bfee-8f1d866d09e7",
-          type: "BUY",
-          quantityChange: 4,
-          pricePerUnit: 320,
-          date: "2026-02-14",
-        },
-        {
-          id: "18244817-0cef-421c-891e-063c5722c44c",
-          portfolioId: "140f5933-6f4b-424f-86c3-3f350a2b1293",
-          assetId: "9a4d67b9-1c7f-4379-8ee8-9d2f327d8418",
-          type: "BUY",
-          quantityChange: 10,
-          pricePerUnit: 100,
-          date: "2026-04-09",
-        },
-      ],
-    },
-  ];
-
   if (!portfolio) return <div>Loading...</div>;
 
   const handleSave = async () => {

@@ -56,7 +56,7 @@ export class PortfoliosService {
             },
           },
         },
-        transactions: true,
+        // transactions: true,
       },
     });
     return plainToInstance(PortfolioDto, portfolio);

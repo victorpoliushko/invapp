@@ -22,9 +22,4 @@ export class PortfolioDto {
   @ValidateNested({each: true})
   @Type(() => PortfolioAssetDto)
   portfolioAssets: PortfolioAssetDto[];
-
-  @IsArray()
-  @ValidateNested({each: true})
-  @Type(() => TransactionsDto)
-  transactions: TransactionsDto[];
 }
