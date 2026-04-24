@@ -3,16 +3,18 @@ import TransactionButton from "./TransactionButton";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 
-export const AssetRow = ({ asset, onExpand, isExpanded }: any) => {
+export const AssetRow = ({ asset, onExpand, isExpanded, transactions }: any) => {
   const { deleteAsset, loadingPrices } = usePortfolio();
-
+console.log(`
+ transactions: ${JSON.stringify(transactions)} 
+`);
   return (
     <tr>
       <td>
         <button onClick={onExpand}>{isExpanded ? "▼" : "►"}</button>
       </td>
       <td>{asset.assets.ticker}</td>
-      <td>'some date'</td>
+      <td>{transactions && transactions.length ? transactions[transactions.length] : ''}</td>
       <td>{asset.quantity}</td>
       <td>{loadingPrices[asset.assetId] ? "..." : asset.price}</td>
       <td className="actions">
