@@ -87,9 +87,9 @@ model PortfolioAsset {
   quantity Float
   price    Float?
 
-  portfolio   Portfolio   @relation(fields: [portfolioId], references: [id])
-  assets      Asset       @relation(fields: [assetId], references: [id])
-  transaction Transaction @relation(fields: [portfolioId, assetId], references: [portfolioId, assetId])
+  portfolio    Portfolio     @relation(fields: [portfolioId], references: [id])
+  asset        Asset         @relation(fields: [assetId], references: [id])
+  transactions Transaction[]
 
   @@id([portfolioId, assetId])
 }
@@ -125,9 +125,9 @@ model Transaction {
   pricePerUnit   Float
   date           DateTime
 
-  portfolio       Portfolio        @relation(fields: [portfolioId], references: [id])
-  asset           Asset            @relation(fields: [assetId], references: [id])
-  portfolioAssets PortfolioAsset[]
+  portfolio      Portfolio      @relation(fields: [portfolioId], references: [id])
+  asset          Asset          @relation(fields: [assetId], references: [id])
+  portfolioAsset PortfolioAsset @relation(fields: [portfolioId, assetId], references: [portfolioId, assetId])
 
   @@index([id, portfolioId, assetId])
 }
