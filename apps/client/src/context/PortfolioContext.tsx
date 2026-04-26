@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
 import { PortfolioDto } from "../../../api/src/portfolios/dto/portfolio.dto";
+import { useAuth } from "../AuthContext";
 
 interface PortfolioContextType {
   portfolio: PortfolioDto | undefined;
@@ -26,10 +27,11 @@ export const PortfolioProvider = ({
   const [loadingPrices, setLoadingPrices] = useState({});
   const fetchWithRedirect = useFetchWithRedirect();
   const token = localStorage.getItem("accessToken");
+  const { accessToken, userId } = useAuth();
 
   const updatePortfolioName = async (newName: string) => {
     if (!newName.trim() || newName === portfolio?.name) return;
-    
+
     const token = localStorage.getItem("accessToken");
     try {
       const res = await fetch(`/api/portfolios/${id}`, {
@@ -71,8 +73,8 @@ export const PortfolioProvider = ({
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        body: JSON.stringify({ assetId }),
       },
+      body: JSON.stringify({ assetId }),
     });
 
     await refreshData();
@@ -81,6 +83,20 @@ export const PortfolioProvider = ({
   useEffect(() => {
     refreshData();
   }, [id]);
+
+  const createPortolio = async (name: string, userId: string) => {
+    const res = await fetch(`api/portfolios`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        name: name,
+        userId: userId,
+      }),
+    });
+  };
 
   return (
     <PortfolioContext.Provider
@@ -100,6 +116,7 @@ export const PortfolioProvider = ({
 
 export const usePortfolio = () => {
   const context = useContext(PortfolioContext);
-  if (!context) throw new Error("usePortfolio must be used within PortfolioProvider");
+  if (!context)
+    throw new Error("usePortfolio must be used within PortfolioProvider");
   return context;
-}
+};

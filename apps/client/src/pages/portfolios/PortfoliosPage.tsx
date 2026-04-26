@@ -45,6 +45,7 @@ export default function PortfoliosPage() {
 
   return (
     <section className="portfolios-section section-container">
+      <div className="test">Create portfolio</div>
       {portfolios.map((p: any) => (
         <Link to={{ pathname: `/portfolios/${p.id}` }} key={1}>
           <div key={p.id} className="portfolio-min">
