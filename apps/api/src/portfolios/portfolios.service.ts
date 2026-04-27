@@ -46,7 +46,7 @@ export class PortfoliosService {
       include: {
         portfolioAssets: {
           include: {
-            assets: {
+            asset: {
               include: {
                 transactions: {
                   where: { portfolioId: id },
@@ -68,7 +68,7 @@ export class PortfoliosService {
       data: {
         name: input.name,
       },
-      include: { portfolioAssets: { include: { assets: true } } },
+      include: { portfolioAssets: { include: { asset: true } } },
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
@@ -82,7 +82,7 @@ export class PortfoliosService {
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
-      include: { portfolioAssets: { include: { assets: true } } },
+      include: { portfolioAssets: { include: { asset: true } } },
     });
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
@@ -162,7 +162,7 @@ export class PortfoliosService {
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { portfolioAssets: { include: { assets: true } } },
+        include: { portfolioAssets: { include: { asset: true } } },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
@@ -191,7 +191,7 @@ export class PortfoliosService {
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { portfolioAssets: { include: { assets: true } } },
+        include: { portfolioAssets: { include: { asset: true } } },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
@@ -203,7 +203,7 @@ export class PortfoliosService {
       include: {
         portfolioAssets: {
           include: {
-            assets: true,
+            asset: true,
           },
         },
       },
@@ -212,15 +212,15 @@ export class PortfoliosService {
     if (!portfolio) throw new NotFoundException('Portfolio not found');
     const prices = [];
     for (const pa of portfolio.portfolioAssets) {
-      console.log(`Fetching price for ${pa.assets.ticker}...`);
-      const price = await this.assetsService.getSharePrice(pa.assets.ticker);
+      console.log(`Fetching price for ${pa.asset.ticker}...`);
+      const price = await this.assetsService.getSharePrice(pa.asset.ticker);
       console.log(`
        price: ${JSON.stringify(price)} 
       `);
 
       prices.push({
         assetId: pa.assetId,
-        symbol: pa.assets.ticker,
+        symbol: pa.asset.ticker,
         actualPrice: price,
       });
 

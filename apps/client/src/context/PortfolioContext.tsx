@@ -96,6 +96,7 @@ export const PortfolioProvider = ({
         userId: userId,
       }),
     });
+    const data = await res.json();
   };
 
   return (
