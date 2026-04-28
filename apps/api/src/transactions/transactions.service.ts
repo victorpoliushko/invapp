@@ -29,16 +29,14 @@ export class TransactionsService {
         quantityChange: input.quantityChange,
         date: input.date,
         pricePerUnit: input.pricePerUnit,
-        portfolio: {
-          connect: { id: input.portfolioId },
-        },
-        ...(assetId && {
-          asset: {
-            connect: {
-              id: assetId,
+        portfolioAsset: {
+          connect: {
+            portfolioId_assetId: {
+              portfolioId: input.portfolioId,
+              assetId: input.assetId,
             },
           },
-        }),
+        },
       },
     });
 
@@ -51,8 +49,10 @@ export class TransactionsService {
     const transaction = await this.prismaService.transaction.findUnique({
       where: { id },
       include: {
-        asset: true,
-        portfolio: true,
+        portfolioAsset: { include: {
+          portfolio: true,
+          asset: true
+        }}
       },
     });
     return plainToInstance(TransactionsDto, transaction);

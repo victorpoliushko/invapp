@@ -65,8 +65,8 @@ model Asset {
   dataSource DataSource?
   updatedAt  DateTime?   @updatedAt
 
-  portfolios   PortfolioAsset[]
-  transactions Transaction[]
+  portfolioAssets   PortfolioAsset[]
+  // transactions Transaction[]
 }
 
 model Portfolio {
@@ -77,7 +77,6 @@ model Portfolio {
   userId String
 
   portfolioAssets PortfolioAsset[]
-  transactions    Transaction[]
 }
 
 model PortfolioAsset {
@@ -125,8 +124,8 @@ model Transaction {
   pricePerUnit   Float
   date           DateTime
 
-  portfolio      Portfolio      @relation(fields: [portfolioId], references: [id])
-  asset          Asset          @relation(fields: [assetId], references: [id])
+  // portfolio      Portfolio      @relation(fields: [portfolioId], references: [id])
+  // asset          Asset          @relation(fields: [assetId], references: [id])
   portfolioAsset PortfolioAsset @relation(fields: [portfolioId, assetId], references: [portfolioId, assetId])
 
   @@index([id, portfolioId, assetId])
