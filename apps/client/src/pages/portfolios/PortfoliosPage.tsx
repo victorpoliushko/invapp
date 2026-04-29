@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 import { Link, useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import { usePortfolio } from "../../context/PortfolioContext";
 
 export default function PortfoliosPage() {
   const { userId } = useParams();
+  const { createPortolio } = usePortfolio();
   const fetchWithRedirect = useFetchWithRedirect();
 
   const [portfolios, setPortfolios] = useState([]);
+  const [portfolioName, setPortfolioName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -46,6 +49,15 @@ export default function PortfoliosPage() {
   return (
     <section className="portfolios-section section-container">
       <div className="test">Create portfolio</div>
+      <input
+            type="text"
+            value={portfolioName}
+            onChange={(e) => setPortfolioName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && createPortolio()}
+            className="assets-h1-input"
+            autoFocus
+          />
+          <button onClick={() => createPortolio()}>Save</button>
       {portfolios.map((p: any) => (
         <Link to={{ pathname: `/portfolios/${p.id}` }} key={1}>
           <div key={p.id} className="portfolio-min">
