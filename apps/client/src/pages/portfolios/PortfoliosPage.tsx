@@ -53,11 +53,11 @@ export default function PortfoliosPage() {
             type="text"
             value={portfolioName}
             onChange={(e) => setPortfolioName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && createPortolio()}
+            onKeyDown={(e) => e.key === "Enter" && createPortolio(portfolioName, userId ?? '')}
             className="assets-h1-input"
             autoFocus
           />
-          <button onClick={() => createPortolio()}>Save</button>
+          <button onClick={() => createPortolio(portfolioName, userId ?? '')}>Save</button>
       {portfolios.map((p: any) => (
         <Link to={{ pathname: `/portfolios/${p.id}` }} key={1}>
           <div key={p.id} className="portfolio-min">

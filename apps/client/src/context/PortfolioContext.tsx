@@ -11,7 +11,7 @@ interface PortfolioContextType {
   deleteAsset: (assetId: string) => Promise<void>;
   updatePortfolioName: (id: string) => Promise<void>;
   refreshData: () => Promise<void>;
-  createPortolio: () => Promise<void>
+  createPortolio: (name: string, userId: string) => Promise<void>
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(
@@ -97,7 +97,7 @@ export const PortfolioProvider = ({
         userId: userId,
       }),
     });
-    const data = await res.json();
+    await res.json();
   };
 
   return (
@@ -109,7 +109,7 @@ export const PortfolioProvider = ({
         refreshData,
         addTransaction: async () => {},
         updatePortfolioName: async () => {},
-        createPortolio: async() => {}
+        createPortolio
       }}
     >
       {children}

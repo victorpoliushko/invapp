@@ -39,16 +39,17 @@ const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
-        path: `/portfolios/user/:userId`,
-        element: <PortfoliosPage />,
-      },
-      // {
-      //   path: `/portfolios/:id`,
-      //   element: <PortfolioPage />,
-      // },
-      {
-        path: `/portfolios/:id`,
-        element: <NewPortfolioPage />,
+        element: <PortfolioProviderWrapper />,
+        children: [
+          {
+            path: "portfolios/user/:userId",
+            element: <PortfoliosPage />,
+          },
+          {
+            path: "portfolios/:id",
+            element: <NewPortfolioPage />,
+          },
+        ],
       },
       {
         path: "/portfolios/:portfolioId/ai-suggestions",
@@ -62,10 +63,20 @@ const router = createBrowserRouter([
   },
 ]);
 
+import { Outlet } from "react-router-dom";
+
+function PortfolioProviderWrapper() {
+  return (
+    <PortfolioProvider>
+      <Outlet />
+    </PortfolioProvider>
+  );
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-        <RouterProvider router={router} />
+      <RouterProvider router={router} />
     </AuthProvider>
   </StrictMode>,
 );
