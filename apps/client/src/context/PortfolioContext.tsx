@@ -86,7 +86,7 @@ export const PortfolioProvider = ({
   }, [id]);
 
   const createPortolio = async (name: string, userId: string) => {
-    const res = await fetch(`api/portfolios`, {
+    const res = await fetch(`http://localhost:5173/api/portfolios`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -97,7 +97,8 @@ export const PortfolioProvider = ({
         userId: userId,
       }),
     });
-    await res.json();
+    if (!res.ok) throw new Error("Create failed");
+    // await res.json();
   };
 
   return (
