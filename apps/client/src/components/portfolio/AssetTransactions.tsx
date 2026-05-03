@@ -11,7 +11,7 @@ export function AssetTransactions({
   portfolioAssetTransactions: TransactionsDto[];
 }) {
   const COLUMN_COUNT = 7;
-  const { refreshData } = usePortfolio();
+  const { refreshPortfolio } = usePortfolio();
   const token = localStorage.getItem("accessToken");
 
   const onDeleteTransaction = async (id: string) => {
@@ -27,7 +27,7 @@ export function AssetTransactions({
 
       if (!res.ok) throw new Error("Delete failed");
       
-      await refreshData();
+      await refreshPortfolio();
     } catch (error) {
       alert("Could not delete transaction");
     }

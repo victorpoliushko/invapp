@@ -6,12 +6,13 @@ import { useAuth } from "../AuthContext";
 
 interface PortfolioContextType {
   portfolio: PortfolioDto | undefined;
+  portfolios: PortfolioDto[] | [];
   loadingPrices: Record<string, boolean>;
   addTransaction: (type: string, assetId: string, data: any) => Promise<void>;
   deleteAsset: (assetId: string) => Promise<void>;
   updatePortfolioName: (id: string) => Promise<void>;
-  refreshData: () => Promise<void>;
-  createPortolio: (name: string, userId: string) => Promise<void>
+  refreshPortfolio: () => Promise<void>;
+  createPortolio: (name: string, userId: string) => Promise<void>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(
@@ -25,6 +26,10 @@ export const PortfolioProvider = ({
 }) => {
   const { id } = useParams<{ id: string }>();
   const [portfolio, setPortfolio] = useState<PortfolioDto | undefined>();
+  const [portfolios, setPortfolios] = useState<PortfolioDto[]>([]);
+  console.log(`
+   portfolios: ${JSON.stringify(portfolios)} 
+  `);
   const [loadingPrices, setLoadingPrices] = useState({});
   const fetchWithRedirect = useFetchWithRedirect();
   const token = localStorage.getItem("accessToken");
@@ -53,7 +58,7 @@ export const PortfolioProvider = ({
     }
   };
 
-  const refreshData = async () => {
+  const refreshPortfolio = async () => {
     if (!id) return;
     const res = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/${id}`,
@@ -68,6 +73,27 @@ export const PortfolioProvider = ({
     setPortfolio(data);
   };
 
+  const refreshUserPortfolios = async () => {
+    if (!id) return;
+    const res = await fetchWithRedirect(
+      `http://localhost:5173/api/portfolios/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    console.log(`
+     res: ${JSON.stringify(res)} 
+    `);
+
+    if (res.ok) {
+      const data = await res.json();
+      setPortfolios(data);
+    }
+  };
+
   const deleteAsset = async (assetId: string) => {
     await fetch(`api/portfolios/${id}/assets`, {
       method: "DELETE",
@@ -78,11 +104,11 @@ export const PortfolioProvider = ({
       body: JSON.stringify({ assetId }),
     });
 
-    await refreshData();
+    await refreshPortfolio();
   };
 
   useEffect(() => {
-    refreshData();
+    refreshPortfolio();
   }, [id]);
 
   const createPortolio = async (name: string, userId: string) => {
@@ -98,19 +124,20 @@ export const PortfolioProvider = ({
       }),
     });
     if (!res.ok) throw new Error("Create failed");
-    // await res.json();
+    await refreshUserPortfolios();
   };
 
   return (
     <PortfolioContext.Provider
       value={{
         portfolio,
+        portfolios,
         loadingPrices,
         deleteAsset,
-        refreshData,
+        refreshPortfolio,
         addTransaction: async () => {},
         updatePortfolioName: async () => {},
-        createPortolio
+        createPortolio,
       }}
     >
       {children}
