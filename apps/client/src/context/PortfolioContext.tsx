@@ -58,11 +58,12 @@ export const PortfolioProvider = ({
     }
   };
 
-  const refreshPortfolio = async () => {
+  const refreshPortfolio = async (id?: string ) => {
     if (!id) return;
     const res = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/${id}`,
       {
+         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -74,15 +75,23 @@ export const PortfolioProvider = ({
   };
 
   const refreshUserPortfolios = async () => {
-    if (!id) return;
+    // if (!id) return;
     const res = await fetchWithRedirect(
-      `http://localhost:5173/api/portfolios/${userId}`,
+      `http://localhost:5173/api/portfolios/user/${userId}`,
       {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       },
     );
+
+    const text = await res.text();
+  if (!text) {
+    console.warn("API returned empty response");
+    setPortfolios([]);
+    return;
+  }
 
     console.log(`
      res: ${JSON.stringify(res)} 
@@ -104,11 +113,11 @@ export const PortfolioProvider = ({
       body: JSON.stringify({ assetId }),
     });
 
-    await refreshPortfolio();
+    await refreshPortfolio(id);
   };
 
   useEffect(() => {
-    refreshPortfolio();
+    refreshPortfolio(id);
   }, [id]);
 
   const createPortolio = async (name: string, userId: string) => {
@@ -124,6 +133,9 @@ export const PortfolioProvider = ({
       }),
     });
     if (!res.ok) throw new Error("Create failed");
+    console.log(`
+     in create portfolio} 
+    `);
     await refreshUserPortfolios();
   };
 
