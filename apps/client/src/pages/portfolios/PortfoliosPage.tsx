@@ -6,7 +6,7 @@ import { usePortfolio } from "../../context/PortfolioContext";
 
 export default function PortfoliosPage() {
   const { userId } = useParams();
-  const { createPortolio } = usePortfolio();
+  const { createPortolio, deletePortfolio } = usePortfolio();
   const fetchWithRedirect = useFetchWithRedirect();
 
   const [portfolios, setPortfolios] = useState([]);
@@ -77,6 +77,7 @@ export default function PortfoliosPage() {
                 <h4>Losers</h4>
                 {/* map over losers here */}
               </div>
+               <button onClick={() => deletePortfolio(p.id)}>Delete</button>
             </div>
           </div>
         </Link>

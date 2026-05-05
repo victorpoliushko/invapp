@@ -13,6 +13,7 @@ interface PortfolioContextType {
   updatePortfolioName: (id: string) => Promise<void>;
   refreshPortfolio: () => Promise<void>;
   createPortolio: (name: string, userId: string) => Promise<void>;
+  deletePortfolio: (id: string) => Promise<void>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(
@@ -116,6 +117,22 @@ export const PortfolioProvider = ({
     await refreshPortfolio(id);
   };
 
+  const deletePortfolio = async (assetId: string) => {
+    console.log(`
+     deleting portfoli
+    `);
+    await fetch(`api/portfolios/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ assetId }),
+    });
+
+    await refreshPortfolio(id);
+  };
+
   useEffect(() => {
     refreshPortfolio(id);
   }, [id]);
@@ -150,6 +167,7 @@ export const PortfolioProvider = ({
         addTransaction: async () => {},
         updatePortfolioName: async () => {},
         createPortolio,
+        deletePortfolio
       }}
     >
       {children}
