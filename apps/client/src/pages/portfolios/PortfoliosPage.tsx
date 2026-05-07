@@ -10,7 +10,7 @@ export default function PortfoliosPage() {
   const fetchWithRedirect = useFetchWithRedirect();
 
   const [portfolios, setPortfolios] = useState([]);
-  const [portfolioName, setPortfolioName] = useState<string>('');
+  const [portfolioName, setPortfolioName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,7 +27,7 @@ export default function PortfoliosPage() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok)
@@ -50,14 +50,18 @@ export default function PortfoliosPage() {
     <section className="portfolios-section section-container">
       <div className="test">Create portfolio</div>
       <input
-            type="text"
-            value={portfolioName}
-            onChange={(e) => setPortfolioName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && createPortolio(portfolioName, userId ?? '')}
-            className="assets-h1-input"
-            autoFocus
-          />
-          <button onClick={() => createPortolio(portfolioName, userId ?? '')}>Save</button>
+        type="text"
+        value={portfolioName}
+        onChange={(e) => setPortfolioName(e.target.value)}
+        onKeyDown={(e) =>
+          e.key === "Enter" && createPortolio(portfolioName, userId ?? "")
+        }
+        className="assets-h1-input"
+        autoFocus
+      />
+      <button onClick={() => createPortolio(portfolioName, userId ?? "")}>
+        Save
+      </button>
       {portfolios.map((p: any) => (
         <Link to={{ pathname: `/portfolios/${p.id}` }} key={1}>
           <div key={p.id} className="portfolio-min">
@@ -77,7 +81,13 @@ export default function PortfoliosPage() {
                 <h4>Losers</h4>
                 {/* map over losers here */}
               </div>
-               <button onClick={() => deletePortfolio(p.id)}>Delete</button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  deletePortfolio(p.id);
+                }}
+              ></button>
             </div>
           </div>
         </Link>

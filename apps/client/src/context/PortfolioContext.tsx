@@ -59,12 +59,12 @@ export const PortfolioProvider = ({
     }
   };
 
-  const refreshPortfolio = async (id?: string ) => {
+  const refreshPortfolio = async (id?: string) => {
     if (!id) return;
     const res = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/${id}`,
       {
-         method: "GET",
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -88,19 +88,20 @@ export const PortfolioProvider = ({
     );
 
     const text = await res.text();
-  if (!text) {
-    console.warn("API returned empty response");
-    setPortfolios([]);
-    return;
-  }
 
-    console.log(`
-     res: ${JSON.stringify(res)} 
-    `);
+    if (!text) {
+      console.warn("API returned empty response");
+      setPortfolios([]);
+      return;
+    }
 
     if (res.ok) {
-      const data = await res.json();
-      setPortfolios(data);
+      try {
+        const data = JSON.parse(text);
+        setPortfolios(data);
+      } catch (e) {
+        console.error("Failed to parse JSON string:", e);
+      }
     }
   };
 
@@ -117,20 +118,25 @@ export const PortfolioProvider = ({
     await refreshPortfolio(id);
   };
 
-  const deletePortfolio = async (assetId: string) => {
+  const deletePortfolio = async (id: string) => {
     console.log(`
      deleting portfoli
     `);
-    await fetch(`api/portfolios/${id}`, {
+    const res = await fetch(`http://localhost:5173/api/portfolios/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ assetId }),
     });
-
-    await refreshPortfolio(id);
+    console.log(`
+     res: ${JSON.stringify(res)} 
+    `);
+    if (res.ok) {
+      await refreshUserPortfolios();
+    } else {
+      console.error("Failed to delete portfolio");
+    }
   };
 
   useEffect(() => {
@@ -167,7 +173,7 @@ export const PortfolioProvider = ({
         addTransaction: async () => {},
         updatePortfolioName: async () => {},
         createPortolio,
-        deletePortfolio
+        deletePortfolio,
       }}
     >
       {children}
