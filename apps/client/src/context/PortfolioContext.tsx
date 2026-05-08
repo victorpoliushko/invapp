@@ -14,6 +14,7 @@ interface PortfolioContextType {
   refreshPortfolio: () => Promise<void>;
   createPortolio: (name: string, userId: string) => Promise<void>;
   deletePortfolio: (id: string) => Promise<void>;
+  refreshUserPortfolios: () => Promise<void>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(
@@ -174,6 +175,7 @@ export const PortfolioProvider = ({
         updatePortfolioName: async () => {},
         createPortolio,
         deletePortfolio,
+        refreshUserPortfolios
       }}
     >
       {children}
