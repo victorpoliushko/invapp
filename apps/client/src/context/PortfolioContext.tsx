@@ -8,6 +8,7 @@ interface PortfolioContextType {
   portfolio: PortfolioDto | undefined;
   portfolios: PortfolioDto[] | [];
   loadingPrices: Record<string, boolean>;
+  loadingPortfolios: boolean;
   addTransaction: (type: string, assetId: string, data: any) => Promise<void>;
   deleteAsset: (assetId: string) => Promise<void>;
   updatePortfolioName: (id: string) => Promise<void>;
@@ -29,10 +30,11 @@ export const PortfolioProvider = ({
   const { id } = useParams<{ id: string }>();
   const [portfolio, setPortfolio] = useState<PortfolioDto | undefined>();
   const [portfolios, setPortfolios] = useState<PortfolioDto[]>([]);
-  console.log(`
-   portfolios: ${JSON.stringify(portfolios)} 
-  `);
+  // console.log(`
+  //  portfolios: ${JSON.stringify(portfolios)} 
+  // `);
   const [loadingPrices, setLoadingPrices] = useState({});
+  const [loadingPortfolios, setLoadingPortfolios] = useState(false);
   const fetchWithRedirect = useFetchWithRedirect();
   const token = localStorage.getItem("accessToken");
   const { accessToken, userId } = useAuth();
@@ -77,7 +79,7 @@ export const PortfolioProvider = ({
   };
 
   const refreshUserPortfolios = async () => {
-    // if (!id) return;
+  setLoadingPortfolios(true);
     const res = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/user/${userId}`,
       {
@@ -102,6 +104,8 @@ export const PortfolioProvider = ({
         setPortfolios(data);
       } catch (e) {
         console.error("Failed to parse JSON string:", e);
+      } finally {
+        setLoadingPortfolios(false);
       }
     }
   };
@@ -169,6 +173,7 @@ export const PortfolioProvider = ({
         portfolio,
         portfolios,
         loadingPrices,
+        loadingPortfolios,
         deleteAsset,
         refreshPortfolio,
         addTransaction: async () => {},
