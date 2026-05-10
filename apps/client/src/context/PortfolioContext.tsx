@@ -11,7 +11,7 @@ interface PortfolioContextType {
   loadingPortfolios: boolean;
   addTransaction: (type: string, assetId: string, data: any) => Promise<void>;
   deleteAsset: (assetId: string) => Promise<void>;
-  updatePortfolioName: (id: string) => Promise<void>;
+  updatePortfolioName: (name: string) => Promise<void>;
   refreshPortfolio: () => Promise<void>;
   createPortolio: (name: string, userId: string) => Promise<void>;
   deletePortfolio: (id: string) => Promise<void>;
@@ -43,14 +43,17 @@ export const PortfolioProvider = ({
     if (!newName.trim() || newName === portfolio?.name) return;
 
     const token = localStorage.getItem("accessToken");
+    console.log(`
+     id: ${JSON.stringify(id)} 
+    `);
     try {
-      const res = await fetch(`/api/portfolios/${id}`, {
+      const res = await fetch(`http://localhost:5173/api/portfolios/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newName }),
+        body: JSON.stringify({ name: newName, id }),
       });
 
       if (res.ok) {
@@ -177,7 +180,7 @@ export const PortfolioProvider = ({
         deleteAsset,
         refreshPortfolio,
         addTransaction: async () => {},
-        updatePortfolioName: async () => {},
+        updatePortfolioName,
         createPortolio,
         deletePortfolio,
         refreshUserPortfolios

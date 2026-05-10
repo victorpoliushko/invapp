@@ -59,6 +59,9 @@ export class PortfoliosService {
   }
 
   async update(input: UpdatePortfolioDto): Promise<PortfolioDto> {
+    console.log(`
+     inout: ${JSON.stringify(input)} 
+    `);
     const portfolio = await this.prismaService.portfolio.update({
       where: { id: input.id },
       data: {

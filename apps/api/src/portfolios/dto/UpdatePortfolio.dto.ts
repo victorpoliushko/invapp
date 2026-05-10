@@ -1,7 +1,7 @@
 import { IsString, IsUUID } from "class-validator";
 
 export class UpdatePortfolioDto {
-  @IsUUID()
+  // @IsUUID()
   id: string;
   
   @IsString()
