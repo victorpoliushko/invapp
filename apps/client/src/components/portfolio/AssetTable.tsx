@@ -44,6 +44,7 @@ export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
             )}
           </>
         ))}
+        
       </tbody>
     </table>
   );
