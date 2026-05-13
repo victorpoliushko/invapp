@@ -3,23 +3,27 @@ import { AssetType } from "../../pages/portfolio/PortfolioPage";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 
 export function AddAsset() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<AssetType[]>([]);
   const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
   const fetchWithRedirect = useFetchWithRedirect();
-    const [newAsset, setNewAsset] = useState<{
-      assetName: string;
-      dueDate: string;
-      quantityChange: string;
-      // period: string;
-      pricePerUnit: number;
-    }>({
-      assetName: "",
-      dueDate: "",
-      quantityChange: "",
-      // period: "",
-      pricePerUnit: 0,
-    });
+  const [newAsset, setNewAsset] = useState<{
+    assetName: string;
+    dueDate: string;
+    quantityChange: string;
+    // period: string;
+    pricePerUnit: number;
+  }>({
+    assetName: "",
+    dueDate: "",
+    quantityChange: "",
+    // period: "",
+    pricePerUnit: 0,
+  });
+
+  console.log(`
+   newAsset: ${JSON.stringify(newAsset)} 
+  `);
 
   // set suggestions on search
   useEffect(() => {
@@ -113,10 +117,23 @@ export function AddAsset() {
         <input
           type="number"
           name="quantityChange"
-          value={"mock bonds data"}
-          // onChange={handleChange}
+          value={newAsset.quantityChange}
+          onChange={e => {
+             setNewAsset({
+              ...newAsset,
+              quantityChange: e.target.value,
+            });
+          }}
+
           onKeyDown={(e) => {
             // if (e.key === "Enter") handleAddAsset();
+            // console.log(`
+            //  e.target: ${(e.target.)} 
+            // `);
+            // setNewAsset({
+            //   ...newAsset,
+            //   quantityChange: e.target.value,
+            // });
           }}
           required
           placeholder="Quantity"

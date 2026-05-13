@@ -3,6 +3,7 @@ import { AssetRow } from "./AssetRow";
 import { AssetTransactions } from "./AssetTransactions";
 import "../../pages/portfolio/PortfolioPage.css";
 import { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
+import { AddAsset } from "./AddAsset";
 
 export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
             )}
           </>
         ))}
-        
+        <AddAsset />
       </tbody>
     </table>
   );

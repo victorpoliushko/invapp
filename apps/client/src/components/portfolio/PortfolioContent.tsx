@@ -3,6 +3,7 @@ import { AssetTable } from "./AssetTable";
 import "../../pages/portfolio/PortfolioPage.css";
 import { useEffect, useState } from "react";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
+import { AddAsset } from "./AddAsset";
 
 export function PortfolioContent() {
   const { portfolio, updatePortfolioName } = usePortfolio();
@@ -142,6 +143,7 @@ export function PortfolioContent() {
                 <td data-label="Quantity">$2,443</td>
                 <td data-label="Period">02/01/2016 - 02/29/2016</td>
               </tr>
+              
               <tr>
                 <td>
                   <div className="asset-autocomplete">
