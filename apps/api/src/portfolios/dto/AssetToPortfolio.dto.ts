@@ -23,7 +23,7 @@ export class AddAssetInputDto {
   @IsString()
   @IsDefined()
   @Expose()
-  @Transform(({ value }) => value.toISOString().split('T')[0])
+  @Transform(({ value }) => value instanceof Date ? value.toISOString().split('T')[0] : value)
   date: string;
 
   @IsNumber()

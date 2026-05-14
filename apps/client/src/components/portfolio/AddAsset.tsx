@@ -1,31 +1,23 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { AssetType } from "../../pages/portfolio/PortfolioPage";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import { usePortfolio } from "../../context/PortfolioContext";
 
 export function AddAsset() {
+  const { id: portfolioId } = useParams<{ id: string }>();
+  const { refreshPortfolio } = usePortfolio();
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<AssetType[]>([]);
   const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
   const fetchWithRedirect = useFetchWithRedirect();
-  const [newAsset, setNewAsset] = useState<{
-    assetName: string;
-    dueDate: string;
-    quantityChange: string;
-    // period: string;
-    pricePerUnit: number;
-  }>({
+  const [newAsset, setNewAsset] = useState({
     assetName: "",
     dueDate: "",
     quantityChange: "",
-    // period: "",
-    pricePerUnit: 0,
+    pricePerUnit: "",
   });
 
-  console.log(`
-   newAsset: ${JSON.stringify(newAsset)} 
-  `);
-
-  // set suggestions on search
   useEffect(() => {
     if (!autocompleteEnabled) return;
     const token = localStorage.getItem("accessToken");
@@ -49,7 +41,6 @@ export function AddAsset() {
 
         if (!response.ok) throw new Error("Failed to fetch asset suggestions");
         const data = await response.json();
-
         setSuggestions(data);
       } catch (err) {
         console.error("Autocomplete error:", err);
@@ -59,8 +50,46 @@ export function AddAsset() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
+  const handleAddAsset = async () => {
+    const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
+    if (!portfolioId || !assetName || !dueDate || !quantityChange || !pricePerUnit) return;
+
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const res = await fetchWithRedirect(
+        `http://localhost:5173/api/portfolios/${portfolioId}/assets`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            assetName,
+            date: new Date(dueDate).toISOString(),
+            quantityChange: Number(quantityChange),
+            pricePerUnit: Number(pricePerUnit),
+            type: "BUY",
+          }),
+        },
+      );
+
+      if (!res.ok) throw new Error("Failed to add asset");
+
+      setNewAsset({ assetName: "", dueDate: "", quantityChange: "", pricePerUnit: "" });
+      setSearchTerm("");
+      setSuggestions([]);
+      setAutocompleteEnabled(true);
+      await refreshPortfolio();
+    } catch (err) {
+      console.error("Add asset error:", err);
+    }
+  };
+
   return (
     <tr>
+      <td></td>
       <td>
         <div className="asset-autocomplete">
           <input
@@ -72,7 +101,7 @@ export function AddAsset() {
               setSearchTerm(e.target.value);
             }}
             onKeyDown={(e) => {
-              // if (e.key === "Enter") handleAddAsset();
+              if (e.key === "Enter") handleAddAsset();
             }}
             required
             placeholder="Asset"
@@ -86,10 +115,7 @@ export function AddAsset() {
                   title={s.name}
                   onClick={() => {
                     setSearchTerm(s.assetSymbol);
-                    setNewAsset({
-                      ...newAsset,
-                      assetName: s.assetSymbol,
-                    });
+                    setNewAsset({ ...newAsset, assetName: s.assetSymbol });
                     setSuggestions([]);
                     setAutocompleteEnabled(false);
                   }}
@@ -105,10 +131,10 @@ export function AddAsset() {
         <input
           type="date"
           name="dueDate"
-          value={"mock bonds data"}
-          // onChange={handleChange}
+          value={newAsset.dueDate}
+          onChange={(e) => setNewAsset({ ...newAsset, dueDate: e.target.value })}
           onKeyDown={(e) => {
-            // if (e.key === "Enter") handleAddAsset();
+            if (e.key === "Enter") handleAddAsset();
           }}
           required
         />
@@ -118,22 +144,9 @@ export function AddAsset() {
           type="number"
           name="quantityChange"
           value={newAsset.quantityChange}
-          onChange={e => {
-             setNewAsset({
-              ...newAsset,
-              quantityChange: e.target.value,
-            });
-          }}
-
+          onChange={(e) => setNewAsset({ ...newAsset, quantityChange: e.target.value })}
           onKeyDown={(e) => {
-            // if (e.key === "Enter") handleAddAsset();
-            // console.log(`
-            //  e.target: ${(e.target.)} 
-            // `);
-            // setNewAsset({
-            //   ...newAsset,
-            //   quantityChange: e.target.value,
-            // });
+            if (e.key === "Enter") handleAddAsset();
           }}
           required
           placeholder="Quantity"
@@ -141,16 +154,21 @@ export function AddAsset() {
       </td>
       <td>
         <input
-          type="text"
+          type="number"
           name="pricePerUnit"
-          value={"mock bonds data"}
-          // onChange={handleChange}
+          value={newAsset.pricePerUnit}
+          onChange={(e) => setNewAsset({ ...newAsset, pricePerUnit: e.target.value })}
           onKeyDown={(e) => {
-            // if (e.key === "Enter") handleAddAsset();
+            if (e.key === "Enter") handleAddAsset();
           }}
           required
-          placeholder="Period"
+          placeholder="Price"
         />
+      </td>
+      <td></td>
+      <td></td>
+      <td>
+        <button onClick={handleAddAsset}>Add</button>
       </td>
     </tr>
   );

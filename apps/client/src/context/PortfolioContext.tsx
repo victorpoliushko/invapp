@@ -65,7 +65,7 @@ export const PortfolioProvider = ({
     }
   };
 
-  const refreshPortfolio = async (id?: string) => {
+  const refreshPortfolio = async () => {
     if (!id) return;
     const res = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/${id}`,
@@ -123,7 +123,7 @@ export const PortfolioProvider = ({
       body: JSON.stringify({ assetId }),
     });
 
-    await refreshPortfolio(id);
+    await refreshPortfolio();
   };
 
   const deletePortfolio = async (id: string) => {
@@ -148,7 +148,7 @@ export const PortfolioProvider = ({
   };
 
   useEffect(() => {
-    refreshPortfolio(id);
+    refreshPortfolio();
   }, [id]);
 
   const createPortolio = async (name: string, userId: string) => {

@@ -46,13 +46,13 @@ export class PortfoliosService {
       include: {
         portfolioAssets: {
           include: {
+            asset: true,
             transactions: {
               where: { portfolioId: id },
               orderBy: { date: 'desc' },
             },
           },
         },
-        // transactions: true,
       },
     });
     return plainToInstance(PortfolioDto, portfolio);
@@ -130,6 +130,17 @@ export class PortfoliosService {
         },
       });
     }
+
+    await this.prismaService.transaction.create({
+      data: {
+        type: input.type,
+        quantityChange: input.quantityChange,
+        date: new Date(input.date),
+        pricePerUnit: input.pricePerUnit,
+        portfolioId: id,
+        assetId: asset.id,
+      },
+    });
 
     const allTransactions = await this.prismaService.transaction.findMany({
       where: { portfolioId: id, assetId: asset.id },

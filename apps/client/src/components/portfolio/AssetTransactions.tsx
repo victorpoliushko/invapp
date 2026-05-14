@@ -6,8 +6,10 @@ import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 
 export function AssetTransactions({
+  assetTicker,
   portfolioAssetTransactions,
 }: {
+  assetTicker: string;
   portfolioAssetTransactions: TransactionsDto[];
 }) {
   const COLUMN_COUNT = 7;
@@ -60,7 +62,7 @@ export function AssetTransactions({
                   <td style={{ color: transaction.type === "BUY" ? "#4caf50" : "#e57373" }}>
                     {transaction.type}
                   </td>
-                  <td>{transaction.asset.ticker}</td>
+                  <td>{assetTicker}</td>
                   <td>{new Date(transaction.date).toLocaleDateString()}</td>
                   <td>{transaction.quantityChange}</td>
                   <td>{transaction.pricePerUnit}</td>

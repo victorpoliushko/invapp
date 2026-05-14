@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { AssetRow } from "./AssetRow";
 import { AssetTransactions } from "./AssetTransactions";
 import "../../pages/portfolio/PortfolioPage.css";
@@ -25,9 +25,8 @@ export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
       </thead>
       <tbody>
         {portfolioAssets.map((portfolioAsset) => (
-          <>
+          <Fragment key={portfolioAsset.assetId}>
             <AssetRow
-              key={portfolioAsset.assetId}
               portfolioAsset={portfolioAsset}
               isExpanded={expandedId === portfolioAsset.assetId}
               onExpand={() =>
@@ -40,10 +39,11 @@ export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
             />
             {expandedId === portfolioAsset.assetId && (
               <AssetTransactions
+                assetTicker={portfolioAsset.asset.ticker}
                 portfolioAssetTransactions={portfolioAsset.transactions}
               />
             )}
-          </>
+          </Fragment>
         ))}
         <AddAsset />
       </tbody>
