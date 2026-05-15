@@ -1,9 +1,10 @@
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const useFetchWithRedirect = () => {
   const navigate = useNavigate();
 
-  async function fetchWithRedirect(input: RequestInfo, init?: RequestInit) {
+  return useCallback(async function fetchWithRedirect(input: RequestInfo, init?: RequestInit) {
     const token = localStorage.getItem("accessToken");
 
     const response = await fetch(input, {
@@ -22,7 +23,5 @@ export const useFetchWithRedirect = () => {
     }
 
     return response;
-  }
-
-  return fetchWithRedirect;
+  }, [navigate]);
 };

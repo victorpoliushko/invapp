@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
 import { PortfolioDto } from "../../../api/src/portfolios/dto/portfolio.dto";
@@ -81,7 +81,7 @@ export const PortfolioProvider = ({
     setPortfolio(data);
   };
 
-  const refreshUserPortfolios = async () => {
+  const refreshUserPortfolios = useCallback(async () => {
   setLoadingPortfolios(true);
     const res = await fetchWithRedirect(
       `http://localhost:5173/api/portfolios/user/${userId}`,
@@ -111,7 +111,7 @@ export const PortfolioProvider = ({
         setLoadingPortfolios(false);
       }
     }
-  };
+  }, [userId, token, fetchWithRedirect]);
 
   const deleteAsset = async (assetId: string) => {
     await fetch(`api/portfolios/${id}/assets`, {
