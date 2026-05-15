@@ -169,7 +169,7 @@ export function PortfolioContent() {
                     type="date"
                     name="dueDate"
                     value={"mock real estate data"}
-                    // onChange={handleChange}
+                    readOnly
                     onKeyDown={(e) => {
                       // if (e.key === "Enter") handleAddAsset();
                     }}
@@ -181,7 +181,7 @@ export function PortfolioContent() {
                     type="number"
                     name="quantityChange"
                     value={"mock real estate data"}
-                    // onChange={handleChange}
+                    readOnly
                     onKeyDown={(e) => {
                       // if (e.key === "Enter") handleAddAsset();
                     }}
@@ -194,7 +194,7 @@ export function PortfolioContent() {
                     type="text"
                     name="pricePerUnit"
                     value={"mock real estate data"}
-                    // onChange={handleChange}
+                    readOnly
                     onKeyDown={(e) => {
                       // if (e.key === "Enter") handleAddAsset();
                     }}
@@ -265,7 +265,7 @@ export function PortfolioContent() {
                     type="date"
                     name="dueDate"
                     value={"mock crypto data"}
-                    // onChange={handleChange}
+                    readOnly
                     onKeyDown={(e) => {
                       // if (e.key === "Enter") handleAddAsset();
                     }}
@@ -277,7 +277,7 @@ export function PortfolioContent() {
                     type="number"
                     name="quantityChange"
                     value={"mock crypto data"}
-                    // onChange={handleChange}
+                    readOnly
                     onKeyDown={(e) => {
                       // if (e.key === "Enter") handleAddAsset();
                     }}
@@ -290,7 +290,7 @@ export function PortfolioContent() {
                     type="text"
                     name="pricePerUnit"
                     value={"mock crypto data"}
-                    // onChange={handleChange}
+                    readOnly
                     onKeyDown={(e) => {
                       // if (e.key === "Enter") handleAddAsset();
                     }}

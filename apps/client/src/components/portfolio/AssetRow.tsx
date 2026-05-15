@@ -22,9 +22,9 @@ export const AssetRow = ({
       </td>
       <td>{portfolioAsset.asset.ticker}</td>
       <td>
-        {portfolioAsset.transactions && portfolioAsset.transactions.length
-          ? portfolioAsset.transactions[portfolioAsset.transactions.length]
-          : ""}
+        {portfolioAsset.transactions?.length
+          ? new Date(portfolioAsset.transactions[0].date).toLocaleDateString()
+          : "—"}
       </td>
       <td>{portfolioAsset.quantity}</td>
       <td>
