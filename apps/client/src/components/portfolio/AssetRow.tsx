@@ -13,8 +13,11 @@ export const AssetRow = ({
   onExpand: any;
   isExpanded: boolean;
 }) => {
-  const { deleteAsset, loadingPrices } = usePortfolio();
+  const { deleteAsset, loadingPrices, currentPrices } = usePortfolio();
 
+  console.log(`
+   currentPrices: ${JSON.stringify(currentPrices)} 
+  `);
   return (
     <tr>
       <td>
@@ -28,7 +31,7 @@ export const AssetRow = ({
       </td>
       <td>{portfolioAsset.quantity}</td>
       <td>
-        {loadingPrices[portfolioAsset.assetId] ? "..." : portfolioAsset.price}
+        {loadingPrices[portfolioAsset.assetId] ? "..." : (currentPrices[portfolioAsset.assetId] ?? "—")}
       </td>
       <td className="actions">
         <TransactionButton assetId={portfolioAsset.assetId} />

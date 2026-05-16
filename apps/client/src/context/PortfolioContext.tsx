@@ -8,6 +8,7 @@ interface PortfolioContextType {
   portfolio: PortfolioDto | undefined;
   portfolios: PortfolioDto[] | [];
   loadingPrices: Record<string, boolean>;
+  currentPrices: Record<string, number>;
   loadingPortfolios: boolean;
   addTransaction: (type: string, assetId: string, data: any) => Promise<void>;
   deleteAsset: (assetId: string) => Promise<void>;
@@ -30,10 +31,8 @@ export const PortfolioProvider = ({
   const { id } = useParams<{ id: string }>();
   const [portfolio, setPortfolio] = useState<PortfolioDto | undefined>();
   const [portfolios, setPortfolios] = useState<PortfolioDto[]>([]);
-  // console.log(`
-  //  portfolios: ${JSON.stringify(portfolios)} 
-  // `);
-  const [loadingPrices, setLoadingPrices] = useState({});
+  const [loadingPrices, setLoadingPrices] = useState<Record<string, boolean>>({});
+  const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
   const [loadingPortfolios, setLoadingPortfolios] = useState(false);
   const fetchWithRedirect = useFetchWithRedirect();
   const token = localStorage.getItem("accessToken");
@@ -65,6 +64,20 @@ export const PortfolioProvider = ({
     }
   };
 
+  const fetchCurrentPrices = async (assets: { assetId: string; ticker: string }[]) => {
+    assets.forEach(({ assetId, ticker }) => {
+      setLoadingPrices((prev) => ({ ...prev, [assetId]: true }));
+      fetchWithRedirect(`http://localhost:5173/api/assets/price?asset=${ticker}`)
+        .then((res) => res.json())
+        .then(({ price }) => {
+          setCurrentPrices((prev) => ({ ...prev, [assetId]: price }));
+        })
+        .finally(() => {
+          setLoadingPrices((prev) => ({ ...prev, [assetId]: false }));
+        });
+    });
+  };
+
   const refreshPortfolio = async () => {
     if (!id) return;
     const res = await fetchWithRedirect(
@@ -79,6 +92,12 @@ export const PortfolioProvider = ({
 
     const data = await res.json();
     setPortfolio(data);
+
+    if (data?.portfolioAssets?.length) {
+      fetchCurrentPrices(
+        data.portfolioAssets.map((pa: any) => ({ assetId: pa.assetId, ticker: pa.asset.ticker }))
+      );
+    }
   };
 
   const refreshUserPortfolios = useCallback(async () => {
@@ -176,6 +195,7 @@ export const PortfolioProvider = ({
         portfolio,
         portfolios,
         loadingPrices,
+        currentPrices,
         loadingPortfolios,
         deleteAsset,
         refreshPortfolio,

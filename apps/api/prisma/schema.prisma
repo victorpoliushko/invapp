@@ -57,13 +57,15 @@ enum DataSource {
 }
 
 model Asset {
-  id         String      @id @default(uuid())
-  ticker     String      @unique
-  name       String?
-  type       AssetType?
-  exchange   String?
-  dataSource DataSource?
-  updatedAt  DateTime?   @updatedAt
+  id              String      @id @default(uuid())
+  ticker          String      @unique
+  name            String?
+  type            AssetType?
+  exchange        String?
+  dataSource      DataSource?
+  updatedAt       DateTime?   @updatedAt
+  currentPrice    Float?
+  priceUpdatedAt  DateTime?
 
   portfolioAssets   PortfolioAsset[]
   // transactions Transaction[]
