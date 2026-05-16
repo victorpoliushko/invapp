@@ -30,9 +30,11 @@ export const AssetRow = ({
           : "—"}
       </td>
       <td>{portfolioAsset.quantity}</td>
+      <td>{portfolioAsset.price ?? "—"}</td>
       <td>
         {loadingPrices[portfolioAsset.assetId] ? "..." : (currentPrices[portfolioAsset.assetId] ?? "—")}
       </td>
+      <td>—</td>
       <td className="actions">
         <TransactionButton assetId={portfolioAsset.assetId} />
         <button onClick={() => deleteAsset(portfolioAsset.assetId)}>
