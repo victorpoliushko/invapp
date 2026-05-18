@@ -53,6 +53,29 @@ body {
 :root {
   --section-max-width: 1440px;
   --section-padding: 1.5rem;
+
+  /* Font scale */
+  --font-xs: 0.75rem;    /* 12px */
+  --font-s:  0.875rem;   /* 14px */
+  --font-m:  1rem;       /* 16px */
+  --font-l:  1.25rem;    /* 20px */
+  --font-xl: 1.5rem;     /* 24px */
+}
+
+/* Font-size utility classes */
+.text-xs { font-size: var(--font-xs); }
+.text-s  { font-size: var(--font-s);  }
+.text-m  { font-size: var(--font-m);  }
+.text-l  { font-size: var(--font-l);  }
+.text-xl { font-size: var(--font-xl); }
+
+/* Page content wrapper — applied to every page via Layout, header excluded */
+.page-content {
+  max-width: var(--section-max-width);
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  font-family: "Inter", sans-serif;
+  font-size: var(--font-m);
 }
 
 .section-container {
@@ -187,33 +210,33 @@ body {
 }
 
 .advanced-level-3-left {
-  flex: 0 0 20%;
-  padding: 1rem;
+  flex: 2 1 0;
   display: flex;
   flex-direction: column;
   text-align: center;
   background: rgb(57, 57, 57);
   padding: 1rem;
+  min-width: 0;
 }
 
 .advanced-level-3-center {
-  flex: 0 0 50%;
-  padding: 1rem;
+  flex: 5 1 0;
   display: flex;
   flex-direction: column;
   text-align: center;
   background: rgb(57, 57, 57);
   padding: 1rem;
+  min-width: 0;
 }
 
 .advanced-level-3-right {
-  flex: 0 0 30%;
-  padding: 1rem;
+  flex: 3 1 0;
   display: flex;
   flex-direction: column;
   text-align: center;
   background: rgb(57, 57, 57);
   padding: 1rem;
+  min-width: 0;
 }
 
 .news-section {
