@@ -30,7 +30,7 @@ export const AssetRow = ({
           : "—"}
       </td>
       <td>{portfolioAsset.quantity}</td>
-      <td>{portfolioAsset.price ?? "—"}</td>
+      <td className="col-avg-price">{portfolioAsset.price ?? "—"}</td>
       <td>
         {loadingPrices[portfolioAsset.assetId] ? "..." : (currentPrices[portfolioAsset.assetId] ?? "—")}
       </td>

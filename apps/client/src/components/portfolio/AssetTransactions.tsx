@@ -12,7 +12,6 @@ export function AssetTransactions({
   assetTicker: string;
   portfolioAssetTransactions: TransactionsDto[];
 }) {
-  const COLUMN_COUNT = 7;
   const { refreshPortfolio } = usePortfolio();
   const token = localStorage.getItem("accessToken");
 
@@ -37,28 +36,22 @@ export function AssetTransactions({
 
   return (
     <tr className="detail-row">
-      <td colSpan={COLUMN_COUNT + 1}>
+      <td colSpan={8}>
         <div className="transactions-container">
           <table className="transactions-subtable">
             <thead>
               <tr>
-                <th scope="col">Actions</th>
                 <th scope="col">Type</th>
                 <th scope="col">Asset</th>
                 <th scope="col">Date</th>
                 <th scope="col">Quantity</th>
                 <th scope="col">Price</th>
-                <th scope="col">Delete</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
               {portfolioAssetTransactions?.map((transaction) => (
                 <tr key={transaction.id}>
-                  <td>
-                    <button title={`Edit`}>
-                      <img src={editIcon} height={20} width={20} alt="edit" />
-                    </button>
-                  </td>
                   <td style={{ color: transaction.type === "BUY" ? "#4caf50" : "#e57373" }}>
                     {transaction.type}
                   </td>
@@ -66,7 +59,10 @@ export function AssetTransactions({
                   <td>{new Date(transaction.date).toLocaleDateString()}</td>
                   <td>{transaction.quantityChange}</td>
                   <td>{transaction.pricePerUnit}</td>
-                  <td>
+                  <td className="actions">
+                    <button title="Edit">
+                      <img src={editIcon} height={20} width={20} alt="edit" />
+                    </button>
                     <button onClick={() => onDeleteTransaction(transaction.id)}>
                       <img src={deleteIcon} height={20} width={20} alt="delete" />
                     </button>
