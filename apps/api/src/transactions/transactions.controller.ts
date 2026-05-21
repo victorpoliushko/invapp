@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Patch,
   Post,
   UseGuards,
   UsePipes,
@@ -24,6 +25,14 @@ export class TransactionsController {
     @Body() createTransactionDTO: CreateTransactionDto,
   ) {
     return this.transactionsService.create(createTransactionDTO);
+  }
+
+  @Patch()
+  @UseGuards(AuthGuard('jwt'))
+  updateTransaction(
+    @Body() data: { id: string; date: string; quantityChange: number; pricePerUnit: number },
+  ) {
+    return this.transactionsService.update(data.id, data);
   }
 
   @Delete()

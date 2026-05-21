@@ -58,6 +58,51 @@ export class TransactionsService {
     return plainToInstance(TransactionsDto, transaction);
   }
 
+  async update(
+    id: string,
+    data: { date: string; quantityChange: number; pricePerUnit: number },
+  ) {
+    return await this.prismaService.$transaction(async (trx) => {
+      await trx.transaction.update({
+        where: { id },
+        data: {
+          date: new Date(data.date),
+          quantityChange: Number(data.quantityChange),
+          pricePerUnit: Number(data.pricePerUnit),
+        },
+      });
+
+      const updated = await trx.transaction.findUniqueOrThrow({ where: { id } });
+      const { portfolioId, assetId } = updated;
+
+      const allTransactions = await trx.transaction.findMany({
+        where: { portfolioId, assetId },
+      });
+
+      let totalQuantityBought = 0;
+      let totalQuantitySold = 0;
+      let totalCostBasis = 0;
+
+      allTransactions.forEach((t) => {
+        if (t.type === 'BUY') {
+          totalQuantityBought += t.quantityChange;
+          totalCostBasis += t.quantityChange * t.pricePerUnit;
+        } else if (t.type === 'SELL') {
+          totalQuantitySold += t.quantityChange;
+        }
+      });
+
+      const currentQuantity = totalQuantityBought - totalQuantitySold;
+      const avgBuyPrice =
+        totalQuantityBought > 0 ? totalCostBasis / totalQuantityBought : 0;
+
+      await trx.portfolioAsset.update({
+        where: { portfolioId_assetId: { portfolioId, assetId } },
+        data: { quantity: currentQuantity, price: avgBuyPrice },
+      });
+    });
+  }
+
   async delete(id: string) {
     return await this.prismaService.$transaction(async (trx) => {
       const transaction = await trx.transaction.findUniqueOrThrow({

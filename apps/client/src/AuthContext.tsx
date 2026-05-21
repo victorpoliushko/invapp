@@ -21,12 +21,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   const login = (newUserId: string, newAccess: string, newRefresh: string) => {
     setUserId(newUserId);
     setAccessToken(newAccess);
-    setRefreshToken(newRefresh);
     localStorage.setItem("userId", newUserId);
     localStorage.setItem("accessToken", newAccess);
     localStorage.setItem("refreshToken", newRefresh);
@@ -40,23 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("refreshToken");
   };
 
-  useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (userId && accessToken) {
-      setUserId(userId);
-      setAccessToken(accessToken);
-    }
-  }, []);
-
   const logout = async () => {
     try {
       await fetch("http://localhost:5173/api/auth-v2/logout", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
     } catch (e) {
       console.error("Logout request failed", e);
@@ -65,13 +51,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Always reads refreshToken from localStorage to avoid stale closure issues.
   const refreshAccessToken = async () => {
-    if (!refreshToken) cleanup();
+    const storedRefresh = localStorage.getItem("refreshToken");
+    if (!storedRefresh) {
+      cleanup();
+      return;
+    }
     try {
       const response = await fetch("http://localhost:5173/api/auth-v2/refresh", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
+        body: JSON.stringify({ refreshToken: storedRefresh }),
       });
 
       if (!response.ok) throw new Error("Refresh failed");
@@ -82,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("Token refreshed successfully");
     } catch (e) {
       console.error("Failed to refresh token", e);
+      cleanup();
     }
   };
 
@@ -90,34 +82,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedAccess = localStorage.getItem("accessToken");
     const storedRefresh = localStorage.getItem("refreshToken");
 
-    if (storedUserId && storedAccess && storedRefresh) {
-      try {
-        const { exp } = jwtDecode<JwtPayload>(storedAccess);
-        const now = Date.now() / 1000;
+    if (!storedUserId || !storedAccess || !storedRefresh) return;
 
-        if (exp < now) {
-          console.log("Access token expired, attempting refresh...");
-          setUserId(storedUserId);
-          setRefreshToken(storedRefresh);
-          refreshAccessToken();
-        } else {
-          setUserId(storedUserId);
-          setAccessToken(storedAccess);
-          setRefreshToken(storedRefresh);
-        }
-      } catch (e) {
-        cleanup();
+    try {
+      const { exp } = jwtDecode<JwtPayload>(storedAccess);
+      if (exp < Date.now() / 1000) {
+        console.log("Access token expired on load, refreshing...");
+        setUserId(storedUserId);
+        refreshAccessToken();
+      } else {
+        setUserId(storedUserId);
+        setAccessToken(storedAccess);
       }
+    } catch {
+      cleanup();
     }
   }, []);
 
+  // Schedule a proactive refresh 30s before expiry whenever accessToken changes.
   useEffect(() => {
     if (!accessToken) return;
-    const { exp } = jwtDecode<JwtPayload>(accessToken);
-    const expiresIn = exp * 1000 - Date.now() - 30_000;
-    if (expiresIn > 0) {
-       const timeout = setTimeout(refreshAccessToken, expiresIn);
+    try {
+      const { exp } = jwtDecode<JwtPayload>(accessToken);
+      const expiresIn = exp * 1000 - Date.now() - 30_000;
+      if (expiresIn <= 0) {
+        refreshAccessToken();
+        return;
+      }
+      const timeout = setTimeout(refreshAccessToken, expiresIn);
       return () => clearTimeout(timeout);
+    } catch {
+      cleanup();
     }
   }, [accessToken]);
 
