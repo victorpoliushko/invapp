@@ -33,4 +33,9 @@ export class AssetsController {
     return this.assetsService.findAssetInAPI(query);
   }
 
+  @Get('search-crypto')
+  async searchCrypto(@Query('q') query: string) {
+    return this.assetsService.searchCrypto(query);
+  }
+
 }

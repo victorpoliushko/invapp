@@ -183,6 +183,18 @@ return response.data;
     }
   }
 
+  async searchCrypto(query: string): Promise<{ id: string; symbol: string; name: string; thumb: string }[]> {
+    const url = `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`;
+    const response = await lastValueFrom(this.httpService.get(url));
+    const coins: any[] = response.data?.coins ?? [];
+    return coins.slice(0, 10).map((c) => ({
+      id: c.id,
+      symbol: c.symbol.toUpperCase(),
+      name: c.name,
+      thumb: c.thumb,
+    }));
+  }
+
   async findAssetInAPI(asset: string): Promise<Asset> {
     try {
       const apikey = this.configService.get<string>('API_KEY');
