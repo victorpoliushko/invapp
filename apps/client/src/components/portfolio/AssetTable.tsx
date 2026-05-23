@@ -5,9 +5,20 @@ import "../../pages/portfolio/PortfolioPage.css";
 import { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 import { AddAsset } from "./AddAsset";
 
-export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
+export const AssetTable = ({
+  portfolio,
+  assetType = "stock",
+}: {
+  portfolio: PortfolioDto;
+  assetType?: "stock" | "crypto";
+}) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const { portfolioAssets } = portfolio;
+
+  const portfolioAssets = portfolio.portfolioAssets.filter((pa) =>
+    assetType === "crypto"
+      ? pa.asset.type === "CRYPTOCURRENCY"
+      : pa.asset.type !== "CRYPTOCURRENCY",
+  );
 
   return (
     <table className="assets-table">
@@ -45,7 +56,7 @@ export const AssetTable = ({ portfolio }: { portfolio: PortfolioDto }) => {
             )}
           </Fragment>
         ))}
-        <AddAsset />
+        <AddAsset assetType={assetType} />
       </tbody>
     </table>
   );

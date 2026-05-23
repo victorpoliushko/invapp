@@ -54,6 +54,7 @@ enum AssetType {
 
 enum DataSource {
   ALPHA_VANTAGE
+  COINGECKO
 }
 
 model Asset {
@@ -63,6 +64,7 @@ model Asset {
   type            AssetType?
   exchange        String?
   dataSource      DataSource?
+  coingeckoId     String?
   updatedAt       DateTime?   @updatedAt
   currentPrice    Float?
   priceUpdatedAt  DateTime?

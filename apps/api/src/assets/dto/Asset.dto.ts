@@ -70,6 +70,10 @@ export class CreateAssetDto {
 
   @IsOptional()
   @IsString()
+  coingeckoId?: string;
+
+  @IsOptional()
+  @IsString()
   buyDate?: string;
 }
 

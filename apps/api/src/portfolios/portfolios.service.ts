@@ -114,7 +114,14 @@ export class PortfoliosService {
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
     if (!asset) {
-      asset = await this.assetsService.createAsset({ ticker: input.assetName });
+      asset = await this.assetsService.createAsset({
+        ticker: input.assetName,
+        ...(input.coingeckoId && {
+          coingeckoId: input.coingeckoId,
+          type: 'CRYPTOCURRENCY' as any,
+          dataSource: 'COINGECKO' as any,
+        }),
+      });
     }
 
     let portfolioAsset = await this.prismaService.portfolioAsset.findUnique({

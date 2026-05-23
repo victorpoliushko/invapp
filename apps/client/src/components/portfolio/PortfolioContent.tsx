@@ -3,7 +3,6 @@ import { AssetTable } from "./AssetTable";
 import "../../pages/portfolio/PortfolioPage.css";
 import { useEffect, useState } from "react";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
-import { AddAsset } from "./AddAsset";
 
 export function PortfolioContent() {
   const { portfolio, updatePortfolioName } = usePortfolio();
@@ -216,91 +215,7 @@ export function PortfolioContent() {
         />
         <label htmlFor="tab-crypto">Crypto</label>
         <div className="tab">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Account</th>
-                <th scope="col">Due Date</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Period</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="Account">Crypto - 3412</td>
-                <td data-label="Due Date">04/01/2016</td>
-                <td data-label="Quantity">$1,190</td>
-                <td data-label="Period">03/01/2016 - 03/31/2016</td>
-              </tr>
-              <tr>
-                <td scope="row" data-label="Account">
-                  Crypto - 6076
-                </td>
-                <td data-label="Due Date">03/01/2016</td>
-                <td data-label="Quantity">$2,443</td>
-                <td data-label="Period">02/01/2016 - 02/29/2016</td>
-              </tr>
-              <tr>
-                <td>
-                  <div className="asset-autocomplete">
-                    {/* <input
-                      type="text"
-                      name="asset"
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setAutocompleteEnabled(true);
-                        setSearchTerm(e.target.value);
-                      }}
-                      onKeyDown={(e) => {
-                        // if (e.key === "Enter") handleAddAsset();
-                      }}
-                      required
-                      placeholder="Asset"
-                      autoComplete="off"
-                    /> */}
-                  </div>
-                </td>
-                <td>
-                  <input
-                    type="date"
-                    name="dueDate"
-                    value={"mock crypto data"}
-                    readOnly
-                    onKeyDown={(e) => {
-                      // if (e.key === "Enter") handleAddAsset();
-                    }}
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    name="quantityChange"
-                    value={"mock crypto data"}
-                    readOnly
-                    onKeyDown={(e) => {
-                      // if (e.key === "Enter") handleAddAsset();
-                    }}
-                    required
-                    placeholder="Quantity"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="pricePerUnit"
-                    value={"mock crypto data"}
-                    readOnly
-                    onKeyDown={(e) => {
-                      // if (e.key === "Enter") handleAddAsset();
-                    }}
-                    required
-                    placeholder="Period"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <AssetTable portfolio={portfolio} assetType="crypto" />
         </div>
       </div>
     </section>

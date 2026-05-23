@@ -73,7 +73,7 @@ export class AssetsService {
 
   async getSharePrice(asset: string): Promise<number> {
     const symbol = asset.trim().toUpperCase();
-    const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+    const CACHE_TTL_MS = 60 * 60 * 1000;
 
     const existing = await this.prismaService.asset.findUnique({ where: { ticker: symbol } });
     if (
@@ -82,6 +82,10 @@ export class AssetsService {
       Date.now() - existing.priceUpdatedAt.getTime() < CACHE_TTL_MS
     ) {
       return existing.currentPrice;
+    }
+
+    if (existing?.dataSource === 'COINGECKO' && existing.coingeckoId) {
+      return this.getCryptoPrice(existing.coingeckoId, symbol);
     }
 
     try {
@@ -106,6 +110,27 @@ export class AssetsService {
       return price;
     } catch (error) {
       console.error(`API error for ${asset}:`, error.message);
+      return existing?.currentPrice ?? 0;
+    }
+  }
+
+  async getCryptoPrice(coingeckoId: string, ticker: string): Promise<number> {
+    try {
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoId}&vs_currencies=usd`;
+      const response = await lastValueFrom(this.httpService.get(url));
+      const price: number = response.data?.[coingeckoId]?.usd;
+
+      if (!price) return 0;
+
+      await this.prismaService.asset.update({
+        where: { ticker: ticker.toUpperCase() },
+        data: { currentPrice: price, priceUpdatedAt: new Date() },
+      });
+
+      return price;
+    } catch (error) {
+      console.error(`CoinGecko price error for ${coingeckoId}:`, error.message);
+      const existing = await this.prismaService.asset.findUnique({ where: { ticker: ticker.toUpperCase() } });
       return existing?.currentPrice ?? 0;
     }
   }
@@ -138,6 +163,7 @@ return response.data;
         type: input.type,
         exchange: input.exchange,
         dataSource: input.dataSource,
+        coingeckoId: input.coingeckoId,
       },
     });
   }

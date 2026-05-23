@@ -4,6 +4,7 @@ import {
   IsDefined,
   IsEnum,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   ValidateIf,
@@ -38,4 +39,8 @@ export class AddAssetInputDto {
     message: 'type must be "BUY" or "SELL"',
   })
   type: TransactionType;
+
+  @IsOptional()
+  @IsString()
+  coingeckoId?: string;
 }
