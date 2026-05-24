@@ -21,6 +21,7 @@ export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypt
   const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
   const [selectedCoingeckoId, setSelectedCoingeckoId] = useState<string | null>(null);
 
+  const [transactionType, setTransactionType] = useState<"BUY" | "SELL">("BUY");
   const [newAsset, setNewAsset] = useState({
     assetName: "",
     dueDate: "",
@@ -67,7 +68,7 @@ export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypt
         date: new Date(dueDate).toISOString(),
         quantityChange: Number(quantityChange),
         pricePerUnit: Number(pricePerUnit),
-        type: "BUY",
+        type: transactionType,
       };
       if (assetType === "crypto" && selectedCoingeckoId) {
         body.coingeckoId = selectedCoingeckoId;
@@ -97,7 +98,15 @@ export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypt
 
   return (
     <tr>
-      <td></td>
+      <td>
+        <select
+          value={transactionType}
+          onChange={(e) => setTransactionType(e.target.value as "BUY" | "SELL")}
+        >
+          <option value="BUY">BUY</option>
+          <option value="SELL">SELL</option>
+        </select>
+      </td>
       <td>
         <div className="asset-autocomplete">
           <input
