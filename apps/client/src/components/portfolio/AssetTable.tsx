@@ -31,6 +31,7 @@ export const AssetTable = ({
           <th scope="col" className="col-avg-price">Avg price</th>
           <th scope="col">Current pricePerUnit</th>
           <th scope="col">% change</th>
+          <th scope="col">Total return</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>

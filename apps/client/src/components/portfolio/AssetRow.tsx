@@ -20,6 +20,10 @@ export const AssetRow = ({
     currentPrice != null && avgPrice != null && avgPrice !== 0
       ? ((currentPrice - avgPrice) / avgPrice) * 100
       : null;
+  const totalReturn =
+    currentPrice != null && avgPrice != null
+      ? (currentPrice - avgPrice) * portfolioAsset.quantity
+      : null;
 
   return (
     <tr>
@@ -39,6 +43,9 @@ export const AssetRow = ({
       </td>
       <td style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "#4caf50" : "#e57373" }}>
         {pctChange == null ? "—" : `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(2)}%`}
+      </td>
+      <td style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "#4caf50" : "#e57373" }}>
+        {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn)}`}
       </td>
       <td className="actions">
         <button onClick={() => deleteAsset(portfolioAsset.assetId)}>
