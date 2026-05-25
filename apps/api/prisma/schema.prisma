@@ -80,7 +80,27 @@ model Portfolio {
   user   User?  @relation(fields: [userId], references: [id])
   userId String
 
-  portfolioAssets PortfolioAsset[]
+  portfolioAssets  PortfolioAsset[]
+  realEstateAssets RealEstate[]
+}
+
+enum RealEstateType {
+  APARTMENT
+  HOUSE
+  COMMERCIAL
+}
+
+model RealEstate {
+  id            String         @id @default(uuid())
+  name          String
+  type          RealEstateType
+  purchaseDate  DateTime
+  purchasePrice Float
+  monthlyRent   Float
+  occupancyPct  Float          @default(100)
+
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId String
 }
 
 model PortfolioAsset {

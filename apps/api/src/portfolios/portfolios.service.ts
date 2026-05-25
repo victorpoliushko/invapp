@@ -53,6 +53,7 @@ export class PortfoliosService {
             },
           },
         },
+        realEstateAssets: true,
       },
     });
     return plainToInstance(PortfolioDto, portfolio);
