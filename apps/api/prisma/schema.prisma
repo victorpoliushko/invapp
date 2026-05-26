@@ -92,15 +92,25 @@ enum RealEstateType {
 
 model RealEstate {
   id            String         @id @default(uuid())
+  code          String
   name          String
   type          RealEstateType
   purchaseDate  DateTime
   purchasePrice Float
-  monthlyRent   Float
-  occupancyPct  Float          @default(100)
 
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
-  portfolioId String
+  portfolio     Portfolio              @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId   String
+  transactions  RealEstateTransaction[]
+}
+
+model RealEstateTransaction {
+  id           String     @id @default(uuid())
+  startDate    DateTime
+  endDate      DateTime
+  monthlyRent  Float
+
+  realEstate   RealEstate @relation(fields: [realEstateId], references: [id], onDelete: Cascade)
+  realEstateId String
 }
 
 model PortfolioAsset {

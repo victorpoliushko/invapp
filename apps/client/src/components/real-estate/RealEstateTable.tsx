@@ -1,21 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { Fragment, useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { RealEstateRow } from "./RealEstateRow";
+import { RealEstateTransactions } from "./RealEstateTransactions";
 import { AddRealEstate } from "./AddRealEstate";
-
-type RealEstate = {
-  id: string;
-  name: string;
-  type: string;
-  purchaseDate: string;
-  purchasePrice: number;
-  monthlyRent: number;
-  occupancyPct: number;
-};
+import { RealEstate } from "./types";
 
 export function RealEstateTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
   const [properties, setProperties] = useState<RealEstate[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!portfolioId) return;
@@ -42,11 +35,12 @@ export function RealEstateTable() {
     <table className="assets-table">
       <thead>
         <tr>
+          <th></th>
+          <th scope="col">Code</th>
           <th scope="col">Name</th>
           <th scope="col">Type</th>
           <th scope="col">Purchase date</th>
           <th scope="col">Purchase price</th>
-          <th scope="col">Monthly rent</th>
           <th scope="col">Occupancy %</th>
           <th scope="col">Annual net income</th>
           <th scope="col">Annual net income %</th>
@@ -56,7 +50,21 @@ export function RealEstateTable() {
       </thead>
       <tbody>
         {properties.map((p) => (
-          <RealEstateRow key={p.id} property={p} onDelete={handleDelete} />
+          <Fragment key={p.id}>
+            <RealEstateRow
+              property={p}
+              isExpanded={expandedId === p.id}
+              onExpand={() => setExpandedId(expandedId === p.id ? null : p.id)}
+              onDelete={handleDelete}
+            />
+            {expandedId === p.id && (
+              <RealEstateTransactions
+                realEstateId={p.id}
+                transactions={p.transactions}
+                onChanged={load}
+              />
+            )}
+          </Fragment>
         ))}
         <AddRealEstate onAdded={load} />
       </tbody>

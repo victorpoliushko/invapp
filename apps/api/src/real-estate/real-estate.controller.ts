@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RealEstateService } from './real-estate.service';
-import { CreateRealEstateDto } from './dto/real-estate.dto';
+import { CreateRealEstateDto, CreateRealEstateTransactionDto } from './dto/real-estate.dto';
 
 @Controller('real-estate')
 @UseGuards(AuthGuard('jwt'))
@@ -22,5 +22,16 @@ export class RealEstateController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.realEstateService.delete(id);
+  }
+
+  @Post('transaction')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  createTransaction(@Body() dto: CreateRealEstateTransactionDto) {
+    return this.realEstateService.createTransaction(dto);
+  }
+
+  @Delete('transaction/:id')
+  deleteTransaction(@Param('id') id: string) {
+    return this.realEstateService.deleteTransaction(id);
   }
 }

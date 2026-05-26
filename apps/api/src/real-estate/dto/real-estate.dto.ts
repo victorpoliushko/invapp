@@ -1,7 +1,10 @@
 import { RealEstateType } from '@prisma/client';
-import { IsEnum, IsNumber, IsString, IsUUID, Min, Max, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsString, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateRealEstateDto {
+  @IsString()
+  code: string;
+
   @IsString()
   name: string;
 
@@ -14,15 +17,20 @@ export class CreateRealEstateDto {
   @IsNumber()
   purchasePrice: number;
 
-  @IsNumber()
-  monthlyRent: number;
-
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  @IsOptional()
-  occupancyPct?: number;
-
   @IsUUID()
   portfolioId: string;
+}
+
+export class CreateRealEstateTransactionDto {
+  @IsUUID()
+  realEstateId: string;
+
+  @IsString()
+  startDate: string;
+
+  @IsString()
+  endDate: string;
+
+  @IsNumber()
+  monthlyRent: number;
 }
