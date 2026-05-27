@@ -31,6 +31,34 @@ export class RealEstateService {
     return this.prismaService.realEstate.delete({ where: { id } });
   }
 
+  async addTransactionByCode(portfolioId: string, code: string, startDate: string, endDate: string, monthlyRent: number) {
+    let property = await this.prismaService.realEstate.findFirst({
+      where: { portfolioId, code },
+    });
+
+    if (!property) {
+      property = await this.prismaService.realEstate.create({
+        data: {
+          code,
+          name: code,
+          type: 'APARTMENT',
+          purchaseDate: new Date(),
+          purchasePrice: 0,
+          portfolioId,
+        },
+      });
+    }
+
+    return this.prismaService.realEstateTransaction.create({
+      data: {
+        realEstateId: property.id,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        monthlyRent: Number(monthlyRent),
+      },
+    });
+  }
+
   async createTransaction(dto: CreateRealEstateTransactionDto) {
     return this.prismaService.realEstateTransaction.create({
       data: {
@@ -38,6 +66,17 @@ export class RealEstateService {
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
         monthlyRent: dto.monthlyRent,
+      },
+    });
+  }
+
+  async updateTransaction(id: string, data: { startDate: string; endDate: string; monthlyRent: number }) {
+    return this.prismaService.realEstateTransaction.update({
+      where: { id },
+      data: {
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        monthlyRent: Number(data.monthlyRent),
       },
     });
   }

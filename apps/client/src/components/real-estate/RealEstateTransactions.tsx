@@ -1,4 +1,5 @@
 import { useState } from "react";
+import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import { RealEstateTransaction } from "./types";
 
@@ -8,25 +9,41 @@ type Props = {
   onChanged: () => void;
 };
 
-export function RealEstateTransactions({ realEstateId, transactions, onChanged }: Props) {
-  const token = () => localStorage.getItem("accessToken");
-  const [form, setForm] = useState({ startDate: "", endDate: "", monthlyRent: "" });
+type EditState = { startDate: string; endDate: string; monthlyRent: string };
 
-  const handleAdd = async () => {
-    const { startDate, endDate, monthlyRent } = form;
-    if (!startDate || !endDate || !monthlyRent) return;
-    const res = await fetch("/api/real-estate/transaction", {
-      method: "POST",
+function toInputDate(iso: string) {
+  return iso.split("T")[0];
+}
+
+export function RealEstateTransactions({ realEstateId: _realEstateId, transactions, onChanged }: Props) {
+  const token = () => localStorage.getItem("accessToken");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editState, setEditState] = useState<EditState | null>(null);
+
+  const startEdit = (t: RealEstateTransaction) => {
+    setEditingId(t.id);
+    setEditState({
+      startDate: toInputDate(t.startDate),
+      endDate: toInputDate(t.endDate),
+      monthlyRent: String(t.monthlyRent),
+    });
+  };
+
+  const cancelEdit = () => { setEditingId(null); setEditState(null); };
+
+  const saveEdit = async (id: string) => {
+    if (!editState) return;
+    const res = await fetch(`/api/real-estate/transaction/${id}`, {
+      method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
       body: JSON.stringify({
-        realEstateId,
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-        monthlyRent: Number(monthlyRent),
+        startDate: new Date(editState.startDate).toISOString(),
+        endDate: new Date(editState.endDate).toISOString(),
+        monthlyRent: Number(editState.monthlyRent),
       }),
     });
-    if (!res.ok) { alert("Failed to add transaction"); return; }
-    setForm({ startDate: "", endDate: "", monthlyRent: "" });
+    if (!res.ok) { alert("Failed to update transaction"); return; }
+    cancelEdit();
     onChanged();
   };
 
@@ -41,7 +58,7 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
 
   return (
     <tr className="detail-row">
-      <td colSpan={10}>
+      <td colSpan={11}>
         <div className="transactions-container">
           <table className="transactions-subtable">
             <thead>
@@ -53,46 +70,51 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
               </tr>
             </thead>
             <tbody>
-              {transactions.map((t) => (
-                <tr key={t.id}>
-                  <td>{new Date(t.startDate).toLocaleDateString()}</td>
-                  <td>{new Date(t.endDate).toLocaleDateString()}</td>
-                  <td>{t.monthlyRent.toLocaleString()}</td>
-                  <td className="actions">
-                    <button onClick={() => handleDelete(t.id)}>
-                      <img src={deleteIcon} height={20} width={20} alt="delete" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              <tr>
-                <td>
-                  <input
-                    type="date"
-                    value={form.startDate}
-                    onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="date"
-                    value={form.endDate}
-                    onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={form.monthlyRent}
-                    onChange={(e) => setForm({ ...form, monthlyRent: e.target.value })}
-                    placeholder="Rent"
-                    onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-                  />
-                </td>
-                <td>
-                  <button onClick={handleAdd}>Add</button>
-                </td>
-              </tr>
+              {transactions.map((t) =>
+                editingId === t.id && editState ? (
+                  <tr key={t.id}>
+                    <td>
+                      <input
+                        type="date"
+                        value={editState.startDate}
+                        onChange={(e) => setEditState({ ...editState, startDate: e.target.value })}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        value={editState.endDate}
+                        onChange={(e) => setEditState({ ...editState, endDate: e.target.value })}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editState.monthlyRent}
+                        onChange={(e) => setEditState({ ...editState, monthlyRent: e.target.value })}
+                      />
+                    </td>
+                    <td className="actions">
+                      <button onClick={() => saveEdit(t.id)}>Save</button>
+                      <button onClick={cancelEdit}>Cancel</button>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={t.id}>
+                    <td>{new Date(t.startDate).toLocaleDateString()}</td>
+                    <td>{new Date(t.endDate).toLocaleDateString()}</td>
+                    <td>{t.monthlyRent.toLocaleString()}</td>
+                    <td className="actions">
+                      <button onClick={() => startEdit(t)}>
+                        <img src={editIcon} height={20} width={20} alt="edit" />
+                      </button>
+                      <button onClick={() => handleDelete(t.id)}>
+                        <img src={deleteIcon} height={20} width={20} alt="delete" />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>

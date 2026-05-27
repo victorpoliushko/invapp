@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { RealEstateRow } from "./RealEstateRow";
 import { RealEstateTransactions } from "./RealEstateTransactions";
-import { AddRealEstate } from "./AddRealEstate";
+import { AddRealEstateTransaction } from "./AddRealEstateTransaction";
 import { RealEstate } from "./types";
 
 export function RealEstateTable() {
@@ -66,7 +66,7 @@ export function RealEstateTable() {
             )}
           </Fragment>
         ))}
-        <AddRealEstate onAdded={load} />
+        <AddRealEstateTransaction onAdded={load} />
       </tbody>
     </table>
   );

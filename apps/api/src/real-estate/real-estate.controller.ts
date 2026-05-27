@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RealEstateService } from './real-estate.service';
 import { CreateRealEstateDto, CreateRealEstateTransactionDto } from './dto/real-estate.dto';
@@ -28,6 +28,23 @@ export class RealEstateController {
   @UsePipes(new ValidationPipe({ transform: true }))
   createTransaction(@Body() dto: CreateRealEstateTransactionDto) {
     return this.realEstateService.createTransaction(dto);
+  }
+
+  @Post('transaction/by-code')
+  addTransactionByCode(
+    @Body() body: { portfolioId: string; code: string; startDate: string; endDate: string; monthlyRent: number },
+  ) {
+    return this.realEstateService.addTransactionByCode(
+      body.portfolioId, body.code, body.startDate, body.endDate, body.monthlyRent,
+    );
+  }
+
+  @Patch('transaction/:id')
+  updateTransaction(
+    @Param('id') id: string,
+    @Body() data: { startDate: string; endDate: string; monthlyRent: number },
+  ) {
+    return this.realEstateService.updateTransaction(id, data);
   }
 
   @Delete('transaction/:id')
