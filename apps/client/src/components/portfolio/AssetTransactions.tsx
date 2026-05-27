@@ -80,7 +80,7 @@ export function AssetTransactions({
 
   return (
     <tr className="detail-row">
-      <td colSpan={9}>
+      <td colSpan={10}>
         <div className="transactions-container">
           <table className="transactions-subtable">
             <thead>

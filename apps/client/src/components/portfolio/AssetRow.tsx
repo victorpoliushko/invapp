@@ -24,6 +24,9 @@ export const AssetRow = ({
     currentPrice != null && avgPrice != null
       ? (currentPrice - avgPrice) * portfolioAsset.quantity
       : null;
+  const totalPosition = portfolioAsset.transactions
+    .filter((t) => t.type === "BUY")
+    .reduce((sum, t) => sum + t.quantityChange * t.pricePerUnit, 0);
 
   return (
     <tr>
@@ -44,6 +47,7 @@ export const AssetRow = ({
       <td style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "#4caf50" : "#e57373" }}>
         {pctChange == null ? "—" : `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(2)}%`}
       </td>
+      <td>{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
       <td style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "#4caf50" : "#e57373" }}>
         {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn)}`}
       </td>

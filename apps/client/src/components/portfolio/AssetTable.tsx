@@ -5,6 +5,12 @@ import "../../pages/portfolio/PortfolioPage.css";
 import { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
 import { AddAsset } from "./AddAsset";
 
+function totalPosition(pa: PortfolioDto["portfolioAssets"][number]): number {
+  return pa.transactions
+    .filter((t) => t.type === "BUY")
+    .reduce((sum, t) => sum + t.quantityChange * t.pricePerUnit, 0);
+}
+
 export const AssetTable = ({
   portfolio,
   assetType = "stock",
@@ -14,11 +20,13 @@ export const AssetTable = ({
 }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const portfolioAssets = portfolio.portfolioAssets.filter((pa) =>
-    assetType === "crypto"
-      ? pa.asset.type === "CRYPTOCURRENCY"
-      : pa.asset.type !== "CRYPTOCURRENCY",
-  );
+  const portfolioAssets = portfolio.portfolioAssets
+    .filter((pa) =>
+      assetType === "crypto"
+        ? pa.asset.type === "CRYPTOCURRENCY"
+        : pa.asset.type !== "CRYPTOCURRENCY",
+    )
+    .sort((a, b) => totalPosition(b) - totalPosition(a));
 
   return (
     <table className="assets-table">
@@ -31,6 +39,7 @@ export const AssetTable = ({
           <th scope="col" className="col-avg-price">Avg price</th>
           <th scope="col">Current pricePerUnit</th>
           <th scope="col">% change</th>
+          <th scope="col">Total position</th>
           <th scope="col">Total return</th>
           <th scope="col">Actions</th>
         </tr>
