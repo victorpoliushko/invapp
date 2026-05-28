@@ -4,6 +4,7 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 import "../../pages/portfolio/PortfolioPage.css";
+import { TRANSACTION_COLORS } from "./transactionColors";
 
 type EditState = {
   date: string;
@@ -97,7 +98,7 @@ export function AssetTransactions({
               {portfolioAssetTransactions?.map((transaction) =>
                 editingId === transaction.id && editState ? (
                   <tr key={transaction.id}>
-                    <td style={{ color: transaction.type === "BUY" ? "#4caf50" : "#e57373" }}>
+                    <td style={{ color: TRANSACTION_COLORS[transaction.type as "BUY" | "SELL"] }}>
                       {transaction.type}
                     </td>
                     <td>{assetTicker}</td>
@@ -129,7 +130,7 @@ export function AssetTransactions({
                   </tr>
                 ) : (
                   <tr key={transaction.id}>
-                    <td style={{ color: transaction.type === "BUY" ? "#4caf50" : "#e57373" }}>
+                    <td style={{ color: TRANSACTION_COLORS[transaction.type as "BUY" | "SELL"] }}>
                       {transaction.type}
                     </td>
                     <td>{assetTicker}</td>

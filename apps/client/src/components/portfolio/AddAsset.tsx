@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { TRANSACTION_COLORS } from "./transactionColors";
 
 type StockSuggestion = { assetSymbol: string; name: string };
 type CryptoSuggestion = { id: string; symbol: string; name: string };
@@ -99,13 +100,22 @@ export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypt
   return (
     <tr>
       <td>
-        <select
-          value={transactionType}
-          onChange={(e) => setTransactionType(e.target.value as "BUY" | "SELL")}
-        >
-          <option value="BUY">BUY</option>
-          <option value="SELL">SELL</option>
-        </select>
+        <div style={{ display: "flex", gap: 2 }}>
+          {(["BUY", "SELL"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTransactionType(t)}
+              style={{
+                color: TRANSACTION_COLORS[t],
+                fontWeight: transactionType === t ? "bold" : "normal",
+                opacity: transactionType === t ? 1 : 0.4,
+                padding: "2px 6px",
+              }}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
       </td>
       <td>
         <div className="asset-autocomplete">
@@ -182,6 +192,8 @@ export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypt
           placeholder="Price"
         />
       </td>
+      <td></td>
+      <td></td>
       <td></td>
       <td></td>
       <td>
