@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react';
 
 export default function MarketNews() {
   const container = useRef<HTMLDivElement>(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
-    const currentContainer = container.current;
-    if (!currentContainer) return;
+    if (initialized.current || !container.current) return;
+    initialized.current = true;
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js";
@@ -17,17 +18,11 @@ export default function MarketNews() {
       "displayMode": "regular",
       "width": "100%",
       "height": "100%",
-      "colorTheme": "dark", 
+      "colorTheme": "dark",
       "locale": "en"
     });
 
-    currentContainer.appendChild(script);
-
-    return () => {
-      if (currentContainer) {
-        currentContainer.innerHTML = ""; 
-      }
-    };
+    container.current.appendChild(script);
   }, []);
 
   return (

@@ -1,4 +1,5 @@
 import "../App.css";
+import { LocationPicker } from "../components/LocationPicker";
 
 export const HomePage = () => {
   return (

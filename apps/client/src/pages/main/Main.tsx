@@ -1,16 +1,14 @@
 import "../../App.css";
+import { LocationPicker } from "../../components/LocationPicker";
 import MarketTicker from "../../components/marketData";
 import MarketNews from "../../components/marketNews";
 
 export const MainPage = () => {
   return (
     <>
-      <div className="">
-        {/* <MarketHeatmap /> */}
-        
-      </div>
+      <div className="">{/* <MarketHeatmap /> */}</div>
 
-            <section className="stocks-section section-container">
+      <section className="stocks-section section-container">
         <h1>Market data</h1>
         <MarketTicker />
         {/* <h1>Stocks</h1>
@@ -96,10 +94,11 @@ export const MainPage = () => {
         </div> */}
       </section>
 
-
-
       <section className="realestate-section section-container section-flex-container">
-        <h1>Real estate</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, alignSelf: "flex-start" }}>
+          <h1 style={{ margin: 0 }}>Real estate</h1>
+          <LocationPicker />
+        </div>
         <div className="realestate-city">
           <div className="realestate-city-cols">
             <div className="realestate-city-col">
