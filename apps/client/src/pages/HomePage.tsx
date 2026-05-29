@@ -29,24 +29,27 @@ export const HomePage = () => {
         <h1 className="pros-section-1-h1">A single tool to track your gains</h1>
         <div className="pros-section-cols">
           <div className="pros-section-div">
-            <h3>Easy to use</h3>
+            <h3>Stocks & Crypto</h3>
             <p>
-              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
-              ipsum Lorem ipsum{" "}
+              Track your stock and cryptocurrency positions in one place. See
+              average buy price, current price, % change, and total return for
+              every asset — updated in real time.
             </p>
           </div>
           <div className="pros-section-div">
-            <h3>Easy to use</h3>
+            <h3>Real Estate</h3>
             <p>
-              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
-              ipsum Lorem ipsum{" "}
+              Log rental properties by code and record occupation periods with
+              monthly rent. The app calculates occupancy rate, annual net income,
+              and total rental return automatically.
             </p>
           </div>
           <div className="pros-section-div">
-            <h3>Easy to use</h3>
+            <h3>One Dashboard</h3>
             <p>
-              Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem
-              ipsum Lorem ipsum{" "}
+              All your assets - equities, crypto, and real estate - live in a
+              single portfolio. Add BUY or SELL transactions, review history
+              inline, and see your total position sorted by size at a glance.
             </p>
           </div>
         </div>
