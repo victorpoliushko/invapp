@@ -49,7 +49,7 @@ export const AssetRow = ({
       </td>
       <td>{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
       <td style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "#4caf50" : "#e57373" }}>
-        {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn)}`}
+        {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn).toLocaleString()}`}
       </td>
       <td className="actions">
         <button onClick={() => deleteAsset(portfolioAsset.assetId)}>
