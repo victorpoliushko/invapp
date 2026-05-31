@@ -56,7 +56,7 @@
   box-sizing: border-box;
   font-weight: 300;
   line-height: 1.5;
-  max-width: 60rem;
+  max-width: 95vw;
   margin: 0 auto;
   font-size: 110%;
   display: flex;
@@ -76,8 +76,11 @@ table {
   border-collapse: collapse;
   margin: 0;
   padding: 0;
-  /* width: 100%; */
-  /* table-layout: fixed; */
+  width: 100%;
+}
+
+.assets-table {
+  table-layout: fixed;
 }
 
 table caption {
@@ -98,8 +101,9 @@ table td {
 }
 
 table th {
-  font-size: .85em;
-  letter-spacing: .1em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: .05em;
   text-transform: uppercase;
 }
 
@@ -107,7 +111,7 @@ table th {
   position: relative;
   display: inline-block;
   width: 100%;
-  min-width: 150px;
+  min-width: 120px;
 }
 
 .col-avg-price {
