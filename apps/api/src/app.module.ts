@@ -25,6 +25,7 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { UploadModule } from './upload/upload.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { RealEstateModule } from './real-estate/real-estate.module';
+import { BondsModule } from './bonds/bonds.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { RealEstateModule } from './real-estate/real-estate.module';
     AssetsModule,
     MixedAssetsModule,
     RealEstateModule,
+    BondsModule,
     PrometheusModule.register(),
     UploadModule
   ],

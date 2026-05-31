@@ -82,6 +82,7 @@ model Portfolio {
 
   portfolioAssets  PortfolioAsset[]
   realEstateAssets RealEstate[]
+  bonds            Bond[]
 }
 
 enum RealEstateType {
@@ -168,6 +169,38 @@ model Transaction {
 enum TransactionType {
   BUY
   SELL
+}
+
+enum CouponFrequency {
+  ANNUAL
+  SEMI_ANNUAL
+  QUARTERLY
+  MONTHLY
+}
+
+model Bond {
+  id              String          @id @default(uuid())
+  isin            String
+  name            String
+  faceValue       Float
+  couponRate      Float
+  couponFrequency CouponFrequency
+  maturityDate    DateTime
+
+  portfolio    Portfolio       @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId  String
+  transactions BondTransaction[]
+}
+
+model BondTransaction {
+  id           String          @id @default(uuid())
+  type         TransactionType
+  quantity     Float
+  pricePerUnit Float
+  date         DateTime
+
+  bond   Bond   @relation(fields: [bondId], references: [id], onDelete: Cascade)
+  bondId String
 }
 
 // TODO

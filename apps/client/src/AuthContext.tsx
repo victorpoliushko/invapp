@@ -70,6 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
       setAccessToken(data.accessToken);
       localStorage.setItem("accessToken", data.accessToken);
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
       console.log("Token refreshed successfully");
     } catch (e) {
       console.error("Failed to refresh token", e);
