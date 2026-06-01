@@ -15,10 +15,30 @@ function toInputDate(iso: string) {
   return iso.split("T")[0];
 }
 
-export function RealEstateTransactions({ realEstateId: _realEstateId, transactions, onChanged }: Props) {
+export function RealEstateTransactions({ realEstateId, transactions, onChanged }: Props) {
   const token = () => localStorage.getItem("accessToken");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editState, setEditState] = useState<EditState | null>(null);
+  const [newTx, setNewTx] = useState({ startDate: "", endDate: "", monthlyRent: "" });
+  const setTx = (field: string, value: string) => setNewTx((f) => ({ ...f, [field]: value }));
+
+  const handleAddTransaction = async () => {
+    const { startDate, endDate, monthlyRent } = newTx;
+    if (!startDate || !endDate || !monthlyRent) return;
+    const res = await fetch("/api/real-estate/transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+      body: JSON.stringify({
+        realEstateId,
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        monthlyRent: Number(monthlyRent),
+      }),
+    });
+    if (!res.ok) { alert("Failed to add transaction"); return; }
+    setNewTx({ startDate: "", endDate: "", monthlyRent: "" });
+    onChanged();
+  };
 
   const startEdit = (t: RealEstateTransaction) => {
     setEditingId(t.id);
@@ -70,6 +90,12 @@ export function RealEstateTransactions({ realEstateId: _realEstateId, transactio
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td><input type="date" value={newTx.startDate} onChange={(e) => setTx("startDate", e.target.value)} title="Start date" /></td>
+                <td><input type="date" value={newTx.endDate} onChange={(e) => setTx("endDate", e.target.value)} title="End date" /></td>
+                <td><input type="number" value={newTx.monthlyRent} onChange={(e) => setTx("monthlyRent", e.target.value)} placeholder="Monthly rent" onKeyDown={(e) => e.key === "Enter" && handleAddTransaction()} /></td>
+                <td className="actions"><button onClick={handleAddTransaction}>Add</button></td>
+              </tr>
               {transactions.map((t) =>
                 editingId === t.id && editState ? (
                   <tr key={t.id}>
