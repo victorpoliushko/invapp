@@ -1,7 +1,6 @@
-import { Fragment, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { BondRow } from "./BondRow";
-import { BondTransactions } from "./BondTransactions";
 import { AddBondTransaction } from "./AddBondTransaction";
 import { Bond } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
@@ -9,7 +8,6 @@ import "../../pages/portfolio/PortfolioPage.css";
 export function BondTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
   const [bonds, setBonds] = useState<Bond[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!portfolioId) return;
@@ -36,12 +34,11 @@ export function BondTable() {
     <table className="assets-table">
       <thead>
         <tr>
-          <th></th>
           <th scope="col">ISIN</th>
           <th scope="col">Name</th>
           <th scope="col">Date bought</th>
           <th scope="col">Quantity</th>
-          <th scope="col">Avg price</th>
+          <th scope="col">Purchase price</th>
           <th scope="col">Face value</th>
           <th scope="col">Coupon %</th>
           <th scope="col">Frequency</th>
@@ -52,21 +49,7 @@ export function BondTable() {
       </thead>
       <tbody>
         {bonds.map((bond) => (
-          <Fragment key={bond.id}>
-            <BondRow
-              bond={bond}
-              isExpanded={expandedId === bond.id}
-              onExpand={() => setExpandedId(expandedId === bond.id ? null : bond.id)}
-              onDelete={handleDelete}
-            />
-            {expandedId === bond.id && (
-              <BondTransactions
-                bondId={bond.id}
-                transactions={bond.transactions}
-                onChanged={load}
-              />
-            )}
-          </Fragment>
+          <BondRow key={bond.id} bond={bond} onDelete={handleDelete} />
         ))}
         <AddBondTransaction onAdded={load} />
       </tbody>

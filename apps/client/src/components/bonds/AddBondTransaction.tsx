@@ -6,46 +6,42 @@ type Props = { onAdded: () => void };
 export function AddBondTransaction({ onAdded }: Props) {
   const { id: portfolioId } = useParams<{ id: string }>();
   const [form, setForm] = useState({
-    isin: "", name: "", faceValue: "", couponRate: "",
-    couponFrequency: "ANNUAL", quantity: "", pricePerUnit: "", date: "",
+    isin: "", name: "", purchaseDate: "", quantity: "", purchasePrice: "",
+    faceValue: "", couponRate: "", couponFrequency: "ANNUAL",
   });
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleAdd = async () => {
-    const { isin, name, faceValue, couponRate, couponFrequency, quantity, pricePerUnit, date } = form;
-    if (!portfolioId || !isin || !name || !faceValue || !couponRate || !quantity || !pricePerUnit || !date) return;
+    const { isin, name, purchaseDate, quantity, purchasePrice, faceValue, couponRate, couponFrequency } = form;
+    if (!portfolioId || !isin || !name || !purchaseDate || !quantity || !purchasePrice || !faceValue || !couponRate) return;
 
     const token = localStorage.getItem("accessToken");
-    const res = await fetch("/api/bonds/transaction/by-isin", {
+    const res = await fetch("/api/bonds", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        portfolioId, isin, name,
+        portfolioId, isin, name, couponFrequency,
+        purchaseDate: new Date(purchaseDate).toISOString(),
+        quantity: Number(quantity),
+        purchasePrice: Number(purchasePrice),
         faceValue: Number(faceValue),
         couponRate: Number(couponRate),
-        couponFrequency,
-        maturityDate: new Date("2099-01-01").toISOString(),
-        type: "BUY",
-        quantity: Number(quantity),
-        pricePerUnit: Number(pricePerUnit),
-        date: new Date(date).toISOString(),
       }),
     });
 
-    if (!res.ok) { alert("Failed to add bond transaction"); return; }
-    setForm({ isin: "", name: "", faceValue: "", couponRate: "", couponFrequency: "ANNUAL", quantity: "", pricePerUnit: "", date: "" });
+    if (!res.ok) { alert("Failed to add bond"); return; }
+    setForm({ isin: "", name: "", purchaseDate: "", quantity: "", purchasePrice: "", faceValue: "", couponRate: "", couponFrequency: "ANNUAL" });
     onAdded();
   };
 
-  // 12 cols: (empty) | ISIN | Name | Date bought | Qty | Price | Face val | Coupon% | Frequency | (empty) | (empty) | Add
+  // 11 cols: ISIN | Name | Date bought | Qty | Price | Face val | Coupon% | Frequency | (empty) | (empty) | Add
   return (
     <tr>
-      <td></td>
       <td><input type="text" value={form.isin} onChange={(e) => set("isin", e.target.value)} placeholder="ISIN" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="text" value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Name" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
-      <td><input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} title="Date bought" /></td>
+      <td><input type="date" value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} /></td>
       <td><input type="number" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} placeholder="Qty" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
-      <td><input type="number" value={form.pricePerUnit} onChange={(e) => set("pricePerUnit", e.target.value)} placeholder="Price" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
+      <td><input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.faceValue} onChange={(e) => set("faceValue", e.target.value)} placeholder="Face val." onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.couponRate} onChange={(e) => set("couponRate", e.target.value)} placeholder="Coupon %" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td>
