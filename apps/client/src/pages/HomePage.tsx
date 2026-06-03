@@ -58,60 +58,56 @@ export const HomePage = () => {
       <section className="section-container advanced-section">
         <h1>Advanced techniques</h1>
         <div className="advanced-level-1">
-          <h1>Some real info</h1>
+          <h1>Track across asset classes</h1>
           <p>
-            A lot of good stuff we were working on for years A lot of good stuff
-            we were working on for years A lot of good stuff we were working on
-            for years A lot of good stuff we were working on for years A lot of
-            good stuff we were working on for years
+            Most tools force you to choose — stocks or crypto or real estate.
+            This app holds all three in one portfolio so you can see your true
+            net position at a glance, compare returns across classes, and stop
+            juggling spreadsheets.
           </p>
         </div>
         <div className="advanced-level-2">
           <div className="advanced-level-2-left">
-            <h1>Some real info</h1>
+            <h1>Know your real return</h1>
             <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
+              Average purchase price, current price, % change, and total return
+              are calculated automatically from your transaction history. Add a
+              buy or sell and the numbers update instantly — no manual formulas
+              needed.
             </p>
           </div>
           <div className="advanced-level-2-right">
-            <h1>Some real info</h1>
+            <h1>Rental income, calculated</h1>
             <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
+              Log occupation periods for each property and the app computes
+              occupancy rate, annual net income, and total rental return. Gaps
+              between tenants are counted against occupancy automatically.
             </p>
           </div>
         </div>
         <div className="advanced-level-3">
           <div className="advanced-level-3-left">
-            <h1>Some real info</h1>
+            <h1>Live market prices</h1>
             <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
+              Stock prices are fetched from Alpha Vantage and cached hourly.
+              Crypto prices come from CoinGecko. Your portfolio value stays
+              current without any manual refresh.
             </p>
           </div>
           <div className="advanced-level-3-center">
-            <h1>Some real info</h1>
+            <h1>Bond coupon income</h1>
             <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
+              Add bonds with face value, coupon rate, and frequency. Annual
+              income and total position are computed on the fly so you always
+              know what your fixed-income holdings contribute to your portfolio.
             </p>
           </div>
           <div className="advanced-level-3-right">
-            <h1>Some real info</h1>
+            <h1>Sorted by size by default</h1>
             <p>
-              A lot of good stuff we were working on for years A lot of good
-              stuff we were working on for years A lot of good stuff we were
-              working on for years A lot of good stuff we were working on for
-              years A lot of good stuff we were working on for years
+              Assets are ranked by total position so your largest holdings
+              always appear first. Spot concentration risk immediately and
+              focus your attention where it matters most.
             </p>
           </div>
         </div>
