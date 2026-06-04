@@ -2,6 +2,57 @@ import "../../App.css";
 import { LocationPicker } from "../../components/LocationPicker";
 import MarketTicker from "../../components/marketData";
 import MarketNews from "../../components/marketNews";
+import { PropertyCard } from "../../components/PropertyCard";
+
+const SAMPLE_PROPERTIES = [
+  {
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80",
+    ],
+    address: "Lviv, Lychakivska 14, apt. 22",
+    type: "Apartment",
+    price: "$85,000",
+    bedrooms: 2,
+    area: "58 m²",
+    description: "Bright 2-bedroom apartment in the historic centre. Renovated kitchen, hardwood floors, 5 min walk to the market square.",
+  },
+  {
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&q=80",
+    ],
+    address: "Lviv, Horodotska 81, apt. 5",
+    type: "Apartment",
+    price: "$62,000",
+    bedrooms: 1,
+    area: "38 m²",
+    description: "Cosy studio near the IT cluster. Modern finishes, separate sleeping area, 10 min by tram to the city centre.",
+  },
+  {
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80",
+    ],
+    address: "Lviv, Franka 9, apt. 3",
+    type: "Apartment",
+    price: "$110,000",
+    bedrooms: 3,
+    area: "82 m²",
+    description: "Spacious 3-bedroom on the 4th floor with a view of Franko Park. Recently renovated, two bathrooms, secure parking.",
+  },
+  {
+    images: [
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80",
+      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80",
+    ],
+    address: "Lviv, Sykhivska 31",
+    type: "House",
+    price: "$175,000",
+    bedrooms: 4,
+    area: "140 m²",
+    description: "Detached house in a quiet residential area. Private garden, garage for two cars, solar panels installed.",
+  },
+];
 
 export const MainPage = () => {
   return (
@@ -94,54 +145,13 @@ export const MainPage = () => {
         </div> */}
       </section>
 
-      <section className="realestate-section section-container section-flex-container">
-        <div style={{ display: "flex", alignItems: "center", gap: 16, alignSelf: "flex-start" }}>
-          <h1 style={{ margin: 0 }}>Real estate</h1>
-          <LocationPicker />
-        </div>
-        <div className="realestate-city">
-          <div className="realestate-city-cols">
-            <div className="realestate-city-col">
-              <div className="realestate-city-item">
-                <div className="realestate-city-item-top">
-                  <p>Lviv, Yaneva 23 50</p>
-                </div>
-                <div className="realestate-city-item-bottom">
-                  <p>1 bedroom</p>
-                  <p>$75k</p>
-                </div>
-              </div>
-              <div className="realestate-city-item">
-                <div className="realestate-city-item-top">
-                  <p>Lviv, Yaneva 23 50</p>
-                </div>
-                <div className="realestate-city-item-bottom">
-                  <p>1 bedroom</p>
-                  <p>$75k</p>
-                </div>
-              </div>
-            </div>
-            <div className="realestate-city-col">
-              <div className="realestate-city-item">
-                <div className="realestate-city-item-top">
-                  <p>Lviv, Yaneva 23 50</p>
-                </div>
-                <div className="realestate-city-item-bottom">
-                  <p>1 bedroom</p>
-                  <p>$75k</p>
-                </div>
-              </div>
-              <div className="realestate-city-item">
-                <div className="realestate-city-item-top">
-                  <p>Lviv, Yaneva 23 50</p>
-                </div>
-                <div className="realestate-city-item-bottom">
-                  <p>1 bedroom</p>
-                  <p>$75k</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <section className="realestate-section section-container">
+        <h1>Real estate</h1>
+        <LocationPicker />
+        <div className="realestate-grid">
+          {SAMPLE_PROPERTIES.map((p, i) => (
+            <PropertyCard key={i} {...p} />
+          ))}
         </div>
       </section>
     </>
