@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 import { Link, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
+import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
 export default function PortfoliosPage() {
   const { userId } = useParams();
@@ -57,12 +58,15 @@ export default function PortfoliosPage() {
                   <h4>Losers</h4>
                 </div>
                 <button
+                  className="portfolio-delete-btn"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     deletePortfolio(p.id);
                   }}
-                ></button>
+                >
+                  <img src={deleteIcon} height={24} width={24} alt="delete" />
+                </button>
               </div>
             </div>
           </Link>
