@@ -4,6 +4,27 @@ import { Link, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
 
+const TYPE_LABEL: Record<string, string> = {
+  CRYPTOCURRENCY: "Crypto",
+  Stock: "Stock",
+  ETF: "ETF",
+  BOND: "Bond",
+  MUTUALFUND: "Fund",
+  COMMODITY: "Commodity",
+};
+
+function topPerformers(portfolioAssets: any[]) {
+  return portfolioAssets
+    .filter((pa) => pa.asset?.currentPrice != null && pa.price != null && pa.price !== 0)
+    .map((pa) => {
+      const pct = ((pa.asset.currentPrice - pa.price) / pa.price) * 100;
+      const dollarReturn = (pa.asset.currentPrice - pa.price) * pa.quantity;
+      return { ticker: pa.asset.ticker, type: pa.asset.type, pct, dollarReturn };
+    })
+    .sort((a, b) => b.pct - a.pct)
+    .slice(0, 3);
+}
+
 export default function PortfoliosPage() {
   const { userId } = useParams();
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
@@ -53,6 +74,21 @@ export default function PortfoliosPage() {
                 </div>
                 <div className="portfolio-min-col">
                   <h4>Top performers</h4>
+                  {topPerformers(p.portfolioAssets ?? []).map((a) => (
+                    <div key={a.ticker} className="portfolio-performer-row">
+                      <span className="portfolio-performer-type">{TYPE_LABEL[a.type] ?? a.type}</span>
+                      <span className="portfolio-performer-name">{a.ticker}</span>
+                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "#4caf50" : "#e57373" }}>
+                        {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
+                      </span>
+                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "#4caf50" : "#e57373" }}>
+                        {a.dollarReturn >= 0 ? "+" : ""}{Math.round(a.dollarReturn).toLocaleString()}$
+                      </span>
+                    </div>
+                  ))}
+                  {topPerformers(p.portfolioAssets ?? []).length === 0 && (
+                    <p className="portfolio-performer-empty">No price data yet</p>
+                  )}
                 </div>
                 <div className="portfolio-min-col">
                   <h4>Losers</h4>

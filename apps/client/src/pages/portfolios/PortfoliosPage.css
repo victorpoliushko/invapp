@@ -91,6 +91,36 @@
   color: white;
 }
 
+.portfolio-performer-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.portfolio-performer-type {
+  color: #aaa;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.portfolio-performer-name {
+  font-weight: 500;
+}
+
+.portfolio-performer-pct,
+.portfolio-performer-dollar {
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-performer-empty {
+  font-size: 0.8rem;
+  color: #777;
+  margin: 0;
+}
+
 .portfolio-delete-btn {
   background: none;
   border: none;
