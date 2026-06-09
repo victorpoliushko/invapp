@@ -11,7 +11,15 @@ const TYPE_LABEL: Record<string, string> = {
   BOND: "Bond",
   MUTUALFUND: "Fund",
   COMMODITY: "Commodity",
+  PRECIOUS_METAL: "Metal",
+  PRIVATE_EQUITY: "PE",
+  CASH: "Cash",
 };
+
+function assetTypeLabel(type: string | null | undefined): string {
+  if (!type) return "Stock";
+  return TYPE_LABEL[type] ?? type;
+}
 
 function topPerformers(portfolioAssets: any[]) {
   return portfolioAssets
@@ -76,7 +84,7 @@ export default function PortfoliosPage() {
                   <h4>Top performers</h4>
                   {topPerformers(p.portfolioAssets ?? []).map((a) => (
                     <div key={a.ticker} className="portfolio-performer-row">
-                      <span className="portfolio-performer-type">{TYPE_LABEL[a.type] ?? a.type}</span>
+                      <span className="portfolio-performer-type">{assetTypeLabel(a.type)}</span>
                       <span className="portfolio-performer-name">{a.ticker}</span>
                       <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "#4caf50" : "#e57373" }}>
                         {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
