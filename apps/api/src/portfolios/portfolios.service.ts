@@ -74,9 +74,11 @@ export class PortfoliosService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prismaService.portfolio.delete({
-      where: { id },
-    });
+    await this.prismaService.$transaction([
+      this.prismaService.transaction.deleteMany({ where: { portfolioId: id } }),
+      this.prismaService.portfolioAsset.deleteMany({ where: { portfolioId: id } }),
+      this.prismaService.portfolio.delete({ where: { id } }),
+    ]);
   }
 
   async getByUserId(userId: string): Promise<PortfolioDto[]> {

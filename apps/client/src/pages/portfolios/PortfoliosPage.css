@@ -133,6 +133,10 @@
   transition: opacity 0.15s;
 }
 
+.portfolio-delete-btn img {
+  filter: brightness(0) invert(1);
+}
+
 .portfolio-delete-btn:hover {
   opacity: 1;
 }

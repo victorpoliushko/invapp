@@ -102,6 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log(`[Auth] ${userId ? `Logged in as ${userId}` : "Not logged in"}`);
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [userId]);
+
   // Schedule a proactive refresh 30s before expiry whenever accessToken changes.
   useEffect(() => {
     if (!accessToken) return;
