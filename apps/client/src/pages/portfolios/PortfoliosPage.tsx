@@ -21,16 +21,22 @@ function assetTypeLabel(type: string | null | undefined): string {
   return TYPE_LABEL[type] ?? type;
 }
 
-function topPerformers(portfolioAssets: any[]) {
+function calcAssetReturns(portfolioAssets: any[]) {
   return portfolioAssets
     .filter((pa) => pa.asset?.currentPrice != null && pa.price != null && pa.price !== 0)
     .map((pa) => {
       const pct = ((pa.asset.currentPrice - pa.price) / pa.price) * 100;
       const dollarReturn = (pa.asset.currentPrice - pa.price) * pa.quantity;
       return { ticker: pa.asset.ticker, type: pa.asset.type, pct, dollarReturn };
-    })
-    .sort((a, b) => b.pct - a.pct)
-    .slice(0, 3);
+    });
+}
+
+function topPerformers(portfolioAssets: any[]) {
+  return calcAssetReturns(portfolioAssets).sort((a, b) => b.pct - a.pct).slice(0, 3);
+}
+
+function topLosers(portfolioAssets: any[]) {
+  return calcAssetReturns(portfolioAssets).filter((a) => a.pct < 0).sort((a, b) => a.pct - b.pct).slice(0, 3);
 }
 
 export default function PortfoliosPage() {
@@ -100,6 +106,21 @@ export default function PortfoliosPage() {
                 </div>
                 <div className="portfolio-min-col">
                   <h4>Losers</h4>
+                  {topLosers(p.portfolioAssets ?? []).map((a) => (
+                    <div key={a.ticker} className="portfolio-performer-row">
+                      <span className="portfolio-performer-type">{assetTypeLabel(a.type)}</span>
+                      <span className="portfolio-performer-name">{a.ticker}</span>
+                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "#4caf50" : "#e57373" }}>
+                        {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
+                      </span>
+                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "#4caf50" : "#e57373" }}>
+                        {a.dollarReturn >= 0 ? "+" : ""}{Math.round(a.dollarReturn).toLocaleString()}$
+                      </span>
+                    </div>
+                  ))}
+                  {topLosers(p.portfolioAssets ?? []).length === 0 && (
+                    <p className="portfolio-performer-empty">No price data yet</p>
+                  )}
                 </div>
                 <button
                   className="portfolio-delete-btn"
