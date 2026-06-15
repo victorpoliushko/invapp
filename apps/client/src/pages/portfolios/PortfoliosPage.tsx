@@ -39,6 +39,17 @@ function topLosers(portfolioAssets: any[]) {
   return calcAssetReturns(portfolioAssets).filter((a) => a.pct < 0).sort((a, b) => a.pct - b.pct).slice(0, 3);
 }
 
+function calcPortfolioReturn(portfolioAssets: any[]): number | null {
+  const valid = portfolioAssets.filter(
+    (pa) => pa.asset?.currentPrice != null && pa.price != null && pa.price !== 0 && pa.quantity != null,
+  );
+  if (valid.length === 0) return null;
+  const totalCost = valid.reduce((sum: number, pa: any) => sum + pa.price * pa.quantity, 0);
+  const totalCurrent = valid.reduce((sum: number, pa: any) => sum + pa.asset.currentPrice * pa.quantity, 0);
+  if (totalCost === 0) return null;
+  return ((totalCurrent - totalCost) / totalCost) * 100;
+}
+
 export default function PortfoliosPage() {
   const { userId } = useParams();
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
@@ -83,7 +94,7 @@ export default function PortfoliosPage() {
                 <div className="portfolio-min-col">
                   <h4>Returns</h4>
                   <p>Goal: {p.goal}%</p>
-                  <p>Actual: {p.actual}%</p>
+                  <p>Actual: {(() => { const r = calcPortfolioReturn(p.portfolioAssets ?? []); if (r == null) return "—"; return <span style={{ color: r >= 0 ? "#4caf50" : "#e57373" }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}%</span>; })()}</p>
                   <p>$: {p.value}</p>
                 </div>
                 <div className="portfolio-min-col">
