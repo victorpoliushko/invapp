@@ -8,20 +8,11 @@ export default function TransactionButton({ assetId }: { assetId: string}) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<number | null>(null);
 
-  const handleRemove = (assetId: string) => {
-    console.log(`params: ${params.id}`);
-    console.log(`asset: ${assetId}`);
+  const handleRemove = (_assetId: string) => {
     setIsEditing(false);
     setInputValue(null);
-
     // sell transaction here
   };
-
-  // const handleRemoveAll = () => {
-  //   // delete asset here
-  //   setIsEditing(false);
-  //   setInputValue(null);
-  // }
 
   if (!isEditing) {
     return (

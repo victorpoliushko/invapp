@@ -42,9 +42,6 @@ export const PortfolioProvider = ({
     if (!newName.trim() || newName === portfolio?.name) return;
 
     const token = localStorage.getItem("accessToken");
-    console.log(`
-     id: ${JSON.stringify(id)} 
-    `);
     try {
       const res = await fetch(`http://localhost:5173/api/portfolios/${id}`, {
         method: "PATCH",
@@ -146,9 +143,6 @@ export const PortfolioProvider = ({
   };
 
   const deletePortfolio = async (id: string) => {
-    console.log(`
-     deleting portfoli
-    `);
     const res = await fetch(`http://localhost:5173/api/portfolios/${id}`, {
       method: "DELETE",
       headers: {
@@ -156,9 +150,6 @@ export const PortfolioProvider = ({
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(`
-     res: ${JSON.stringify(res)} 
-    `);
     if (res.ok) {
       await refreshUserPortfolios();
     } else {
@@ -183,9 +174,6 @@ export const PortfolioProvider = ({
       }),
     });
     if (!res.ok) throw new Error("Create failed");
-    console.log(`
-     in create portfolio} 
-    `);
     await refreshUserPortfolios();
   };
 

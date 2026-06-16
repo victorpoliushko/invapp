@@ -67,18 +67,9 @@ export default function PortfoliosPage() {
     setIsCreating(false);
   };
 
-    console.log(`
-   portfolios 1: ${JSON.stringify(portfolios)} 
-  `);
-
-
   useEffect(() => {
     refreshUserPortfolios();
   }, [userId, refreshUserPortfolios]);
-
-  console.log(`
-   portfolios 2: ${JSON.stringify(portfolios)} 
-  `);
 
   // if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;

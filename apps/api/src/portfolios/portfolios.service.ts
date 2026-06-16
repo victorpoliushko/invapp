@@ -18,13 +18,6 @@ interface AssetsWithPrices {
   quantity: number;
 }
 
-interface AddAssetInput {
-  assetName: string;
-  dueDate: string;
-  quantity: number;
-  price: number;
-}
-
 @Injectable()
 export class PortfoliosService {
   constructor(
@@ -60,9 +53,6 @@ export class PortfoliosService {
   }
 
   async update(input: UpdatePortfolioDto): Promise<PortfolioDto> {
-    console.log(`
-     inout: ${JSON.stringify(input)} 
-    `);
     const portfolio = await this.prismaService.portfolio.update({
       where: { id: input.id },
       data: {
@@ -232,12 +222,7 @@ export class PortfoliosService {
     if (!portfolio) throw new NotFoundException('Portfolio not found');
     const prices = [];
     for (const pa of portfolio.portfolioAssets) {
-      console.log(`Fetching price for ${pa.asset.ticker}...`);
       const price = await this.assetsService.getSharePrice(pa.asset.ticker);
-      console.log(`
-       price: ${JSON.stringify(price)} 
-      `);
-
       prices.push({
         assetId: pa.assetId,
         symbol: pa.asset.ticker,

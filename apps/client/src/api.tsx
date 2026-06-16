@@ -1,9 +1,6 @@
 import { PortfolioDto } from "../../api/src/portfolios/dto/portfolio.dto";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';;
-
-
-console.log("Current BASE_URL is:", BASE_URL); 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 
 const apiRequest = async (path: String) => {
   const token = localStorage.getItem('accessToken');

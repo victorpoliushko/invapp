@@ -14,9 +14,7 @@ import { CreateTransactionDto } from './dto/CreateTransaction.dto';
 
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private transactionsService: TransactionsService) {
-    console.log('transaction controller');
-  }
+  constructor(private transactionsService: TransactionsService) {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
