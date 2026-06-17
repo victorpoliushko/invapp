@@ -11,16 +11,16 @@ import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authServece: AuthService) {
-    super();
+    super({ usernameField: 'email' });
   }
 
-  async validate(username: string, password: string): Promise<any> {
+  async validate(email: string, password: string): Promise<any> {
     if (!password)
       throw new HttpException(
         getReasonPhrase('Please provide the password'),
         StatusCodes.UNAUTHORIZED,
       );
-    const user = await this.authServece.validateUser({ username, password });
+    const user = await this.authServece.validateUser({ email, password });
 
     if (!user) {
       throw new UnauthorizedException();

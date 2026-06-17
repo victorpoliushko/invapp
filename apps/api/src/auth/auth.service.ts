@@ -11,7 +11,7 @@ import { CurrentUser } from './types/current-user';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 
 export type AuthInput = {
-  username: string;
+  email: string;
   password: string;
 };
 
@@ -38,7 +38,7 @@ export class AuthService {
   ) {}
 
   async validateUser(input: AuthInput): Promise<SignInData | null> {
-    const user = await this.userService.getUserByName(input.username);
+    const user = await this.userService.getUserByEmail(input.email);
     if (!user) {
       throw new HttpException(getReasonPhrase(StatusCodes.NOT_FOUND), StatusCodes.NOT_FOUND);
     }
