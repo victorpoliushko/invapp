@@ -28,8 +28,14 @@ export function Header() {
         {userId ? (
           <>
             <ul className="navbar-ul">
+              <Link to="/main">
+                <h3>Main</h3>
+              </Link>
               <Link to={{ pathname: `/portfolios/user/${userId}`}} key={1}>
                 <h3>Portfolios</h3>
+              </Link>
+              <Link to="/settings">
+                <h3>Settings</h3>
               </Link>
             </ul>
           <button className="signin-button" onClick={handleLogout}>Logout</button>

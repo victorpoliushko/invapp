@@ -3,7 +3,7 @@ header {
 }
 
 .navbar-logo {
-  margin-left: 20px;
+  display: block;
 }
 
 nav {
@@ -11,10 +11,16 @@ nav {
   justify-content: space-between;
   align-items: center;
   max-width: 1440px;
+  width: 100%;
   height: 150px;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.navbar-ul {
+  display: contents;
 }
 
 nav > span {

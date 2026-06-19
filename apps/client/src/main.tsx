@@ -14,6 +14,7 @@ import { Layout } from "./Layout.tsx";
 import AuthCallback from "./pages/auth/AuthCallback.tsx";
 import { PortfolioProvider } from "./context/PortfolioContext.tsx";
 import NewPortfolioPage from "./pages/portfolio/NewPortfolioPage.tsx";
+import Profile from "./pages/profile/Profile.tsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "/portfolios/:portfolioId/ai-suggestions",
         element: <AiSuggestions />,
+      },
+      {
+        path: "/settings",
+        element: <Profile />,
       },
       {
         path: "/auth-redirect",
