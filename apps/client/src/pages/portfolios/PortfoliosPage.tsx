@@ -39,6 +39,12 @@ function topLosers(portfolioAssets: any[]) {
   return calcAssetReturns(portfolioAssets).filter((a) => a.pct < 0).sort((a, b) => a.pct - b.pct).slice(0, 3);
 }
 
+function calcPortfolioDollarReturn(portfolioAssets: any[]): number | null {
+  const returns = calcAssetReturns(portfolioAssets);
+  if (returns.length === 0) return null;
+  return returns.reduce((sum, a) => sum + a.dollarReturn, 0);
+}
+
 function calcPortfolioReturn(portfolioAssets: any[]): number | null {
   const valid = portfolioAssets.filter(
     (pa) => pa.asset?.currentPrice != null && pa.price != null && pa.price !== 0 && pa.quantity != null,
@@ -86,7 +92,7 @@ export default function PortfoliosPage() {
                   <h4>Returns</h4>
                   <p>Goal: {p.goal}%</p>
                   <p>Actual: {(() => { const r = calcPortfolioReturn(p.portfolioAssets ?? []); if (r == null) return "—"; return <span style={{ color: r >= 0 ? "#4caf50" : "#e57373" }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}%</span>; })()}</p>
-                  <p>$: {p.value}</p>
+                  <p>$: {(() => { const d = calcPortfolioDollarReturn(p.portfolioAssets ?? []); if (d == null) return "—"; return <span style={{ color: d >= 0 ? "#4caf50" : "#e57373" }}>{d >= 0 ? "+" : ""}{Math.round(d).toLocaleString()}$</span>; })()}</p>
                 </div>
                 <div className="portfolio-min-col">
                   <h4>Top performers</h4>
