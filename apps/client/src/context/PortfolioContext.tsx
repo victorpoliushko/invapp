@@ -14,7 +14,7 @@ interface PortfolioContextType {
   deleteAsset: (assetId: string) => Promise<void>;
   updatePortfolioName: (name: string) => Promise<void>;
   refreshPortfolio: () => Promise<void>;
-  createPortolio: (name: string, userId: string) => Promise<void>;
+  createPortolio: (name: string, userId: string, goal?: number) => Promise<void>;
   deletePortfolio: (id: string) => Promise<void>;
   refreshUserPortfolios: () => Promise<void>;
 }
@@ -161,7 +161,7 @@ export const PortfolioProvider = ({
     refreshPortfolio();
   }, [id]);
 
-  const createPortolio = async (name: string, userId: string) => {
+  const createPortolio = async (name: string, userId: string, goal?: number) => {
     const res = await fetch(`http://localhost:5173/api/portfolios`, {
       method: "POST",
       headers: {
@@ -169,8 +169,9 @@ export const PortfolioProvider = ({
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        name: name,
-        userId: userId,
+        name,
+        userId,
+        ...(goal !== undefined && { goal }),
       }),
     });
     if (!res.ok) throw new Error("Create failed");

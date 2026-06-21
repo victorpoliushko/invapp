@@ -76,6 +76,7 @@ model Asset {
 model Portfolio {
   id   String @id @default(uuid())
   name String
+  goal Float?
 
   user   User?  @relation(fields: [userId], references: [id])
   userId String

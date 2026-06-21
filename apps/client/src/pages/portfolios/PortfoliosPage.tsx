@@ -62,13 +62,16 @@ export default function PortfoliosPage() {
     usePortfolio();
   // const [portfolios, setPortfolios] = useState([]);
   const [portfolioName, setPortfolioName] = useState<string>("");
+  const [portfolioGoal, setPortfolioGoal] = useState<string>("");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState(null);
 
   const handleCreate = () => {
     if (portfolioName.trim()) {
-      createPortolio(portfolioName, userId ?? "");
+      const goal = portfolioGoal !== "" ? parseFloat(portfolioGoal) : undefined;
+      createPortolio(portfolioName, userId ?? "", goal);
       setPortfolioName("");
+      setPortfolioGoal("");
     }
     setIsCreating(false);
   };
@@ -90,7 +93,7 @@ export default function PortfoliosPage() {
               <div className="portfolio-min-cols">
                 <div className="portfolio-min-col">
                   <h4>Returns</h4>
-                  <p>Goal: {p.goal}%</p>
+                  <p>Goal: {p.goal != null ? `${p.goal}%` : "—"}</p>
                   <p>Actual: {(() => { const r = calcPortfolioReturn(p.portfolioAssets ?? []); if (r == null) return "—"; return <span style={{ color: r >= 0 ? "#4caf50" : "#e57373" }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}%</span>; })()}</p>
                   <p>$: {(() => { const d = calcPortfolioDollarReturn(p.portfolioAssets ?? []); if (d == null) return "—"; return <span style={{ color: d >= 0 ? "#4caf50" : "#e57373" }}>{d >= 0 ? "+" : ""}{Math.round(d).toLocaleString()}$</span>; })()}</p>
                 </div>
@@ -159,6 +162,18 @@ export default function PortfoliosPage() {
               if (e.key === "Escape") setIsCreating(false);
             }}
             autoFocus
+          />
+          <input
+            type="number"
+            className="portfolio-create-input"
+            placeholder="Goal % (optional)"
+            value={portfolioGoal}
+            onChange={(e) => setPortfolioGoal(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleCreate();
+              if (e.key === "Escape") setIsCreating(false);
+            }}
+            min={0}
           />
           <div className="portfolio-create-actions">
             <button className="portfolio-create-confirm" onClick={handleCreate}>Create</button>
