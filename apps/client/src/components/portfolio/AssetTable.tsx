@@ -40,7 +40,7 @@ export const AssetTable = ({
   portfolio: PortfolioDto;
   assetType?: "stock" | "crypto";
 }) => {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [sortCol, setSortCol] = useState<SortCol>("totalPosition");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const { currentPrices } = usePortfolio();
@@ -113,16 +113,16 @@ export const AssetTable = ({
           <Fragment key={portfolioAsset.assetId}>
             <AssetRow
               portfolioAsset={portfolioAsset}
-              isExpanded={expandedId === portfolioAsset.assetId}
+              isExpanded={expandedIds.has(portfolioAsset.assetId)}
               onExpand={() =>
-                setExpandedId(
-                  expandedId === portfolioAsset.assetId
-                    ? null
-                    : portfolioAsset.assetId,
-                )
+                setExpandedIds((prev) => {
+                  const next = new Set(prev);
+                  next.has(portfolioAsset.assetId) ? next.delete(portfolioAsset.assetId) : next.add(portfolioAsset.assetId);
+                  return next;
+                })
               }
             />
-            {expandedId === portfolioAsset.assetId && (
+            {expandedIds.has(portfolioAsset.assetId) && (
               <AssetTransactions
                 assetTicker={portfolioAsset.asset.ticker}
                 portfolioAssetTransactions={portfolioAsset.transactions}
