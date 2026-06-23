@@ -55,6 +55,31 @@ function topLosers(portfolioAssets: PortfolioAssetStub[]) {
   return calcAssetReturns(portfolioAssets).filter((a) => a.pct < 0).sort((a, b) => a.pct - b.pct).slice(0, 3);
 }
 
+function calcPortfolioDollarReturn(portfolioAssets: PortfolioAssetStub[]): number | null {
+  const returns = calcAssetReturns(portfolioAssets);
+  if (returns.length === 0) return null;
+  return returns.reduce((sum, a) => sum + a.dollarReturn, 0);
+}
+
+function calcPortfolioReturn(portfolioAssets: PortfolioAssetStub[]): number | null {
+  const valid = portfolioAssets.filter(
+    (pa) => pa.asset?.currentPrice != null && pa.price != null && pa.price !== 0 && pa.quantity != null,
+  );
+  if (valid.length === 0) return null;
+  const totalCost = valid.reduce((sum, pa) => sum + pa.price! * pa.quantity, 0);
+  const totalCurrent = valid.reduce((sum, pa) => sum + pa.asset.currentPrice! * pa.quantity, 0);
+  if (totalCost === 0) return null;
+  return ((totalCurrent - totalCost) / totalCost) * 100;
+}
+
+// ── helper mirroring AssetTable.tsx multi-expand toggle ──────────────────────
+
+function toggleExpanded(prev: Set<string>, id: string): Set<string> {
+  const next = new Set(prev);
+  next.has(id) ? next.delete(id) : next.add(id);
+  return next;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('calculateAssetsTotalPrice', () => {
@@ -141,5 +166,56 @@ describe('topLosers', () => {
   it('sorts worst performer first', () => {
     const result = topLosers(assets);
     expect(result[0].ticker).toBe('B');
+  });
+});
+
+describe('calcPortfolioReturn', () => {
+  it('computes weighted % return across multiple assets', () => {
+    const assets: PortfolioAssetStub[] = [
+      { asset: { ticker: 'A', type: 'Stock', currentPrice: 150 }, price: 100, quantity: 10 },
+      { asset: { ticker: 'B', type: 'Stock', currentPrice: 80 }, price: 100, quantity: 10 },
+    ];
+    // cost = 1000 + 1000 = 2000, current = 1500 + 800 = 2300 -> +15%
+    expect(calcPortfolioReturn(assets)).toBeCloseTo(15);
+  });
+
+  it('returns null when no asset has price data', () => {
+    const assets: PortfolioAssetStub[] = [
+      { asset: { ticker: 'A', type: 'Stock', currentPrice: null }, price: 100, quantity: 10 },
+    ];
+    expect(calcPortfolioReturn(assets)).toBeNull();
+  });
+});
+
+describe('calcPortfolioDollarReturn', () => {
+  it('sums dollar return across all assets', () => {
+    const assets: PortfolioAssetStub[] = [
+      { asset: { ticker: 'A', type: 'Stock', currentPrice: 150 }, price: 100, quantity: 10 },
+      { asset: { ticker: 'B', type: 'Stock', currentPrice: 80 }, price: 100, quantity: 10 },
+    ];
+    // (150-100)*10 + (80-100)*10 = 500 - 200 = 300
+    expect(calcPortfolioDollarReturn(assets)).toBe(300);
+  });
+
+  it('returns null when there is no valid asset data', () => {
+    expect(calcPortfolioDollarReturn([])).toBeNull();
+  });
+});
+
+describe('toggleExpanded', () => {
+  it('adds an id that is not yet expanded', () => {
+    const result = toggleExpanded(new Set(), 'asset-1');
+    expect(result.has('asset-1')).toBe(true);
+  });
+
+  it('removes an id that is already expanded', () => {
+    const result = toggleExpanded(new Set(['asset-1']), 'asset-1');
+    expect(result.has('asset-1')).toBe(false);
+  });
+
+  it('keeps other expanded ids untouched when toggling one', () => {
+    const result = toggleExpanded(new Set(['asset-1']), 'asset-2');
+    expect(result.has('asset-1')).toBe(true);
+    expect(result.has('asset-2')).toBe(true);
   });
 });
