@@ -1,0 +1,55 @@
+:root {
+  /* Colors — surfaces (dark theme) */
+  --color-bg: #282b2e;
+  --color-surface: #383838;
+  --color-surface-alt: #2b2b2b;
+  --color-surface-raised: #424242;
+  --color-surface-card: #2e2e2e;
+  --color-surface-input: #1e1e1e;
+
+  /* Colors — borders */
+  --color-border: #444;
+  --color-border-strong: #555;
+  --color-border-muted: #616161;
+
+  /* Colors — text */
+  --color-text: #ffffff;
+  --color-text-muted: #aaa;
+  --color-text-faint: #777;
+
+  /* Colors — brand / status */
+  --color-primary: #4caf50;
+  --color-primary-hover: #45a049;
+  --color-danger: #e57373;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+
+  /* Typography */
+  --font-family: "Inter", sans-serif;
+  --font-xs: 0.75rem;
+  --font-s: 0.875rem;
+  --font-m: 1rem;
+  --font-l: 1.25rem;
+  --font-xl: 1.5rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 20px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.1);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+
+  /* Layout */
+  --section-max-width: 1440px;
+  --section-padding: 1.5rem;
+}

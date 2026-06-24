@@ -7,9 +7,9 @@
 }
 
 .profile-card {
-  background: #2b2b2b;
-  border: 1px solid #444;
-  border-radius: 8px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #383838;
+  border-bottom: 1px solid var(--color-surface);
   padding-bottom: 0.75rem;
 }
 
@@ -34,14 +34,14 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 .profile-value {
-  color: #f1f1f1;
+  color: var(--color-text);
 }
 
 .profile-status {
   padding: 2rem;
-  color: #888;
+  color: var(--color-text-muted);
 }

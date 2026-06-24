@@ -12,7 +12,7 @@
   padding: 1rem 2rem;
   margin-right: 0.2rem;
   cursor: pointer;
-  background-color: #383838;
+  background-color: var(--color-surface);
   font-weight: bold;
   transition: ease 0.3s;
 }
@@ -23,10 +23,6 @@
   width: 100%;
   height: 100%;
   display: none;
-  /* padding: 1rem; */
-  /* background: #fff; */
-  /* padding: 20px; */
-  /* box-shadow: -10px 10px 0px 0px black; */
 }
  
 .assets input[type="radio"] {
@@ -34,7 +30,7 @@
 }
  
 .assets input[type="radio"]:checked + label {
-  background: #4d4d4d;
+  background: var(--color-border-muted);
 }
  
 .assets input[type="radio"]:checked + label + .tab {
@@ -67,7 +63,7 @@
 
 
 table {
-  border: 1px solid #111111;
+  border: 1px solid var(--color-bg);
   border-collapse: collapse;
   margin: 0;
   padding: 0;
@@ -84,8 +80,8 @@ table caption {
 }
 
 table tr {
-  background-color: #383838;
-  border: 1px solid #111111;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-bg);
   padding: .35em;
 }
 
@@ -108,7 +104,7 @@ table th {
 }
 
 .th-sortable:hover {
-  color: #e0e0e0;
+  color: var(--color-text);
 }
 
 .th-sortable-inner {
@@ -121,8 +117,8 @@ table th {
 .th-total-row th {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #ccc;
-  border-top: 1px solid #555;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border-strong);
   padding-top: 4px;
   padding-bottom: 6px;
 }
@@ -142,9 +138,9 @@ table th {
   width: 100%;
   box-sizing: border-box;
   padding: 6px 8px;
-  border: 1px solid #444;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  background-color: #2b2b2b;
+  background-color: var(--color-surface-alt);
   color: white;
 }
 
@@ -153,8 +149,8 @@ table th {
   top: 100%;
   left: 0;
   width: 100%;
-  background: #2b2b2b;
-  border: 1px solid #555;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-strong);
   border-top: none;
   border-radius: 0 0 6px 6px;
   list-style: none;
@@ -172,11 +168,10 @@ table th {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* color: #f1f1f1; */
 }
 
 .suggestions-list li:hover {
-  background-color: #444;
+  background-color: var(--color-border);
 }
 
 @media screen and (max-width: 600px) {
@@ -200,13 +195,13 @@ table th {
   }
   
   table tr {
-    border-bottom: 3px solid #111111;
+    border-bottom: 3px solid var(--color-bg);
     display: block;
     margin-bottom: .625em;
   }
   
   table td {
-    border-bottom: 1px solid #111111;
+    border-bottom: 1px solid var(--color-bg);
     display: block;
     font-size: .8em;
     text-align: right;
@@ -259,19 +254,19 @@ table th {
 
 .transactions-subtable {
   width: 100%;
-  background-color: #2e2e2e;
+  background-color: var(--color-surface-card);
 }
 
 .transactions-subtable tr {
-  background-color: #2e2e2e;
+  background-color: var(--color-surface-card);
 }
 
 .transactions-subtable input {
   width: 100px;
   box-sizing: border-box;
   padding: 4px 6px;
-  border: 1px solid #444;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  background-color: #1e1e1e;
+  background-color: var(--color-surface-input);
   color: white;
 }
