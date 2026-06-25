@@ -45,3 +45,53 @@
   padding: 2rem;
   color: var(--color-text-muted);
 }
+
+.profile-input {
+  width: 60%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  text-align: right;
+}
+
+.profile-error {
+  color: var(--color-danger);
+  font-size: var(--font-s);
+  margin: 0;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.profile-edit-btn,
+.profile-save-btn,
+.profile-cancel-btn {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-s);
+}
+
+.profile-edit-btn,
+.profile-save-btn {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.profile-edit-btn:hover,
+.profile-save-btn:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.profile-cancel-btn {
+  background-color: var(--color-border-muted);
+  color: white;
+}

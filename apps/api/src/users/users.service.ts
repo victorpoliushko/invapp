@@ -69,6 +69,7 @@ export class UsersService {
         id,
       },
       data: {
+        username: input.username,
         phoneNumber: input.phoneNumber,
         role: input.role
       },
