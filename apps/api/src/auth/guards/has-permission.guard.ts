@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, HttpException, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { PERMISSION_KEY } from "../../customDecorators/has-permission.decorator";
+import { PERMISSION_KEY } from "../decorators/has-permission.decorator";
 import { getReasonPhrase, StatusCodes } from "http-status-codes";
 
 @Injectable()
