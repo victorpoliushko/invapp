@@ -130,7 +130,7 @@ export const PortfolioProvider = ({
   }, [userId, token, fetchWithRedirect]);
 
   const deleteAsset = async (assetId: string) => {
-    await fetch(`api/portfolios/${id}/assets`, {
+    await fetch(`http://localhost:5173/api/portfolios/${id}/assets`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

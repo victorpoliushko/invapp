@@ -182,19 +182,19 @@ export class PortfoliosService {
     id: string,
     input: DeleteAssetsFromPortfolioDto,
   ): Promise<PortfolioDto> {
+    await this.prismaService.transaction.deleteMany({
+      where: {
+        portfolioId: id,
+        assetId: input.assetId,
+      },
+    });
+
     await this.prismaService.portfolioAsset.delete({
       where: {
         portfolioId_assetId: {
           portfolioId: id,
           assetId: input.assetId,
         },
-      },
-    });
-
-    await this.prismaService.transaction.deleteMany({
-      where: {
-        portfolioId: id,
-        assetId: input.assetId,
       },
     });
 
