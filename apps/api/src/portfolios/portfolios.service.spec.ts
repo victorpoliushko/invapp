@@ -408,6 +408,79 @@ describe('PortfoliosService', () => {
         data: { quantity: 12, price: Math.round(-1332 / 12) },
       });
     });
+
+    it('creates a cryptocurrency asset sourced from coingecko when a coingeckoId is provided', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
+      assetsService.findAssetByName.mockResolvedValue(null);
+      assetsService.createAsset.mockResolvedValue({ id: 'a1', ticker: 'BTC' });
+      prisma.portfolioAsset.findUnique.mockResolvedValue(null);
+      prisma.portfolioAsset.create.mockResolvedValue({ id: 'pa1' });
+      prisma.transaction.create.mockResolvedValue({});
+      prisma.transaction.findMany.mockResolvedValue([
+        { type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 50000 },
+      ]);
+      prisma.portfolioAsset.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+
+      await service.addAssetToPortfolio('p1', {
+        ...baseInput,
+        assetName: 'BTC',
+        coingeckoId: 'bitcoin',
+      } as any);
+
+      expect(assetsService.createAsset).toHaveBeenCalledWith({
+        ticker: 'BTC',
+        coingeckoId: 'bitcoin',
+        type: 'CRYPTOCURRENCY',
+        dataSource: 'COINGECKO',
+      });
+    });
+
+    it('records a SELL-only position as a negative quantity with zero average price', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
+      assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
+      prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
+      prisma.transaction.create.mockResolvedValue({});
+      prisma.transaction.findMany.mockResolvedValue([
+        { type: TransactionType.SELL, quantityChange: 4, pricePerUnit: 100 },
+      ]);
+      prisma.portfolioAsset.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+
+      await service.addAssetToPortfolio('p1', {
+        ...baseInput,
+        type: TransactionType.SELL,
+        quantityChange: 4,
+      } as any);
+
+      expect(prisma.portfolioAsset.update).toHaveBeenCalledWith({
+        where: { portfolioId_assetId: { portfolioId: 'p1', assetId: 'a1' } },
+        data: { quantity: -4, price: 0 },
+      });
+    });
+
+    it('records the transaction with the given type, quantity, price and date', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
+      assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
+      prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
+      prisma.transaction.create.mockResolvedValue({});
+      prisma.transaction.findMany.mockResolvedValue([]);
+      prisma.portfolioAsset.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+
+      await service.addAssetToPortfolio('p1', baseInput as any);
+
+      expect(prisma.transaction.create).toHaveBeenCalledWith({
+        data: {
+          type: TransactionType.BUY,
+          quantityChange: 10,
+          date: new Date('2026-01-01'),
+          pricePerUnit: 100,
+          portfolioId: 'p1',
+          assetId: 'a1',
+        },
+      });
+    });
   });
 
   describe('deleteAsset', () => {
@@ -479,6 +552,29 @@ describe('PortfoliosService', () => {
 
     it('returns 0 for an empty list', () => {
       expect(service.calculateAssetsTotalPrice([])).toBe(0);
+    });
+  });
+
+  describe('syncAssetPrice', () => {
+    it('looks up the asset by id when an id is provided', async () => {
+      prisma.asset = { findUnique: jest.fn().mockResolvedValue({ ticker: 'AAPL' }) };
+      assetsService.getSharePrice.mockResolvedValue(150);
+
+      const result = await service.syncAssetPrice([{ id: 'a1', assetSymbol: 'AAPL' }]);
+
+      expect(prisma.asset.findUnique).toHaveBeenCalledWith({ where: { id: 'a1' } });
+      expect(assetsService.getSharePrice).toHaveBeenCalledWith('AAPL');
+      expect(result).toBe(150);
+    });
+
+    it('falls back to looking up by ticker symbol when no id is provided', async () => {
+      prisma.asset = { findUnique: jest.fn().mockResolvedValue({ ticker: 'BTC' }) };
+      assetsService.getSharePrice.mockResolvedValue(50000);
+
+      const result = await service.syncAssetPrice([{ assetSymbol: 'BTC' }]);
+
+      expect(prisma.asset.findUnique).toHaveBeenCalledWith({ where: { ticker: 'BTC' } });
+      expect(result).toBe(50000);
     });
   });
 });
