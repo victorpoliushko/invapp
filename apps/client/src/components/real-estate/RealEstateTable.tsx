@@ -21,6 +21,8 @@ export function RealEstateTable() {
 
   useEffect(() => { load(); }, [load]);
 
+  const totalPurchasePrice = properties.reduce((sum, p) => sum + p.purchasePrice, 0);
+
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
     const res = await fetch(`/api/real-estate/${id}`, {
@@ -66,7 +68,7 @@ export function RealEstateTable() {
             )}
           </Fragment>
         ))}
-        <AddRealEstate onAdded={load} />
+        <AddRealEstate onAdded={load} totalPurchasePrice={totalPurchasePrice} />
       </tbody>
     </table>
   );

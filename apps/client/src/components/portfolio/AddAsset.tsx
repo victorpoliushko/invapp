@@ -12,7 +12,13 @@ function isCrypto(s: Suggestion): s is CryptoSuggestion {
   return "id" in s;
 }
 
-export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypto" }) {
+export function AddAsset({
+  assetType = "stock",
+  totalPositionSum,
+}: {
+  assetType?: "stock" | "crypto";
+  totalPositionSum: number;
+}) {
   const { id: portfolioId } = useParams<{ id: string }>();
   const { refreshPortfolio } = usePortfolio();
   const fetchWithRedirect = useFetchWithRedirect();
@@ -194,7 +200,9 @@ export function AddAsset({ assetType = "stock" }: { assetType?: "stock" | "crypt
       </td>
       <td></td>
       <td></td>
-      <td></td>
+      <td style={{ fontWeight: 600, textAlign: "right" }}>
+        {totalPositionSum > 0 ? Math.round(totalPositionSum).toLocaleString() : "—"}
+      </td>
       <td></td>
       <td>
         <button onClick={handleAddAsset}>Add</button>

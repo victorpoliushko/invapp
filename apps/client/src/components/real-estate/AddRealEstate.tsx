@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-type Props = { onAdded: () => void };
+type Props = { onAdded: () => void; totalPurchasePrice: number };
 
-export function AddRealEstate({ onAdded }: Props) {
+export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
   const { id: portfolioId } = useParams<{ id: string }>();
   const [form, setForm] = useState({
     code: "",
@@ -72,7 +72,10 @@ export function AddRealEstate({ onAdded }: Props) {
       <td>
         <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" />
       </td>
-      <td colSpan={4}></td>
+      <td colSpan={3}></td>
+      <td style={{ fontWeight: 600, textAlign: "right" }}>
+        {totalPurchasePrice.toLocaleString()}
+      </td>
       <td>
         <button onClick={handleAdd}>Add</button>
       </td>

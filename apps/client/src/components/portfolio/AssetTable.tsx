@@ -72,11 +72,6 @@ export const AssetTable = ({
     });
 
   const totalPositionSum = portfolioAssets.reduce((sum, pa) => sum + totalPosition(pa), 0);
-  const totalReturnSum = portfolioAssets.reduce((sum, pa) => {
-    const cur = currentPrices[pa.assetId];
-    const avg = pa.price;
-    return cur != null && avg != null ? sum + (cur - avg) * pa.quantity : sum;
-  }, 0);
 
   return (
     <table className="assets-table">
@@ -98,14 +93,6 @@ export const AssetTable = ({
             <span className="th-sortable-inner">Total return <span>{indicator("totalReturn")}</span></span>
           </th>
           <th scope="col">Actions</th>
-        </tr>
-        <tr className="th-total-row">
-          <th colSpan={7}></th>
-          <th>{totalPositionSum > 0 ? Math.round(totalPositionSum).toLocaleString() : "—"}</th>
-          <th style={{ color: totalReturnSum >= 0 ? "#4caf50" : "#e57373" }}>
-            {totalReturnSum !== 0 ? `${totalReturnSum >= 0 ? "+" : ""}${Math.round(totalReturnSum).toLocaleString()}` : "—"}
-          </th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -130,7 +117,7 @@ export const AssetTable = ({
             )}
           </Fragment>
         ))}
-        <AddAsset assetType={assetType} />
+        <AddAsset assetType={assetType} totalPositionSum={totalPositionSum} />
       </tbody>
     </table>
   );
