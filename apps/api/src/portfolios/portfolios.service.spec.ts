@@ -577,6 +577,112 @@ describe('PortfoliosService', () => {
       expect(result).toBe(50000);
     });
   });
+
+  describe('getPortfolioReturns', () => {
+    it('throws NotFoundException when the portfolio does not exist', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue(null);
+
+      await expect(service.getPortfolioReturns('missing', 'all')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('returns null for both fields when there is no valid position data', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+
+      const result = await service.getPortfolioReturns('p1', 'all');
+
+      expect(result).toEqual({ pctReturn: null, dollarReturn: null });
+    });
+
+    it('computes weighted % and $ return across all BUY/SELL transactions for "all" time', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        portfolioAssets: [
+          {
+            asset: { currentPrice: 150 },
+            transactions: [
+              { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100, date: new Date('2020-01-01') },
+            ],
+          },
+          {
+            asset: { currentPrice: 80 },
+            transactions: [
+              { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100, date: new Date('2020-01-01') },
+            ],
+          },
+        ],
+      });
+
+      const result = await service.getPortfolioReturns('p1', 'all');
+
+      // cost = 1000 + 1000 = 2000, current = 1500 + 800 = 2300 -> +15%, +300
+      expect(result.pctReturn).toBeCloseTo(15);
+      expect(result.dollarReturn).toBe(300);
+    });
+
+    it('only counts transactions within the last year when period is "year"', async () => {
+      const now = new Date();
+      const twoYearsAgo = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate());
+      const recently = new Date(now.getFullYear(), now.getMonth(), Math.max(now.getDate() - 1, 1));
+
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        portfolioAssets: [
+          {
+            asset: { currentPrice: 200 },
+            transactions: [
+              { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 999, date: twoYearsAgo },
+              { type: TransactionType.BUY, quantityChange: 5, pricePerUnit: 100, date: recently },
+            ],
+          },
+        ],
+      });
+
+      const result = await service.getPortfolioReturns('p1', 'year');
+
+      // only the recent 5@100 transaction counts: cost = 500, current = 1000 -> +100%, +500
+      expect(result.pctReturn).toBeCloseTo(100);
+      expect(result.dollarReturn).toBe(500);
+    });
+
+    it('excludes assets with no current price', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        portfolioAssets: [
+          {
+            asset: { currentPrice: null },
+            transactions: [
+              { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100, date: new Date('2020-01-01') },
+            ],
+          },
+        ],
+      });
+
+      const result = await service.getPortfolioReturns('p1', 'all');
+
+      expect(result).toEqual({ pctReturn: null, dollarReturn: null });
+    });
+
+    it('excludes assets that were fully sold off (net non-positive quantity)', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        portfolioAssets: [
+          {
+            asset: { currentPrice: 150 },
+            transactions: [
+              { type: TransactionType.BUY, quantityChange: 5, pricePerUnit: 100, date: new Date('2020-01-01') },
+              { type: TransactionType.SELL, quantityChange: 5, pricePerUnit: 150, date: new Date('2020-06-01') },
+            ],
+          },
+        ],
+      });
+
+      const result = await service.getPortfolioReturns('p1', 'all');
+
+      expect(result).toEqual({ pctReturn: null, dollarReturn: null });
+    });
+  });
 });
 
 describe('toggleExpanded', () => {

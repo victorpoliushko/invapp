@@ -12,7 +12,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { PortfoliosService } from './portfolios.service';
+import { PortfoliosService, ReturnPeriod } from './portfolios.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
@@ -99,5 +99,14 @@ export class PortfoliosController {
   @Get(':id/balance')
   getBalance(@Param('id') id: string, @Query('currency') currency: Currency) {
     return this.portfoliosService.getPortfolioBalance(id, currency);
+  }
+
+  @Get(':id/returns')
+  @UseGuards(AuthGuard('jwt'))
+  getReturns(
+    @Param('id') id: string,
+    @Query('period') period: ReturnPeriod = 'all',
+  ) {
+    return this.portfoliosService.getPortfolioReturns(id, period);
   }
 }

@@ -8,6 +8,10 @@
   padding: 2rem;
 }
 
+.portfolio-min--clickable {
+  cursor: pointer;
+}
+
 .portfolio-min-cols {
   display: flex;
   flex-direction: row;
@@ -24,6 +28,18 @@
 .portfolio-min-col h4,
 .portfolio-min-col p {
   margin: 0;
+}
+
+.portfolio-returns-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.portfolio-returns-header select {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.3rem;
 }
 
 .portfolio-min--add {

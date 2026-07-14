@@ -18,6 +18,52 @@ interface AssetsWithPrices {
   quantity: number;
 }
 
+export type ReturnPeriod = 'all' | 'year' | 'month';
+
+interface PeriodTransaction {
+  type: TransactionType;
+  quantityChange: number;
+  pricePerUnit: number;
+  date: Date;
+}
+
+function periodStartDate(period: ReturnPeriod): Date | null {
+  const now = new Date();
+  if (period === 'year') {
+    return new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+  }
+  if (period === 'month') {
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  return null;
+}
+
+// Position built from the asset's own BUY/SELL transactions dated within the
+// period. There's no historical price snapshot to compare against, so the
+// "return for the period" is the return on what was bought/sold during that
+// period, not the return on pre-existing holdings.
+function calcPeriodPosition(
+  transactions: PeriodTransaction[],
+  periodStart: Date | null,
+): { quantity: number; avgPrice: number } | null {
+  let quantity = 0;
+  let cost = 0;
+
+  for (const t of transactions) {
+    if (periodStart && new Date(t.date) < periodStart) continue;
+    if (t.type === TransactionType.BUY) {
+      quantity += t.quantityChange;
+      cost += t.quantityChange * t.pricePerUnit;
+    } else {
+      quantity -= t.quantityChange;
+      cost -= t.quantityChange * t.pricePerUnit;
+    }
+  }
+
+  if (quantity <= 0) return null;
+  return { quantity, avgPrice: cost / quantity };
+}
+
 @Injectable()
 export class PortfoliosService {
   constructor(
@@ -237,5 +283,48 @@ export class PortfoliosService {
 
   calculateAssetsTotalPrice(assets: AssetsWithPrices[]) {
     return assets.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
+  }
+
+  async getPortfolioReturns(
+    id: string,
+    period: ReturnPeriod,
+  ): Promise<{ pctReturn: number | null; dollarReturn: number | null }> {
+    const portfolio = await this.prismaService.portfolio.findUnique({
+      where: { id },
+      include: {
+        portfolioAssets: {
+          include: {
+            asset: true,
+            transactions: { where: { portfolioId: id } },
+          },
+        },
+      },
+    });
+
+    if (!portfolio) throw new NotFoundException('Portfolio not found');
+
+    const periodStart = periodStartDate(period);
+    let totalCost = 0;
+    let totalCurrent = 0;
+    let hasPosition = false;
+
+    for (const pa of portfolio.portfolioAssets) {
+      if (pa.asset.currentPrice == null) continue;
+      const position = calcPeriodPosition(pa.transactions, periodStart);
+      if (!position || position.avgPrice === 0) continue;
+
+      hasPosition = true;
+      totalCost += position.avgPrice * position.quantity;
+      totalCurrent += pa.asset.currentPrice * position.quantity;
+    }
+
+    if (!hasPosition || totalCost === 0) {
+      return { pctReturn: null, dollarReturn: null };
+    }
+
+    return {
+      pctReturn: ((totalCurrent - totalCost) / totalCost) * 100,
+      dollarReturn: totalCurrent - totalCost,
+    };
   }
 }
