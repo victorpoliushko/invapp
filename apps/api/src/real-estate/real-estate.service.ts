@@ -21,6 +21,8 @@ export class RealEstateService {
         type: dto.type,
         purchaseDate: new Date(dto.purchaseDate),
         purchasePrice: dto.purchasePrice,
+        rooms: dto.rooms,
+        totalArea: dto.totalArea,
         portfolioId: dto.portfolioId,
       },
       include: { transactions: true },

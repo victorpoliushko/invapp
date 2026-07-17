@@ -11,13 +11,15 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
     type: "APARTMENT",
     purchaseDate: "",
     purchasePrice: "",
+    rooms: "",
+    totalArea: "",
   });
 
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleAdd = async () => {
-    const { code, name, type, purchaseDate, purchasePrice } = form;
-    if (!portfolioId || !code || !name || !purchaseDate || !purchasePrice) return;
+    const { code, name, type, purchaseDate, purchasePrice, rooms, totalArea } = form;
+    if (!portfolioId || !code || !name || !purchaseDate || !purchasePrice || !rooms || !totalArea) return;
 
     const token = localStorage.getItem("accessToken");
     const res = await fetch("/api/real-estate", {
@@ -29,12 +31,14 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
         type,
         purchaseDate: new Date(purchaseDate).toISOString(),
         purchasePrice: Number(purchasePrice),
+        rooms: Number(rooms),
+        totalArea: Number(totalArea),
         portfolioId,
       }),
     });
 
     if (!res.ok) { alert("Failed to add property"); return; }
-    setForm({ code: "", name: "", type: "APARTMENT", purchaseDate: "", purchasePrice: "" });
+    setForm({ code: "", name: "", type: "APARTMENT", purchaseDate: "", purchasePrice: "", rooms: "", totalArea: "" });
     onAdded();
   };
 
@@ -71,6 +75,26 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
       </td>
       <td>
         <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" />
+      </td>
+      <td>
+        <input
+          type="number"
+          value={form.rooms}
+          onChange={(e) => set("rooms", e.target.value)}
+          placeholder="Rooms"
+          min={0}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+        />
+      </td>
+      <td>
+        <input
+          type="number"
+          value={form.totalArea}
+          onChange={(e) => set("totalArea", e.target.value)}
+          placeholder="Area, m²"
+          min={0}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+        />
       </td>
       <td colSpan={3}></td>
       <td style={{ fontWeight: 600, textAlign: "right" }}>

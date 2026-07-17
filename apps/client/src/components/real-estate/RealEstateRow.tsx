@@ -52,6 +52,8 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete }: Prop
       <td>{TYPE_LABELS[property.type] ?? property.type}</td>
       <td>{new Date(property.purchaseDate).toLocaleDateString()}</td>
       <td>{property.purchasePrice.toLocaleString()}</td>
+      <td>{property.rooms ?? "—"}</td>
+      <td>{property.totalArea != null ? property.totalArea.toLocaleString() : "—"}</td>
       <td>{occupancyPct.toFixed(1)}%</td>
       <td style={gain(annualNet)}>{Math.round(annualNet).toLocaleString()}</td>
       <td style={gain(annualNetPct)}>{annualNetPct.toFixed(2)}%</td>

@@ -67,6 +67,54 @@ describe('RealEstateService', () => {
     });
   });
 
+  describe('create', () => {
+    it('persists rooms and totalArea alongside the other fields', async () => {
+      prisma.realEstate.create.mockResolvedValue({ id: 're-1' });
+
+      await service.create({
+        code: 'LVIV-01',
+        name: 'City Apartment',
+        type: 'APARTMENT' as any,
+        purchaseDate: '2026-01-01',
+        purchasePrice: 150000,
+        rooms: 3,
+        totalArea: 72.5,
+        portfolioId: 'p1',
+      });
+
+      expect(prisma.realEstate.create).toHaveBeenCalledWith({
+        data: {
+          code: 'LVIV-01',
+          name: 'City Apartment',
+          type: 'APARTMENT',
+          purchaseDate: new Date('2026-01-01'),
+          purchasePrice: 150000,
+          rooms: 3,
+          totalArea: 72.5,
+          portfolioId: 'p1',
+        },
+        include: { transactions: true },
+      });
+    });
+
+    it('persists undefined rooms and totalArea when not provided', async () => {
+      prisma.realEstate.create.mockResolvedValue({ id: 're-1' });
+
+      await service.create({
+        code: 'LVIV-02',
+        name: 'Studio',
+        type: 'APARTMENT' as any,
+        purchaseDate: '2026-01-01',
+        purchasePrice: 90000,
+        portfolioId: 'p1',
+      });
+
+      expect(prisma.realEstate.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ rooms: undefined, totalArea: undefined }) }),
+      );
+    });
+  });
+
   describe('getByPortfolio', () => {
     it('scopes the query to the given portfolio and orders transactions by start date desc', async () => {
       await service.getByPortfolio('p1');

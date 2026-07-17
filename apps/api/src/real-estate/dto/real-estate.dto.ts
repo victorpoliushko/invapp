@@ -17,6 +17,14 @@ export class CreateRealEstateDto {
   @IsNumber()
   purchasePrice: number;
 
+  @IsOptional()
+  @IsNumber()
+  rooms?: number;
+
+  @IsOptional()
+  @IsNumber()
+  totalArea?: number;
+
   @IsUUID()
   portfolioId: string;
 }

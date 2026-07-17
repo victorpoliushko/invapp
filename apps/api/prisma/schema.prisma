@@ -99,6 +99,8 @@ model RealEstate {
   type          RealEstateType
   purchaseDate  DateTime
   purchasePrice Float
+  rooms         Int?
+  totalArea     Float?
 
   portfolio     Portfolio              @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
   portfolioId   String

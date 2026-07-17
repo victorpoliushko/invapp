@@ -12,5 +12,7 @@ export type RealEstate = {
   type: string;
   purchaseDate: string;
   purchasePrice: number;
+  rooms: number | null;
+  totalArea: number | null;
   transactions: RealEstateTransaction[];
 };

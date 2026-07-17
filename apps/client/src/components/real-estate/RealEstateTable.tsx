@@ -43,6 +43,8 @@ export function RealEstateTable() {
           <th scope="col">Type</th>
           <th scope="col">Purchase date</th>
           <th scope="col">Purchase price</th>
+          <th scope="col">Rooms</th>
+          <th scope="col">Total area, m²</th>
           <th scope="col">Occupancy %</th>
           <th scope="col">Annual net income</th>
           <th scope="col">Annual net income %</th>
