@@ -1,3 +1,9 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .container {
   width: 100vh;
   margin: 45px 40px;
@@ -33,6 +39,8 @@
 
 /* Page content wrapper — applied to every page via Layout, header excluded */
 .page-content {
+  flex: 1;
+  width: 100%;
   max-width: var(--section-max-width);
   margin: 0 auto;
   padding: 2rem 2.5rem;
