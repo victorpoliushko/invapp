@@ -15,16 +15,16 @@ export function BondRow({ bond, onDelete }: { bond: Bond; onDelete: (id: string)
 
   return (
     <tr>
-      <td>{bond.isin}</td>
-      <td>{bond.name}</td>
-      <td>{new Date(bond.purchaseDate).toLocaleDateString()}</td>
-      <td>{bond.quantity}</td>
-      <td>{bond.purchasePrice}</td>
-      <td>{bond.faceValue.toLocaleString()}</td>
-      <td>{bond.couponRate}%</td>
-      <td>{FREQUENCY_LABEL[bond.couponFrequency]}</td>
-      <td>{annualIncome > 0 ? Math.round(annualIncome).toLocaleString() : "—"}</td>
-      <td>{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
+      <td data-label="ISIN">{bond.isin}</td>
+      <td data-label="Name">{bond.name}</td>
+      <td data-label="Date bought">{new Date(bond.purchaseDate).toLocaleDateString()}</td>
+      <td data-label="Quantity">{bond.quantity}</td>
+      <td data-label="Purchase price">{bond.purchasePrice}</td>
+      <td data-label="Face value">{bond.faceValue.toLocaleString()}</td>
+      <td data-label="Coupon %">{bond.couponRate}%</td>
+      <td data-label="Frequency">{FREQUENCY_LABEL[bond.couponFrequency]}</td>
+      <td data-label="Annual income">{annualIncome > 0 ? Math.round(annualIncome).toLocaleString() : "—"}</td>
+      <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
       <td className="actions">
         <button onClick={() => onDelete(bond.id)}>
           <img src={deleteIcon} height={30} width={30} alt="delete" />

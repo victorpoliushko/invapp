@@ -5,8 +5,9 @@
 }
 
 .container {
-  width: 100vh;
+  width: 100%;
   margin: 45px 40px;
+  box-sizing: border-box;
 }
 
 .welcome {
@@ -384,4 +385,56 @@
   color: #ccc;
   margin: 0;
   line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 24px 20px;
+  }
+
+  .welcome {
+    font-size: 32px;
+  }
+
+  .app-name {
+    font-size: 42px;
+  }
+
+  .intro-section-1-h1 {
+    font-size: 28px;
+  }
+
+  .intro-section-1-p {
+    font-size: 16px;
+  }
+
+  .pros-section-cols {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .advanced-level-2,
+  .advanced-level-3 {
+    flex-direction: column;
+  }
+
+  .advanced-level-3-left,
+  .advanced-level-3-center,
+  .advanced-level-3-right {
+    flex: 1 1 auto;
+  }
+
+  .news-section {
+    height: auto;
+    min-height: 300px;
+    padding: 1.5rem;
+  }
+
+  .stocks-wrapper {
+    flex-wrap: wrap;
+  }
+
+  .realestate-grid {
+    grid-template-columns: 1fr;
+  }
 }

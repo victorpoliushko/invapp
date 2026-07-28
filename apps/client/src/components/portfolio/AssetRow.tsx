@@ -33,22 +33,22 @@ export const AssetRow = ({
       <td>
         <button onClick={onExpand}>{isExpanded ? "▼" : "►"}</button>
       </td>
-      <td>{portfolioAsset.asset.ticker}</td>
-      <td>
+      <td data-label="Asset">{portfolioAsset.asset.ticker}</td>
+      <td data-label="Last transaction">
         {portfolioAsset.transactions?.length
           ? new Date(portfolioAsset.transactions[0].date).toLocaleDateString()
           : "—"}
       </td>
-      <td>{portfolioAsset.quantity}</td>
-      <td className="col-avg-price">{portfolioAsset.price ?? "—"}</td>
-      <td>
+      <td data-label="Quantity">{portfolioAsset.quantity}</td>
+      <td className="col-avg-price" data-label="Avg price">{portfolioAsset.price ?? "—"}</td>
+      <td data-label="Current price">
         {loadingPrices[portfolioAsset.assetId] ? "..." : (currentPrice ?? "—")}
       </td>
-      <td style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "#4caf50" : "#e57373" }}>
+      <td data-label="% change" style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "#4caf50" : "#e57373" }}>
         {pctChange == null ? "—" : `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(2)}%`}
       </td>
-      <td>{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
-      <td style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "#4caf50" : "#e57373" }}>
+      <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
+      <td data-label="Total return" style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "#4caf50" : "#e57373" }}>
         {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn).toLocaleString()}`}
       </td>
       <td className="actions">

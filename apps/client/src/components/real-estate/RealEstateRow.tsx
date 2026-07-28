@@ -1,4 +1,5 @@
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstate } from "./types";
 
 type Props = {
@@ -47,17 +48,17 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete }: Prop
       <td>
         <button onClick={onExpand}>{isExpanded ? "▼" : "►"}</button>
       </td>
-      <td>{property.code}</td>
-      <td>{property.name}</td>
-      <td>{TYPE_LABELS[property.type] ?? property.type}</td>
-      <td>{new Date(property.purchaseDate).toLocaleDateString()}</td>
-      <td>{property.purchasePrice.toLocaleString()}</td>
-      <td>{property.rooms ?? "—"}</td>
-      <td>{property.totalArea != null ? property.totalArea.toLocaleString() : "—"}</td>
-      <td>{occupancyPct.toFixed(1)}%</td>
-      <td style={gain(annualNet)}>{Math.round(annualNet).toLocaleString()}</td>
-      <td style={gain(annualNetPct)}>{annualNetPct.toFixed(2)}%</td>
-      <td style={gain(totalReturn)}>
+      <td data-label="Code">{property.code}</td>
+      <td data-label="Name">{property.name}</td>
+      <td data-label="Type">{TYPE_LABELS[property.type] ?? property.type}</td>
+      <td data-label="Purchase date">{new Date(property.purchaseDate).toLocaleDateString()}</td>
+      <td data-label="Purchase price">{property.purchasePrice.toLocaleString()}</td>
+      <td data-label="Rooms">{property.rooms ?? "—"}</td>
+      <td data-label="Total area, m²">{property.totalArea != null ? property.totalArea.toLocaleString() : "—"}</td>
+      <td data-label="Occupancy %">{occupancyPct.toFixed(1)}%</td>
+      <td data-label="Annual net income" style={gain(annualNet)}>{Math.round(annualNet).toLocaleString()}</td>
+      <td data-label="Annual net income %" style={gain(annualNetPct)}>{annualNetPct.toFixed(2)}%</td>
+      <td data-label="Total return" style={gain(totalReturn)}>
         {totalReturn >= 0 ? "+" : ""}
         {Math.round(totalReturn).toLocaleString()}
       </td>

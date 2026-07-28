@@ -200,7 +200,7 @@ export function AddAsset({
       </td>
       <td></td>
       <td></td>
-      <td style={{ fontWeight: 600, textAlign: "right" }}>
+      <td data-label="Total position" style={{ fontWeight: 600, textAlign: "right" }}>
         {totalPositionSum > 0 ? Math.round(totalPositionSum).toLocaleString() : "—"}
       </td>
       <td></td>

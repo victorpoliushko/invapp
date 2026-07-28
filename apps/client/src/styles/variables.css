@@ -52,4 +52,11 @@
   /* Layout */
   --section-max-width: 1440px;
   --section-padding: 1.5rem;
+
+  /*
+   * Breakpoint reference (media queries can't read custom properties,
+   * so these are documentation only — use the raw px values below):
+   * --bp-tablet: 768px
+   * --bp-mobile: 600px
+   */
 }

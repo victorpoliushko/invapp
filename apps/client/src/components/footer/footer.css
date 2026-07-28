@@ -15,3 +15,11 @@
   color: var(--color-text-muted);
   font-size: var(--font-s);
 }
+
+@media (max-width: 600px) {
+  .footer-content {
+    padding: var(--space-md) var(--section-padding);
+    font-size: var(--font-xs);
+    text-align: center;
+  }
+}

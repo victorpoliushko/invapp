@@ -156,3 +156,34 @@
 .portfolio-delete-btn:hover {
   opacity: 1;
 }
+
+@media (max-width: 900px) {
+  .portfolio-min {
+    margin: 2rem auto;
+    padding: 1.5rem;
+  }
+
+  .portfolio-min-cols {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .portfolio-delete-btn {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-performer-row {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "type name name"
+      "pct  pct  dollar";
+    row-gap: 2px;
+  }
+
+  .portfolio-performer-type { grid-area: type; }
+  .portfolio-performer-name { grid-area: name; }
+  .portfolio-performer-pct { grid-area: pct; }
+  .portfolio-performer-dollar { grid-area: dollar; text-align: right; }
+}

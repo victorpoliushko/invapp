@@ -97,7 +97,7 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
         />
       </td>
       <td colSpan={3}></td>
-      <td style={{ fontWeight: 600, textAlign: "right" }}>
+      <td data-label="Total position" style={{ fontWeight: 600, textAlign: "right" }}>
         {totalPurchasePrice.toLocaleString()}
       </td>
       <td>
