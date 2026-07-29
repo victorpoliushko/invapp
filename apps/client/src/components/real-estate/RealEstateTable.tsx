@@ -34,6 +34,7 @@ export function RealEstateTable() {
   };
 
   return (
+    <div className="table-scroll">
     <table className="assets-table">
       <thead>
         <tr>
@@ -73,5 +74,6 @@ export function RealEstateTable() {
         <AddRealEstate onAdded={load} totalPurchasePrice={totalPurchasePrice} />
       </tbody>
     </table>
+    </div>
   );
 }

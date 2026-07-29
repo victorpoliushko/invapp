@@ -5,6 +5,7 @@
 
 .ai-suggestions header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   height: 100px;
@@ -18,9 +19,10 @@
 
 .add-rule-form {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
-  height: 38px;
+  min-height: 38px;
 }
 
 .add-rule-form > input {
@@ -39,4 +41,31 @@
   border: none;
   background-color: #141413;
   color: #FAFAF8;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .ai-suggestions img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ai-suggestions header {
+    height: auto;
+    padding: 1rem 0;
+  }
+
+  .add-rule-main {
+    padding: 10px 16px;
+  }
+
+  .add-rule-form > input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .add-rule-form > button {
+    width: 100%;
+  }
 }

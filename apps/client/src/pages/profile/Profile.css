@@ -95,3 +95,30 @@
   background-color: var(--color-border-muted);
   color: white;
 }
+
+@media (max-width: 480px) {
+  .profile-section {
+    max-width: 100%;
+  }
+
+  .profile-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .profile-input {
+    width: 100%;
+    text-align: left;
+  }
+
+  .profile-actions {
+    justify-content: stretch;
+  }
+
+  .profile-edit-btn,
+  .profile-save-btn,
+  .profile-cancel-btn {
+    flex: 1;
+  }
+}

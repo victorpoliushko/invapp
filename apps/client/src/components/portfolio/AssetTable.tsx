@@ -74,6 +74,7 @@ export const AssetTable = ({
   const totalPositionSum = portfolioAssets.reduce((sum, pa) => sum + totalPosition(pa), 0);
 
   return (
+    <div className="table-scroll">
     <table className="assets-table">
       <thead>
         <tr>
@@ -120,5 +121,6 @@ export const AssetTable = ({
         <AddAsset assetType={assetType} totalPositionSum={totalPositionSum} />
       </tbody>
     </table>
+    </div>
   );
 };

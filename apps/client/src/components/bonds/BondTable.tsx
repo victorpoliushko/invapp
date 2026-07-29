@@ -31,6 +31,7 @@ export function BondTable() {
   };
 
   return (
+    <div className="table-scroll">
     <table className="assets-table">
       <thead>
         <tr>
@@ -54,5 +55,6 @@ export function BondTable() {
         <AddBondTransaction onAdded={load} />
       </tbody>
     </table>
+    </div>
   );
 }
