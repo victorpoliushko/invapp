@@ -7,7 +7,7 @@ describe('RealEstateService', () => {
 
   beforeEach(() => {
     prisma = {
-      realEstate: { findFirst: jest.fn(), create: jest.fn(), delete: jest.fn(), findMany: jest.fn() },
+      realEstate: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findMany: jest.fn() },
       realEstateTransaction: { create: jest.fn() },
     };
     service = new RealEstateService(prisma);
@@ -112,6 +112,55 @@ describe('RealEstateService', () => {
       expect(prisma.realEstate.create).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.objectContaining({ rooms: undefined, totalArea: undefined }) }),
       );
+    });
+  });
+
+  describe('update', () => {
+    it('updates the provided fields, converting purchaseDate to a Date', async () => {
+      prisma.realEstate.update.mockResolvedValue({ id: 're-1' });
+
+      await service.update('re-1', {
+        code: 'LVIV-01',
+        name: 'Renovated Apartment',
+        type: 'APARTMENT' as any,
+        purchaseDate: '2026-02-01',
+        purchasePrice: 160000,
+        rooms: 4,
+        totalArea: 80,
+      });
+
+      expect(prisma.realEstate.update).toHaveBeenCalledWith({
+        where: { id: 're-1' },
+        data: {
+          code: 'LVIV-01',
+          name: 'Renovated Apartment',
+          type: 'APARTMENT',
+          purchaseDate: new Date('2026-02-01'),
+          purchasePrice: 160000,
+          rooms: 4,
+          totalArea: 80,
+        },
+        include: { transactions: true },
+      });
+    });
+
+    it('omits purchaseDate from the update when not provided', async () => {
+      prisma.realEstate.update.mockResolvedValue({ id: 're-1' });
+
+      await service.update('re-1', { rooms: 2 });
+
+      expect(prisma.realEstate.update).toHaveBeenCalledWith({
+        where: { id: 're-1' },
+        data: {
+          code: undefined,
+          name: undefined,
+          type: undefined,
+          purchasePrice: undefined,
+          rooms: 2,
+          totalArea: undefined,
+        },
+        include: { transactions: true },
+      });
     });
   });
 

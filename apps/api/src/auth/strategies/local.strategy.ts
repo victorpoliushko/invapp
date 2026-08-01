@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(email: string, password: string): Promise<any> {
     if (!password)
       throw new HttpException(
-        getReasonPhrase('Please provide the password'),
+        getReasonPhrase(StatusCodes.UNAUTHORIZED),
         StatusCodes.UNAUTHORIZED,
       );
     const user = await this.authServece.validateUser({ email, password });

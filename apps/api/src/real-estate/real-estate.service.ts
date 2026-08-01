@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRealEstateDto, CreateRealEstateTransactionDto } from './dto/real-estate.dto';
+import { CreateRealEstateDto, CreateRealEstateTransactionDto, UpdateRealEstateDto } from './dto/real-estate.dto';
 
 @Injectable()
 export class RealEstateService {
@@ -24,6 +24,22 @@ export class RealEstateService {
         rooms: dto.rooms,
         totalArea: dto.totalArea,
         portfolioId: dto.portfolioId,
+      },
+      include: { transactions: true },
+    });
+  }
+
+  async update(id: string, dto: UpdateRealEstateDto) {
+    return this.prismaService.realEstate.update({
+      where: { id },
+      data: {
+        code: dto.code,
+        name: dto.name,
+        type: dto.type,
+        ...(dto.purchaseDate && { purchaseDate: new Date(dto.purchaseDate) }),
+        purchasePrice: dto.purchasePrice,
+        rooms: dto.rooms,
+        totalArea: dto.totalArea,
       },
       include: { transactions: true },
     });

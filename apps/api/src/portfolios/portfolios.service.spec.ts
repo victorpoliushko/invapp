@@ -511,7 +511,6 @@ describe('PortfoliosService', () => {
     });
 
     it('returns actual prices for each portfolio asset', async () => {
-      jest.useFakeTimers();
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         portfolioAssets: [
@@ -521,15 +520,28 @@ describe('PortfoliosService', () => {
       });
       assetsService.getSharePrice.mockResolvedValueOnce(150).mockResolvedValueOnce(50000);
 
-      const resultPromise = service.getPortfolioBalance('p1', 'USD' as any);
-      await jest.runAllTimersAsync();
-      const result = await resultPromise;
+      const result = await service.getPortfolioBalance('p1', 'USD' as any);
 
       expect(result).toEqual([
         { assetId: 'a1', symbol: 'AAPL', actualPrice: 150 },
         { assetId: 'a2', symbol: 'BTC', actualPrice: 50000 },
       ]);
-      jest.useRealTimers();
+    });
+
+    it('fetches prices concurrently instead of serially', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        portfolioAssets: [
+          { assetId: 'a1', asset: { ticker: 'AAPL' } },
+          { assetId: 'a2', asset: { ticker: 'BTC' } },
+        ],
+      });
+      assetsService.getSharePrice.mockResolvedValue(100);
+
+      const start = Date.now();
+      await service.getPortfolioBalance('p1', 'USD' as any);
+
+      expect(Date.now() - start).toBeLessThan(500);
     });
 
     it('returns an empty array when the portfolio has no assets', async () => {

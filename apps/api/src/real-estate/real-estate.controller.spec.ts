@@ -8,6 +8,7 @@ describe('RealEstateController', () => {
     service = {
       getByPortfolio: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
       delete: jest.fn(),
       createTransaction: jest.fn(),
       addTransactionByCode: jest.fn(),
@@ -42,6 +43,16 @@ describe('RealEstateController', () => {
       controller.create(dto as any);
 
       expect(service.create).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('update', () => {
+    it('delegates to the service with the property id and update dto', () => {
+      const dto = { rooms: 4, totalArea: 85 };
+
+      controller.update('re-1', dto as any);
+
+      expect(service.update).toHaveBeenCalledWith('re-1', dto);
     });
   });
 

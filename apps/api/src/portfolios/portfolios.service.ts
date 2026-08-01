@@ -266,19 +266,14 @@ export class PortfoliosService {
     });
 
     if (!portfolio) throw new NotFoundException('Portfolio not found');
-    const prices = [];
-    for (const pa of portfolio.portfolioAssets) {
-      const price = await this.assetsService.getSharePrice(pa.asset.ticker);
-      prices.push({
+
+    return Promise.all(
+      portfolio.portfolioAssets.map(async (pa) => ({
         assetId: pa.assetId,
         symbol: pa.asset.ticker,
-        actualPrice: price,
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-    }
-
-    return prices;
+        actualPrice: await this.assetsService.getSharePrice(pa.asset.ticker),
+      })),
+    );
   }
 
   calculateAssetsTotalPrice(assets: AssetsWithPrices[]) {

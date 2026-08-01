@@ -39,4 +39,10 @@ describe('HasPermissionGuard', () => {
       HttpException,
     );
   });
+
+  it('throws Forbidden (not a raw TypeError) when there is no user at all', () => {
+    reflector.get.mockReturnValue('portfolios:delete');
+
+    expect(() => guard.canActivate(makeContext(undefined))).toThrow(HttpException);
+  });
 });

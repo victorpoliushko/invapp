@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { HttpException, UnauthorizedException } from '@nestjs/common';
 import { LocalStrategy } from './local.strategy';
 
 describe('LocalStrategy', () => {
@@ -20,13 +20,8 @@ describe('LocalStrategy', () => {
       expect(result).toEqual({ userId: 'u1', username: 'vic' });
     });
 
-    it('throws when no password is provided', async () => {
-      // Bug: the guard calls getReasonPhrase('Please provide the password') — that
-      // function expects a StatusCode, not a message, so it throws its own internal
-      // Error ("Status code does not exist: ...") instead of the intended HttpException.
-      await expect(strategy.validate('v@x.com', '')).rejects.toThrow(
-        'Status code does not exist: Please provide the password',
-      );
+    it('throws Unauthorized when no password is provided', async () => {
+      await expect(strategy.validate('v@x.com', '')).rejects.toThrow(HttpException);
       expect(authService.validateUser).not.toHaveBeenCalled();
     });
 

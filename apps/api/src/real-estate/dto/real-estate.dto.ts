@@ -29,6 +29,36 @@ export class CreateRealEstateDto {
   portfolioId: string;
 }
 
+export class UpdateRealEstateDto {
+  @IsOptional()
+  @IsString()
+  code?: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsEnum(RealEstateType)
+  type?: RealEstateType;
+
+  @IsOptional()
+  @IsString()
+  purchaseDate?: string;
+
+  @IsOptional()
+  @IsNumber()
+  purchasePrice?: number;
+
+  @IsOptional()
+  @IsNumber()
+  rooms?: number;
+
+  @IsOptional()
+  @IsNumber()
+  totalArea?: number;
+}
+
 export class CreateRealEstateTransactionDto {
   @IsUUID()
   realEstateId: string;

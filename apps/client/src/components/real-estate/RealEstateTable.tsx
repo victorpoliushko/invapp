@@ -61,6 +61,7 @@ export function RealEstateTable() {
               isExpanded={expandedId === p.id}
               onExpand={() => setExpandedId(expandedId === p.id ? null : p.id)}
               onDelete={handleDelete}
+              onUpdated={load}
             />
             {expandedId === p.id && (
               <RealEstateTransactions

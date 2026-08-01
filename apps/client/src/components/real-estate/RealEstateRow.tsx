@@ -1,4 +1,6 @@
+import { useState } from "react";
 import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import editIcon from "../../assets/pencil-svgrepo-com.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstate } from "./types";
 
@@ -7,6 +9,7 @@ type Props = {
   isExpanded: boolean;
   onExpand: () => void;
   onDelete: (id: string) => void;
+  onUpdated: () => void;
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -39,9 +42,101 @@ function calcStats(property: RealEstate) {
   return { occupancyPct, annualNet, annualNetPct, totalReturn: totalRentEarned };
 }
 
-export function RealEstateRow({ property, isExpanded, onExpand, onDelete }: Props) {
+function toDateInputValue(iso: string): string {
+  return new Date(iso).toISOString().slice(0, 10);
+}
+
+export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpdated }: Props) {
   const { occupancyPct, annualNet, annualNetPct, totalReturn } = calcStats(property);
   const gain = (v: number) => ({ color: v >= 0 ? "#4caf50" : "#e57373" });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState({
+    code: property.code,
+    name: property.name,
+    type: property.type,
+    purchaseDate: toDateInputValue(property.purchaseDate),
+    purchasePrice: String(property.purchasePrice),
+    rooms: property.rooms != null ? String(property.rooms) : "",
+    totalArea: property.totalArea != null ? String(property.totalArea) : "",
+  });
+
+  const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
+
+  const startEditing = () => {
+    setForm({
+      code: property.code,
+      name: property.name,
+      type: property.type,
+      purchaseDate: toDateInputValue(property.purchaseDate),
+      purchasePrice: String(property.purchasePrice),
+      rooms: property.rooms != null ? String(property.rooms) : "",
+      totalArea: property.totalArea != null ? String(property.totalArea) : "",
+    });
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    const { code, name, type, purchaseDate, purchasePrice, rooms, totalArea } = form;
+    if (!code || !name || !purchaseDate || !purchasePrice || !rooms || !totalArea) return;
+
+    const token = localStorage.getItem("accessToken");
+    const res = await fetch(`/api/real-estate/${property.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        code,
+        name,
+        type,
+        purchaseDate: new Date(purchaseDate).toISOString(),
+        purchasePrice: Number(purchasePrice),
+        rooms: Number(rooms),
+        totalArea: Number(totalArea),
+      }),
+    });
+
+    if (!res.ok) { alert("Failed to update property"); return; }
+    setIsEditing(false);
+    onUpdated();
+  };
+
+  if (isEditing) {
+    return (
+      <tr>
+        <td></td>
+        <td>
+          <input type="text" value={form.code} onChange={(e) => set("code", e.target.value)} placeholder="Code" />
+        </td>
+        <td>
+          <input type="text" value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Name" />
+        </td>
+        <td>
+          <select value={form.type} onChange={(e) => set("type", e.target.value)}>
+            <option value="APARTMENT">Apartment</option>
+            <option value="HOUSE">House</option>
+            <option value="COMMERCIAL">Commercial</option>
+          </select>
+        </td>
+        <td>
+          <input type="date" value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
+        </td>
+        <td>
+          <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" />
+        </td>
+        <td>
+          <input type="number" value={form.rooms} onChange={(e) => set("rooms", e.target.value)} placeholder="Rooms" min={0} />
+        </td>
+        <td>
+          <input type="number" value={form.totalArea} onChange={(e) => set("totalArea", e.target.value)} placeholder="Area, m²" min={0} />
+        </td>
+        <td colSpan={4}></td>
+        <td className="actions">
+          <button onClick={handleSave}>Save</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </td>
+      </tr>
+    );
+  }
 
   return (
     <tr>
@@ -63,6 +158,9 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete }: Prop
         {Math.round(totalReturn).toLocaleString()}
       </td>
       <td className="actions">
+        <button onClick={startEditing}>
+          <img src={editIcon} height={24} width={24} alt="edit" />
+        </button>
         <button onClick={() => onDelete(property.id)}>
           <img src={deleteIcon} height={30} width={30} alt="delete" />
         </button>

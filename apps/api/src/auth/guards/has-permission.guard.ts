@@ -18,8 +18,7 @@ export class HasPermissionGuard implements CanActivate {
       return true;
     }
 
-    const includesPermision = user.permissions.includes(requiredPermision);
-    if (!user || !includesPermision) {
+    if (!user || !user.permissions.includes(requiredPermision)) {
       throw new HttpException(
         getReasonPhrase(StatusCodes.FORBIDDEN),
         StatusCodes.FORBIDDEN

@@ -19,9 +19,6 @@ import refreshJwtConfig from './config/refresh-jwt-config';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
-// tmp remove
-// import { GoogleAnalyticsService } from './ga4/googleAnalyticsApi.service';
-// import { GoogleAnalyticsController } from './ga4/googleAnalyticsApi.controller';
 import { UploadModule } from './upload/upload.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { RealEstateModule } from './real-estate/real-estate.module';
@@ -42,12 +39,8 @@ import { BondsModule } from './bonds/bonds.module';
     PrometheusModule.register(),
     UploadModule
   ],
-  controllers: [AppController, AssetsController, 
-    // GoogleAnalyticsController
-  ],
-  providers: [AppService, AssetsService, AuthService, JwtService, UsersService, PrismaService, 
-    // GoogleAnalyticsService,
-     {
+  controllers: [AppController, AssetsController],
+  providers: [AppService, AssetsService, AuthService, JwtService, UsersService, PrismaService, {
     provide: APP_INTERCEPTOR,
     useClass: LoggingInterceptor
   }],
