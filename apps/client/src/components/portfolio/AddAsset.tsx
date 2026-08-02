@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { usePortfolio } from "../../context/PortfolioContext";
@@ -27,6 +28,8 @@ export function AddAsset({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
   const [selectedCoingeckoId, setSelectedCoingeckoId] = useState<string | null>(null);
+  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number } | null>(null);
+  const autocompleteRef = useRef<HTMLDivElement>(null);
 
   const [transactionType, setTransactionType] = useState<"BUY" | "SELL">("BUY");
   const [newAsset, setNewAsset] = useState({
@@ -62,6 +65,28 @@ export function AddAsset({
 
     return () => clearTimeout(timer);
   }, [searchTerm, assetType]);
+
+  useEffect(() => {
+    if (suggestions.length === 0) {
+      setDropdownRect(null);
+      return;
+    }
+
+    const updateRect = () => {
+      const el = autocompleteRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      setDropdownRect({ top: rect.bottom, left: rect.left, width: rect.width });
+    };
+
+    updateRect();
+    window.addEventListener("scroll", updateRect, true);
+    window.addEventListener("resize", updateRect);
+    return () => {
+      window.removeEventListener("scroll", updateRect, true);
+      window.removeEventListener("resize", updateRect);
+    };
+  }, [suggestions]);
 
   const handleAddAsset = async () => {
     const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
@@ -124,7 +149,7 @@ export function AddAsset({
         </div>
       </td>
       <td>
-        <div className="asset-autocomplete">
+        <div className="asset-autocomplete" ref={autocompleteRef}>
           <input
             type="text"
             value={searchTerm}
@@ -136,8 +161,16 @@ export function AddAsset({
             placeholder={assetType === "crypto" ? "Search crypto" : "Asset"}
             autoComplete="off"
           />
-          {suggestions.length > 0 && (
-            <ul className="suggestions-list">
+          {suggestions.length > 0 && dropdownRect && createPortal(
+            <ul
+              className="suggestions-list"
+              style={{
+                position: "fixed",
+                top: dropdownRect.top,
+                left: dropdownRect.left,
+                width: dropdownRect.width,
+              }}
+            >
               {suggestions.slice(0, 5).map((s) =>
                 isCrypto(s) ? (
                   <li
@@ -168,7 +201,8 @@ export function AddAsset({
                   </li>
                 )
               )}
-            </ul>
+            </ul>,
+            document.body,
           )}
         </div>
       </td>
