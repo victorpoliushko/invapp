@@ -1,19 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRealEstateDto, CreateRealEstateTransactionDto, UpdateRealEstateDto } from './dto/real-estate.dto';
+import { PortfoliosService } from '../portfolios/portfolios.service';
 
 @Injectable()
 export class RealEstateService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private portfoliosService: PortfoliosService,
+  ) {}
 
-  async getByPortfolio(portfolioId: string) {
+  private async getPortfolioIdForProperty(id: string): Promise<string> {
+    const property = await this.prismaService.realEstate.findUnique({
+      where: { id },
+      select: { portfolioId: true },
+    });
+    if (!property) throw new NotFoundException('Property not found');
+    return property.portfolioId;
+  }
+
+  private async getPortfolioIdForTransaction(transactionId: string): Promise<string> {
+    const transaction = await this.prismaService.realEstateTransaction.findUnique({
+      where: { id: transactionId },
+      select: { realEstate: { select: { portfolioId: true } } },
+    });
+    if (!transaction) throw new NotFoundException('Transaction not found');
+    return transaction.realEstate.portfolioId;
+  }
+
+  async getByPortfolio(portfolioId: string, userId: string) {
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return this.prismaService.realEstate.findMany({
       where: { portfolioId },
       include: { transactions: { orderBy: { startDate: 'desc' } } },
     });
   }
 
-  async create(dto: CreateRealEstateDto) {
+  async create(dto: CreateRealEstateDto, userId: string) {
+    await this.portfoliosService.assertOwnership(dto.portfolioId, userId);
+
     return this.prismaService.realEstate.create({
       data: {
         code: dto.code,
@@ -29,7 +55,10 @@ export class RealEstateService {
     });
   }
 
-  async update(id: string, dto: UpdateRealEstateDto) {
+  async update(id: string, dto: UpdateRealEstateDto, userId: string) {
+    const portfolioId = await this.getPortfolioIdForProperty(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return this.prismaService.realEstate.update({
       where: { id },
       data: {
@@ -45,11 +74,23 @@ export class RealEstateService {
     });
   }
 
-  async delete(id: string) {
+  async delete(id: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForProperty(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return this.prismaService.realEstate.delete({ where: { id } });
   }
 
-  async addTransactionByCode(portfolioId: string, code: string, startDate: string, endDate: string, monthlyRent: number) {
+  async addTransactionByCode(
+    portfolioId: string,
+    code: string,
+    startDate: string,
+    endDate: string,
+    monthlyRent: number,
+    userId: string,
+  ) {
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     let property = await this.prismaService.realEstate.findFirst({
       where: { portfolioId, code },
     });
@@ -77,7 +118,10 @@ export class RealEstateService {
     });
   }
 
-  async createTransaction(dto: CreateRealEstateTransactionDto) {
+  async createTransaction(dto: CreateRealEstateTransactionDto, userId: string) {
+    const portfolioId = await this.getPortfolioIdForProperty(dto.realEstateId);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return this.prismaService.realEstateTransaction.create({
       data: {
         realEstateId: dto.realEstateId,
@@ -88,7 +132,14 @@ export class RealEstateService {
     });
   }
 
-  async updateTransaction(id: string, data: { startDate: string; endDate: string; monthlyRent: number }) {
+  async updateTransaction(
+    id: string,
+    data: { startDate: string; endDate: string; monthlyRent: number },
+    userId: string,
+  ) {
+    const portfolioId = await this.getPortfolioIdForTransaction(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return this.prismaService.realEstateTransaction.update({
       where: { id },
       data: {
@@ -99,7 +150,10 @@ export class RealEstateService {
     });
   }
 
-  async deleteTransaction(id: string) {
+  async deleteTransaction(id: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForTransaction(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return this.prismaService.realEstateTransaction.delete({ where: { id } });
   }
 }

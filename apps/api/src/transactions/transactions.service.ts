@@ -2,7 +2,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTransactionDto } from './dto/CreateTransaction.dto';
 import { TransactionsDto } from './dto/Transations.dto';
 import { plainToInstance } from 'class-transformer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PortfoliosService } from 'src/portfolios/portfolios.service';
 
 @Injectable()
@@ -12,7 +12,18 @@ export class TransactionsService {
     private portfoliosService: PortfoliosService,
   ) {}
 
-  async create(input: CreateTransactionDto): Promise<TransactionsDto> {
+  private async getPortfolioIdForTransaction(id: string): Promise<string> {
+    const transaction = await this.prismaService.transaction.findUnique({
+      where: { id },
+      select: { portfolioId: true },
+    });
+    if (!transaction) throw new NotFoundException('Transaction not found');
+    return transaction.portfolioId;
+  }
+
+  async create(input: CreateTransactionDto, userId: string): Promise<TransactionsDto> {
+    await this.portfoliosService.assertOwnership(input.portfolioId, userId);
+
     let assetId = input.assetId;
 
     if (!assetId && input.assetName) {
@@ -40,7 +51,7 @@ export class TransactionsService {
       },
     });
 
-    this.portfoliosService.addAssetToPortfolio(input.portfolioId, input);
+    this.portfoliosService.addAssetToPortfolio(input.portfolioId, input, userId);
 
     return plainToInstance(TransactionsDto, createdTransaction);
   }
@@ -61,7 +72,11 @@ export class TransactionsService {
   async update(
     id: string,
     data: { date: string; quantityChange: number; pricePerUnit: number },
+    userId: string,
   ) {
+    const portfolioId = await this.getPortfolioIdForTransaction(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return await this.prismaService.$transaction(async (trx) => {
       await trx.transaction.update({
         where: { id },
@@ -73,7 +88,7 @@ export class TransactionsService {
       });
 
       const updated = await trx.transaction.findUniqueOrThrow({ where: { id } });
-      const { portfolioId, assetId } = updated;
+      const { assetId } = updated;
 
       const allTransactions = await trx.transaction.findMany({
         where: { portfolioId, assetId },
@@ -103,13 +118,16 @@ export class TransactionsService {
     });
   }
 
-  async delete(id: string) {
+  async delete(id: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForTransaction(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
     return await this.prismaService.$transaction(async (trx) => {
       const transaction = await trx.transaction.findUniqueOrThrow({
         where: { id },
       });
 
-      const { portfolioId, assetId } = transaction;
+      const { assetId } = transaction;
 
       await trx.transaction.delete({ where: { id } });
 

@@ -2,9 +2,8 @@ import { plainToInstance } from 'class-transformer';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { AddAssetInputDto } from './dto/AssetToPortfolio.dto';
-import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dto';
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AssetsService } from '../assets/assets.service';
@@ -71,6 +70,21 @@ export class PortfoliosService {
     private assetsService: AssetsService,
   ) {}
 
+  // Verifies that `userId` owns the portfolio identified by `portfolioId`,
+  // throwing NotFound/Forbidden otherwise. Called first by every method that
+  // acts on a specific portfolio, so a user can never read or mutate a
+  // portfolio that isn't theirs just by knowing/guessing its id.
+  async assertOwnership(portfolioId: string, userId: string): Promise<void> {
+    const portfolio = await this.prismaService.portfolio.findUnique({
+      where: { id: portfolioId },
+      select: { userId: true },
+    });
+    if (!portfolio) throw new NotFoundException('Portfolio not found');
+    if (portfolio.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this portfolio');
+    }
+  }
+
   async create(input: CreatePortfolioDto): Promise<PortfolioDto> {
     const createdPortfolio = await this.prismaService.portfolio.create({
       data: input,
@@ -79,7 +93,9 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, createdPortfolio);
   }
 
-  async getById(id: string): Promise<PortfolioDto> {
+  async getById(id: string, userId: string): Promise<PortfolioDto> {
+    await this.assertOwnership(id, userId);
+
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
@@ -98,7 +114,9 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, portfolio);
   }
 
-  async update(input: UpdatePortfolioDto): Promise<PortfolioDto> {
+  async update(input: UpdatePortfolioDto, userId: string): Promise<PortfolioDto> {
+    await this.assertOwnership(input.id, userId);
+
     const portfolio = await this.prismaService.portfolio.update({
       where: { id: input.id },
       data: {
@@ -109,7 +127,9 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, portfolio);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, userId: string): Promise<void> {
+    await this.assertOwnership(id, userId);
+
     await this.prismaService.$transaction([
       this.prismaService.transaction.deleteMany({ where: { portfolioId: id } }),
       this.prismaService.portfolioAsset.deleteMany({ where: { portfolioId: id } }),
@@ -138,17 +158,9 @@ export class PortfoliosService {
   async addAssetToPortfolio(
     id: string,
     input: AddAssetInputDto,
+    userId: string,
   ): Promise<PortfolioDto> {
-    const exsitingPortfolio = await this.prismaService.portfolio.findUnique({
-      where: { id },
-    });
-
-    if (!exsitingPortfolio) {
-      throw new HttpException(
-        getReasonPhrase(StatusCodes.NOT_FOUND),
-        StatusCodes.NOT_FOUND,
-      );
-    }
+    await this.assertOwnership(id, userId);
 
     let asset = await this.assetsService.findAssetByName(input.assetName);
 
@@ -227,7 +239,10 @@ export class PortfoliosService {
   async deleteAsset(
     id: string,
     input: DeleteAssetsFromPortfolioDto,
+    userId: string,
   ): Promise<PortfolioDto> {
+    await this.assertOwnership(id, userId);
+
     await this.prismaService.transaction.deleteMany({
       where: {
         portfolioId: id,
@@ -253,7 +268,9 @@ export class PortfoliosService {
     return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
-  async getPortfolioBalance(id: string, currency: Currency): Promise<any> {
+  async getPortfolioBalance(id: string, currency: Currency, userId: string): Promise<any> {
+    await this.assertOwnership(id, userId);
+
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
@@ -283,7 +300,10 @@ export class PortfoliosService {
   async getPortfolioReturns(
     id: string,
     period: ReturnPeriod,
+    userId: string,
   ): Promise<{ pctReturn: number | null; dollarReturn: number | null }> {
+    await this.assertOwnership(id, userId);
+
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {

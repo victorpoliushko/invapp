@@ -1,7 +1,9 @@
-import { HttpException } from '@nestjs/common';
+import { ForbiddenException, HttpException } from '@nestjs/common';
 import { PortfoliosController } from './portfolios.controller';
 
 describe('PortfoliosController', () => {
+  const user = { id: 'u1' } as any;
+
   let service: any;
   let controller: PortfoliosController;
 
@@ -26,7 +28,7 @@ describe('PortfoliosController', () => {
       const dto = { userId: 'u1', name: 'Retirement' };
       service.create.mockResolvedValue({ id: 'p1', ...dto });
 
-      const result = await controller.createPortfolio(dto as any, { id: 'u1' } as any);
+      const result = await controller.createPortfolio(dto as any, user);
 
       expect(service.create).toHaveBeenCalledWith(dto);
       expect(result).toEqual({ id: 'p1', ...dto });
@@ -35,83 +37,86 @@ describe('PortfoliosController', () => {
     it('throws Forbidden when the dto userId does not match the authenticated user', () => {
       const dto = { userId: 'someone-else', name: 'Retirement' };
 
-      expect(() => controller.createPortfolio(dto as any, { id: 'u1' } as any)).toThrow(
-        HttpException,
-      );
+      expect(() => controller.createPortfolio(dto as any, user)).toThrow(HttpException);
       expect(service.create).not.toHaveBeenCalled();
     });
   });
 
   describe('updatePortfolio', () => {
-    it('delegates to the service with the update dto', () => {
+    it('delegates to the service with the update dto and authenticated user id', () => {
       const dto = { id: 'p1', name: 'New Name' };
-      controller.updatePortfolio('p1', dto as any);
+      controller.updatePortfolio('p1', dto as any, user);
 
-      expect(service.update).toHaveBeenCalledWith(dto);
+      expect(service.update).toHaveBeenCalledWith(dto, 'u1');
     });
   });
 
   describe('deletePortfolio', () => {
-    it('delegates to the service with the portfolio id', () => {
-      controller.deletePortfolio('p1');
+    it('delegates to the service with the portfolio id and authenticated user id', () => {
+      controller.deletePortfolio('p1', user);
 
-      expect(service.delete).toHaveBeenCalledWith('p1');
+      expect(service.delete).toHaveBeenCalledWith('p1', 'u1');
     });
   });
 
   describe('getPortfolio', () => {
-    it('delegates to the service with the portfolio id', () => {
-      controller.getPortfolio('p1');
+    it('delegates to the service with the portfolio id and authenticated user id', () => {
+      controller.getPortfolio('p1', user);
 
-      expect(service.getById).toHaveBeenCalledWith('p1');
+      expect(service.getById).toHaveBeenCalledWith('p1', 'u1');
     });
   });
 
   describe('getPortfoliosByUserId', () => {
-    it('delegates to the service with the user id', () => {
-      controller.getPortfoliosByUserId('u1');
+    it('delegates to the service when the requested user id matches the authenticated user', () => {
+      controller.getPortfoliosByUserId('u1', user);
 
       expect(service.getByUserId).toHaveBeenCalledWith('u1');
+    });
+
+    it('throws Forbidden when requesting another user\'s portfolios', () => {
+      expect(() => controller.getPortfoliosByUserId('someone-else', user)).toThrow(ForbiddenException);
+      expect(service.getByUserId).not.toHaveBeenCalled();
     });
   });
 
   describe('addAssetToPortfolio', () => {
-    it('delegates to the service with the portfolio id and dto', () => {
+    it('delegates to the service with the portfolio id, dto and authenticated user id', () => {
       const dto = { assetName: 'AAPL', quantityChange: 1, pricePerUnit: 100, date: '2026-01-01', type: 'BUY' };
-      controller.addAssetToPortfolio('p1', dto as any);
+      controller.addAssetToPortfolio('p1', dto as any, user);
 
-      expect(service.addAssetToPortfolio).toHaveBeenCalledWith('p1', dto);
+      expect(service.addAssetToPortfolio).toHaveBeenCalledWith('p1', dto, 'u1');
     });
   });
 
   describe('deleteAsset', () => {
-    it('delegates to the service with the portfolio id and dto', () => {
+    it('delegates to the service with the portfolio id, dto and authenticated user id', () => {
       const dto = { assetId: 'a1' };
-      controller.deleteAsset('p1', dto as any);
+      controller.deleteAsset('p1', dto as any, user);
 
-      expect(service.deleteAsset).toHaveBeenCalledWith('p1', dto);
+      expect(service.deleteAsset).toHaveBeenCalledWith('p1', dto, 'u1');
     });
   });
 
   describe('getBalance', () => {
-    it('delegates to the service with the portfolio id and currency', () => {
-      controller.getBalance('p1', 'USD' as any);
+    it('delegates to the service with the portfolio id, currency and authenticated user id', () => {
+      controller.getBalance('p1', 'USD' as any, user);
 
-      expect(service.getPortfolioBalance).toHaveBeenCalledWith('p1', 'USD');
+      expect(service.getPortfolioBalance).toHaveBeenCalledWith('p1', 'USD', 'u1');
     });
   });
 
   describe('getReturns', () => {
     it('defaults to the "all" period when none is provided', () => {
-      controller.getReturns('p1', undefined as any);
+      controller.getReturns('p1', undefined as any, user);
 
-      expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'all');
+      expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'all', 'u1');
     });
 
     it('passes through an explicit period', () => {
-      controller.getReturns('p1', 'year');
+      controller.getReturns('p1', 'year', user);
 
-      expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'year');
+      expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'year', 'u1');
     });
   });
 });

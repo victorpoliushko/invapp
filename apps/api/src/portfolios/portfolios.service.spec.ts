@@ -2,7 +2,7 @@
 // Tests for pure helper logic extracted from PortfoliosService
 import { PortfoliosService } from './portfolios.service';
 import { TransactionType } from '@prisma/client';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 interface AssetWithPrice {
   asset: string;
@@ -206,6 +206,9 @@ describe('calcPortfolioDollarReturn', () => {
 });
 
 describe('PortfoliosService', () => {
+  const OWNER_ID = 'u1';
+  const OTHER_USER_ID = 'u2';
+
   let prisma: any;
   let assetsService: any;
   let service: PortfoliosService;
@@ -214,7 +217,7 @@ describe('PortfoliosService', () => {
     prisma = {
       portfolio: {
         create: jest.fn(),
-        findUnique: jest.fn(),
+        findUnique: jest.fn().mockResolvedValue({ userId: OWNER_ID }),
         update: jest.fn(),
         delete: jest.fn(),
         findMany: jest.fn(),
@@ -243,6 +246,26 @@ describe('PortfoliosService', () => {
     service = new PortfoliosService(prisma, assetsService);
   });
 
+  describe('assertOwnership', () => {
+    it('resolves without throwing when the portfolio belongs to the user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OWNER_ID });
+
+      await expect(service.assertOwnership('p1', OWNER_ID)).resolves.toBeUndefined();
+    });
+
+    it('throws NotFoundException when the portfolio does not exist', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue(null);
+
+      await expect(service.assertOwnership('missing', OWNER_ID)).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws ForbiddenException when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.assertOwnership('p1', OWNER_ID)).rejects.toThrow(ForbiddenException);
+    });
+  });
+
   describe('create', () => {
     it('creates a portfolio and includes the user', async () => {
       prisma.portfolio.create.mockResolvedValue({ id: 'p1', name: 'Retirement', userId: 'u1' });
@@ -259,9 +282,14 @@ describe('PortfoliosService', () => {
 
   describe('getById', () => {
     it('fetches a portfolio with assets, transactions and real estate', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', portfolioAssets: [], realEstateAssets: [] });
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        portfolioAssets: [],
+        realEstateAssets: [],
+      });
 
-      const result = await service.getById('p1');
+      const result = await service.getById('p1', OWNER_ID);
 
       expect(prisma.portfolio.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({ where: { id: 'p1' } }),
@@ -272,9 +300,13 @@ describe('PortfoliosService', () => {
     it('returns null when portfolio does not exist', async () => {
       prisma.portfolio.findUnique.mockResolvedValue(null);
 
-      const result = await service.getById('missing');
+      await expect(service.getById('missing', OWNER_ID)).rejects.toThrow(NotFoundException);
+    });
 
-      expect(result).toBeNull();
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.getById('p1', OWNER_ID)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -282,13 +314,22 @@ describe('PortfoliosService', () => {
     it('updates only the portfolio name', async () => {
       prisma.portfolio.update.mockResolvedValue({ id: 'p1', name: 'New Name' });
 
-      await service.update({ id: 'p1', name: 'New Name' } as any);
+      await service.update({ id: 'p1', name: 'New Name' } as any, OWNER_ID);
 
       expect(prisma.portfolio.update).toHaveBeenCalledWith({
         where: { id: 'p1' },
         data: { name: 'New Name' },
         include: { portfolioAssets: { include: { asset: true } } },
       });
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.update({ id: 'p1', name: 'New Name' } as any, OWNER_ID)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(prisma.portfolio.update).not.toHaveBeenCalled();
     });
   });
 
@@ -297,13 +338,20 @@ describe('PortfoliosService', () => {
       prisma.portfolioAsset.deleteMany = jest.fn();
       prisma.$transaction.mockResolvedValue(undefined);
 
-      await service.delete('p1');
+      await service.delete('p1', OWNER_ID);
 
       expect(prisma.transaction.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
       expect(prisma.portfolioAsset.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
       expect(prisma.portfolio.delete).toHaveBeenCalledWith({ where: { id: 'p1' } });
       expect(prisma.$transaction).toHaveBeenCalledTimes(1);
       expect(prisma.$transaction.mock.calls[0][0]).toHaveLength(3);
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.delete('p1', OWNER_ID)).rejects.toThrow(ForbiddenException);
+      expect(prisma.portfolio.delete).not.toHaveBeenCalled();
     });
   });
 
@@ -344,11 +392,19 @@ describe('PortfoliosService', () => {
     it('throws NotFound when the portfolio does not exist', async () => {
       prisma.portfolio.findUnique.mockResolvedValue(null);
 
-      await expect(service.addAssetToPortfolio('missing', baseInput as any)).rejects.toThrow();
+      await expect(service.addAssetToPortfolio('missing', baseInput as any, OWNER_ID)).rejects.toThrow();
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(assetsService.findAssetByName).not.toHaveBeenCalled();
     });
 
     it('creates a new asset when it does not exist yet', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
       assetsService.findAssetByName.mockResolvedValue(null);
       assetsService.createAsset.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
       prisma.portfolioAsset.findUnique.mockResolvedValue(null);
@@ -360,7 +416,7 @@ describe('PortfoliosService', () => {
       prisma.portfolioAsset.update.mockResolvedValue({});
       prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
 
-      await service.addAssetToPortfolio('p1', baseInput as any);
+      await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       expect(assetsService.createAsset).toHaveBeenCalledWith(
         expect.objectContaining({ ticker: 'AAPL' }),
@@ -371,7 +427,6 @@ describe('PortfoliosService', () => {
     });
 
     it('reuses an existing asset and portfolioAsset without recreating them', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
       prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
       prisma.transaction.create.mockResolvedValue({});
@@ -381,14 +436,13 @@ describe('PortfoliosService', () => {
       prisma.portfolioAsset.update.mockResolvedValue({});
       prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
 
-      await service.addAssetToPortfolio('p1', baseInput as any);
+      await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       expect(assetsService.createAsset).not.toHaveBeenCalled();
       expect(prisma.portfolioAsset.create).not.toHaveBeenCalled();
     });
 
     it('recomputes quantity and rounded average price from all transactions', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
       prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
       prisma.transaction.create.mockResolvedValue({});
@@ -400,7 +454,7 @@ describe('PortfoliosService', () => {
       prisma.portfolioAsset.update.mockResolvedValue({});
       prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
 
-      await service.addAssetToPortfolio('p1', baseInput as any);
+      await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       // quantity = 10 + 5 - 3 = 12, cost = 1000 + 665 - 2997 = -1332, avg = -1332/12 = -111 (rounded)
       expect(prisma.portfolioAsset.update).toHaveBeenCalledWith({
@@ -410,7 +464,6 @@ describe('PortfoliosService', () => {
     });
 
     it('creates a cryptocurrency asset sourced from coingecko when a coingeckoId is provided', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
       assetsService.findAssetByName.mockResolvedValue(null);
       assetsService.createAsset.mockResolvedValue({ id: 'a1', ticker: 'BTC' });
       prisma.portfolioAsset.findUnique.mockResolvedValue(null);
@@ -426,7 +479,7 @@ describe('PortfoliosService', () => {
         ...baseInput,
         assetName: 'BTC',
         coingeckoId: 'bitcoin',
-      } as any);
+      } as any, OWNER_ID);
 
       expect(assetsService.createAsset).toHaveBeenCalledWith({
         ticker: 'BTC',
@@ -437,7 +490,6 @@ describe('PortfoliosService', () => {
     });
 
     it('records a SELL-only position as a negative quantity with zero average price', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
       prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
       prisma.transaction.create.mockResolvedValue({});
@@ -451,7 +503,7 @@ describe('PortfoliosService', () => {
         ...baseInput,
         type: TransactionType.SELL,
         quantityChange: 4,
-      } as any);
+      } as any, OWNER_ID);
 
       expect(prisma.portfolioAsset.update).toHaveBeenCalledWith({
         where: { portfolioId_assetId: { portfolioId: 'p1', assetId: 'a1' } },
@@ -460,7 +512,6 @@ describe('PortfoliosService', () => {
     });
 
     it('records the transaction with the given type, quantity, price and date', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1' });
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
       prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
       prisma.transaction.create.mockResolvedValue({});
@@ -468,7 +519,7 @@ describe('PortfoliosService', () => {
       prisma.portfolioAsset.update.mockResolvedValue({});
       prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
 
-      await service.addAssetToPortfolio('p1', baseInput as any);
+      await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       expect(prisma.transaction.create).toHaveBeenCalledWith({
         data: {
@@ -489,7 +540,7 @@ describe('PortfoliosService', () => {
       prisma.portfolioAsset.delete.mockResolvedValue({});
       prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
 
-      const result = await service.deleteAsset('p1', { assetId: 'a1' } as any);
+      const result = await service.deleteAsset('p1', { assetId: 'a1' } as any, OWNER_ID);
 
       expect(prisma.transaction.deleteMany).toHaveBeenCalledWith({
         where: { portfolioId: 'p1', assetId: 'a1' },
@@ -499,20 +550,38 @@ describe('PortfoliosService', () => {
       });
       expect(result.id).toBe('p1');
     });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.deleteAsset('p1', { assetId: 'a1' } as any, OWNER_ID)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(prisma.transaction.deleteMany).not.toHaveBeenCalled();
+    });
   });
 
   describe('getPortfolioBalance', () => {
     it('throws NotFoundException when the portfolio does not exist', async () => {
       prisma.portfolio.findUnique.mockResolvedValue(null);
 
-      await expect(service.getPortfolioBalance('missing', 'USD' as any)).rejects.toThrow(
+      await expect(service.getPortfolioBalance('missing', 'USD' as any, OWNER_ID)).rejects.toThrow(
         NotFoundException,
+      );
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.getPortfolioBalance('p1', 'USD' as any, OWNER_ID)).rejects.toThrow(
+        ForbiddenException,
       );
     });
 
     it('returns actual prices for each portfolio asset', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
+        userId: OWNER_ID,
         portfolioAssets: [
           { assetId: 'a1', asset: { ticker: 'AAPL' } },
           { assetId: 'a2', asset: { ticker: 'BTC' } },
@@ -520,7 +589,7 @@ describe('PortfoliosService', () => {
       });
       assetsService.getSharePrice.mockResolvedValueOnce(150).mockResolvedValueOnce(50000);
 
-      const result = await service.getPortfolioBalance('p1', 'USD' as any);
+      const result = await service.getPortfolioBalance('p1', 'USD' as any, OWNER_ID);
 
       expect(result).toEqual([
         { assetId: 'a1', symbol: 'AAPL', actualPrice: 150 },
@@ -531,6 +600,7 @@ describe('PortfoliosService', () => {
     it('fetches prices concurrently instead of serially', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
+        userId: OWNER_ID,
         portfolioAssets: [
           { assetId: 'a1', asset: { ticker: 'AAPL' } },
           { assetId: 'a2', asset: { ticker: 'BTC' } },
@@ -539,15 +609,15 @@ describe('PortfoliosService', () => {
       assetsService.getSharePrice.mockResolvedValue(100);
 
       const start = Date.now();
-      await service.getPortfolioBalance('p1', 'USD' as any);
+      await service.getPortfolioBalance('p1', 'USD' as any, OWNER_ID);
 
       expect(Date.now() - start).toBeLessThan(500);
     });
 
     it('returns an empty array when the portfolio has no assets', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', userId: OWNER_ID, portfolioAssets: [] });
 
-      const result = await service.getPortfolioBalance('p1', 'USD' as any);
+      const result = await service.getPortfolioBalance('p1', 'USD' as any, OWNER_ID);
 
       expect(result).toEqual([]);
     });
@@ -594,15 +664,23 @@ describe('PortfoliosService', () => {
     it('throws NotFoundException when the portfolio does not exist', async () => {
       prisma.portfolio.findUnique.mockResolvedValue(null);
 
-      await expect(service.getPortfolioReturns('missing', 'all')).rejects.toThrow(
+      await expect(service.getPortfolioReturns('missing', 'all', OWNER_ID)).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it('returns null for both fields when there is no valid position data', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
 
-      const result = await service.getPortfolioReturns('p1', 'all');
+      await expect(service.getPortfolioReturns('p1', 'all', OWNER_ID)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('returns null for both fields when there is no valid position data', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', userId: OWNER_ID, portfolioAssets: [] });
+
+      const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
 
       expect(result).toEqual({ pctReturn: null, dollarReturn: null });
     });
@@ -610,6 +688,7 @@ describe('PortfoliosService', () => {
     it('computes weighted % and $ return across all BUY/SELL transactions for "all" time', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
+        userId: OWNER_ID,
         portfolioAssets: [
           {
             asset: { currentPrice: 150 },
@@ -626,7 +705,7 @@ describe('PortfoliosService', () => {
         ],
       });
 
-      const result = await service.getPortfolioReturns('p1', 'all');
+      const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
 
       // cost = 1000 + 1000 = 2000, current = 1500 + 800 = 2300 -> +15%, +300
       expect(result.pctReturn).toBeCloseTo(15);
@@ -640,6 +719,7 @@ describe('PortfoliosService', () => {
 
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
+        userId: OWNER_ID,
         portfolioAssets: [
           {
             asset: { currentPrice: 200 },
@@ -651,7 +731,7 @@ describe('PortfoliosService', () => {
         ],
       });
 
-      const result = await service.getPortfolioReturns('p1', 'year');
+      const result = await service.getPortfolioReturns('p1', 'year', OWNER_ID);
 
       // only the recent 5@100 transaction counts: cost = 500, current = 1000 -> +100%, +500
       expect(result.pctReturn).toBeCloseTo(100);
@@ -661,6 +741,7 @@ describe('PortfoliosService', () => {
     it('excludes assets with no current price', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
+        userId: OWNER_ID,
         portfolioAssets: [
           {
             asset: { currentPrice: null },
@@ -671,7 +752,7 @@ describe('PortfoliosService', () => {
         ],
       });
 
-      const result = await service.getPortfolioReturns('p1', 'all');
+      const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
 
       expect(result).toEqual({ pctReturn: null, dollarReturn: null });
     });
@@ -679,6 +760,7 @@ describe('PortfoliosService', () => {
     it('excludes assets that were fully sold off (net non-positive quantity)', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
+        userId: OWNER_ID,
         portfolioAssets: [
           {
             asset: { currentPrice: 150 },
@@ -690,7 +772,7 @@ describe('PortfoliosService', () => {
         ],
       });
 
-      const result = await service.getPortfolioReturns('p1', 'all');
+      const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
 
       expect(result).toEqual({ pctReturn: null, dollarReturn: null });
     });

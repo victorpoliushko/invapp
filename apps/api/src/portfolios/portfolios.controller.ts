@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpException,
   Param,
@@ -49,8 +50,9 @@ export class PortfoliosController {
   updatePortfolio(
     @Param('id') id: string,
     @Body() updatePortfolioInput: UpdatePortfolioDto,
+    @GetUser() user: User,
   ) {
-    return this.portfoliosService.update(updatePortfolioInput);
+    return this.portfoliosService.update(updatePortfolioInput, user.id);
   }
 
   @Delete('/:id')
@@ -58,21 +60,25 @@ export class PortfoliosController {
   @UsePipes(new ValidationPipe())
   deletePortfolio(
     @Param('id') id: string,
+    @GetUser() user: User,
   ) {
-    return this.portfoliosService.delete(id);
+    return this.portfoliosService.delete(id, user.id);
   }
 
   @Get('/:id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  getPortfolio(@Param('id') id: string) {
-    return this.portfoliosService.getById(id);
+  getPortfolio(@Param('id') id: string, @GetUser() user: User) {
+    return this.portfoliosService.getById(id, user.id);
   }
 
   @Get('/user/:userId')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  getPortfoliosByUserId(@Param('userId') userId: string) {
+  getPortfoliosByUserId(@Param('userId') userId: string, @GetUser() user: User) {
+    if (userId !== user.id) {
+      throw new ForbiddenException('You do not have access to this user\'s portfolios');
+    }
     return this.portfoliosService.getByUserId(userId);
   }
 
@@ -82,8 +88,9 @@ export class PortfoliosController {
   addAssetToPortfolio(
     @Param('id') id: string,
     @Body() addAssetToPortfolioDto: AddAssetInputDto,
+    @GetUser() user: User,
   ) {
-    return this.portfoliosService.addAssetToPortfolio(id, addAssetToPortfolioDto);
+    return this.portfoliosService.addAssetToPortfolio(id, addAssetToPortfolioDto, user.id);
   }
 
   @Delete('/:id/assets')
@@ -92,13 +99,19 @@ export class PortfoliosController {
   deleteAsset(
     @Param('id') assetId: string,
     @Body() deleteAssetsDto: DeleteAssetsFromPortfolioDto,
+    @GetUser() user: User,
   ) {
-    return this.portfoliosService.deleteAsset(assetId, deleteAssetsDto);
+    return this.portfoliosService.deleteAsset(assetId, deleteAssetsDto, user.id);
   }
 
   @Get(':id/balance')
-  getBalance(@Param('id') id: string, @Query('currency') currency: Currency) {
-    return this.portfoliosService.getPortfolioBalance(id, currency);
+  @UseGuards(AuthGuard('jwt'))
+  getBalance(
+    @Param('id') id: string,
+    @Query('currency') currency: Currency,
+    @GetUser() user: User,
+  ) {
+    return this.portfoliosService.getPortfolioBalance(id, currency, user.id);
   }
 
   @Get(':id/returns')
@@ -106,7 +119,8 @@ export class PortfoliosController {
   getReturns(
     @Param('id') id: string,
     @Query('period') period: ReturnPeriod = 'all',
+    @GetUser() user: User,
   ) {
-    return this.portfoliosService.getPortfolioReturns(id, period);
+    return this.portfoliosService.getPortfolioReturns(id, period, user.id);
   }
 }
