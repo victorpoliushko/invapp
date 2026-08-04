@@ -356,19 +356,39 @@ describe('PortfoliosService', () => {
   });
 
   describe('getByUserId', () => {
-    it('returns all portfolios for a user', async () => {
+    it('returns all portfolios for a user, including bonds and real estate', async () => {
       prisma.portfolio.findMany.mockResolvedValue([
-        { id: 'p1', portfolioAssets: [] },
-        { id: 'p2', portfolioAssets: [] },
+        { id: 'p1', portfolioAssets: [], bonds: [], realEstateAssets: [] },
+        { id: 'p2', portfolioAssets: [], bonds: [], realEstateAssets: [] },
       ]);
 
       const result = await service.getByUserId('u1');
 
       expect(prisma.portfolio.findMany).toHaveBeenCalledWith({
         where: { userId: 'u1' },
-        include: { portfolioAssets: { include: { asset: true } } },
+        include: {
+          portfolioAssets: { include: { asset: true } },
+          bonds: true,
+          realEstateAssets: true,
+        },
       });
       expect(result).toHaveLength(2);
+    });
+
+    it('includes each portfolio\'s bonds and real estate in the returned dto', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          portfolioAssets: [],
+          bonds: [{ id: 'b1', isin: 'US123' }],
+          realEstateAssets: [{ id: 're1', code: 'LVIV-01' }],
+        },
+      ]);
+
+      const [result] = await service.getByUserId('u1');
+
+      expect(result.bonds).toEqual([{ id: 'b1', isin: 'US123' }]);
+      expect(result.realEstateAssets).toEqual([{ id: 're1', code: 'LVIV-01' }]);
     });
 
     it('returns an empty array when the user has no portfolios', async () => {

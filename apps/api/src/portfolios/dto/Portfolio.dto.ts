@@ -2,7 +2,7 @@ import { IsArray, IsDefined, IsNotEmpty, IsOptional, ValidateNested } from "clas
 import { UserDto } from "../../users/dto/User.dto";
 import { Type } from "class-transformer";
 import { PortfolioAssetDto } from "./PortfolioAsset.dto";
-import { RealEstate } from "@prisma/client";
+import { Bond, RealEstate } from "@prisma/client";
 
 export class PortfolioDto {
   @IsDefined()
@@ -26,4 +26,8 @@ export class PortfolioDto {
   @IsOptional()
   @IsArray()
   realEstateAssets: RealEstate[];
+
+  @IsOptional()
+  @IsArray()
+  bonds: Bond[];
 }

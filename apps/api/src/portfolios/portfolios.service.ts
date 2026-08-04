@@ -140,7 +140,11 @@ export class PortfoliosService {
   async getByUserId(userId: string): Promise<PortfolioDto[]> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
-      include: { portfolioAssets: { include: { asset: true } } },
+      include: {
+        portfolioAssets: { include: { asset: true } },
+        bonds: true,
+        realEstateAssets: true,
+      },
     });
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
