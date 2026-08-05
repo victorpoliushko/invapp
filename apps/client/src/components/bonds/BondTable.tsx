@@ -38,6 +38,7 @@ export function BondTable() {
           <th scope="col">ISIN</th>
           <th scope="col">Name</th>
           <th scope="col">Date bought</th>
+          <th scope="col">Maturity date</th>
           <th scope="col">Quantity</th>
           <th scope="col">Purchase price</th>
           <th scope="col">Face value</th>

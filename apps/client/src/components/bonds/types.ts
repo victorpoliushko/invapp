@@ -10,4 +10,5 @@ export type Bond = {
   quantity: number;
   purchasePrice: number;
   purchaseDate: string;
+  maturityDate: string | null;
 };

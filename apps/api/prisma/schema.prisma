@@ -191,6 +191,7 @@ model Bond {
   quantity        Float           @default(0)
   purchasePrice   Float           @default(0)
   purchaseDate    DateTime        @default(now())
+  maturityDate    DateTime?
 
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
   portfolioId String

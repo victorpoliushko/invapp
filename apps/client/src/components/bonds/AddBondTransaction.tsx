@@ -6,14 +6,14 @@ type Props = { onAdded: () => void };
 export function AddBondTransaction({ onAdded }: Props) {
   const { id: portfolioId } = useParams<{ id: string }>();
   const [form, setForm] = useState({
-    isin: "", name: "", purchaseDate: "", quantity: "", purchasePrice: "",
+    isin: "", name: "", purchaseDate: "", maturityDate: "", quantity: "", purchasePrice: "",
     faceValue: "", couponRate: "", couponFrequency: "ANNUAL",
   });
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleAdd = async () => {
-    const { isin, name, purchaseDate, quantity, purchasePrice, faceValue, couponRate, couponFrequency } = form;
-    if (!portfolioId || !isin || !name || !purchaseDate || !quantity || !purchasePrice || !faceValue || !couponRate) return;
+    const { isin, name, purchaseDate, maturityDate, quantity, purchasePrice, faceValue, couponRate, couponFrequency } = form;
+    if (!portfolioId || !isin || !name || !purchaseDate || !maturityDate || !quantity || !purchasePrice || !faceValue || !couponRate) return;
 
     const token = localStorage.getItem("accessToken");
     const res = await fetch("/api/bonds", {
@@ -22,6 +22,7 @@ export function AddBondTransaction({ onAdded }: Props) {
       body: JSON.stringify({
         portfolioId, isin, name, couponFrequency,
         purchaseDate: new Date(purchaseDate).toISOString(),
+        maturityDate: new Date(maturityDate).toISOString(),
         quantity: Number(quantity),
         purchasePrice: Number(purchasePrice),
         faceValue: Number(faceValue),
@@ -30,16 +31,17 @@ export function AddBondTransaction({ onAdded }: Props) {
     });
 
     if (!res.ok) { alert("Failed to add bond"); return; }
-    setForm({ isin: "", name: "", purchaseDate: "", quantity: "", purchasePrice: "", faceValue: "", couponRate: "", couponFrequency: "ANNUAL" });
+    setForm({ isin: "", name: "", purchaseDate: "", maturityDate: "", quantity: "", purchasePrice: "", faceValue: "", couponRate: "", couponFrequency: "ANNUAL" });
     onAdded();
   };
 
-  // 11 cols: ISIN | Name | Date bought | Qty | Price | Face val | Coupon% | Frequency | (empty) | (empty) | Add
+  // 12 cols: ISIN | Name | Date bought | Maturity date | Qty | Price | Face val | Coupon% | Frequency | (empty) | (empty) | Add
   return (
     <tr>
       <td><input type="text" value={form.isin} onChange={(e) => set("isin", e.target.value)} placeholder="ISIN" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="text" value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Name" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="date" value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} /></td>
+      <td><input type="date" value={form.maturityDate} onChange={(e) => set("maturityDate", e.target.value)} /></td>
       <td><input type="number" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} placeholder="Qty" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.faceValue} onChange={(e) => set("faceValue", e.target.value)} placeholder="Face val." onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>

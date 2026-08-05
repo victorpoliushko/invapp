@@ -18,6 +18,7 @@ export function BondRow({ bond, onDelete }: { bond: Bond; onDelete: (id: string)
       <td data-label="ISIN">{bond.isin}</td>
       <td data-label="Name">{bond.name}</td>
       <td data-label="Date bought">{new Date(bond.purchaseDate).toLocaleDateString()}</td>
+      <td data-label="Maturity date">{bond.maturityDate ? new Date(bond.maturityDate).toLocaleDateString() : "—"}</td>
       <td data-label="Quantity">{bond.quantity}</td>
       <td data-label="Purchase price">{bond.purchasePrice}</td>
       <td data-label="Face value">{bond.faceValue.toLocaleString()}</td>

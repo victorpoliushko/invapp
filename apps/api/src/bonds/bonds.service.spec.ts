@@ -54,6 +54,43 @@ describe('BondsService', () => {
       });
     });
 
+    it('parses the maturity date when provided', async () => {
+      await service.create({
+        portfolioId: 'p1',
+        isin: 'US123',
+        name: 'Treasury',
+        faceValue: 1000,
+        couponRate: 5,
+        couponFrequency: 'ANNUAL' as any,
+        quantity: 10,
+        purchasePrice: 980,
+        purchaseDate: '2026-01-01',
+        maturityDate: '2036-01-01',
+      }, OWNER_ID);
+
+      expect(prisma.bond.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ maturityDate: new Date('2036-01-01') }) }),
+      );
+    });
+
+    it('leaves maturityDate undefined when not provided', async () => {
+      await service.create({
+        portfolioId: 'p1',
+        isin: 'US123',
+        name: 'Treasury',
+        faceValue: 1000,
+        couponRate: 5,
+        couponFrequency: 'ANNUAL' as any,
+        quantity: 10,
+        purchasePrice: 980,
+        purchaseDate: '2026-01-01',
+      }, OWNER_ID);
+
+      expect(prisma.bond.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ maturityDate: undefined }) }),
+      );
+    });
+
     it('throws Forbidden when the portfolio belongs to another user', async () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
@@ -93,6 +130,22 @@ describe('BondsService', () => {
       const call = prisma.bond.update.mock.calls[0][0];
       expect(call.data).not.toHaveProperty('purchaseDate');
       expect(call.data).toEqual({ isin: 'US999' });
+    });
+
+    it('parses maturityDate when provided', async () => {
+      await service.update('bond-1', { maturityDate: '2036-01-01' }, OWNER_ID);
+
+      expect(prisma.bond.update).toHaveBeenCalledWith({
+        where: { id: 'bond-1' },
+        data: { maturityDate: new Date('2036-01-01') },
+      });
+    });
+
+    it('omits maturityDate when not provided', async () => {
+      await service.update('bond-1', { isin: 'US999' }, OWNER_ID);
+
+      const call = prisma.bond.update.mock.calls[0][0];
+      expect(call.data).not.toHaveProperty('maturityDate');
     });
 
     it('throws NotFound when the bond does not exist', async () => {

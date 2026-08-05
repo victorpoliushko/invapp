@@ -36,6 +36,7 @@ export class BondsService {
       quantity: number;
       purchasePrice: number;
       purchaseDate: string;
+      maturityDate?: string;
     },
     userId: string,
   ) {
@@ -52,6 +53,7 @@ export class BondsService {
         quantity: Number(data.quantity),
         purchasePrice: Number(data.purchasePrice),
         purchaseDate: new Date(data.purchaseDate),
+        maturityDate: data.maturityDate ? new Date(data.maturityDate) : undefined,
       },
     });
   }
@@ -67,6 +69,7 @@ export class BondsService {
       quantity: number;
       purchasePrice: number;
       purchaseDate: string;
+      maturityDate: string;
     }>,
     userId: string,
   ) {
@@ -84,6 +87,7 @@ export class BondsService {
         ...(data.quantity != null && { quantity: Number(data.quantity) }),
         ...(data.purchasePrice != null && { purchasePrice: Number(data.purchasePrice) }),
         ...(data.purchaseDate && { purchaseDate: new Date(data.purchaseDate) }),
+        ...(data.maturityDate && { maturityDate: new Date(data.maturityDate) }),
       },
     });
   }
