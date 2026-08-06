@@ -698,7 +698,9 @@ describe('PortfoliosService', () => {
     });
 
     it('returns null for both fields when there is no valid position data', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', userId: OWNER_ID, portfolioAssets: [] });
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1', userId: OWNER_ID, portfolioAssets: [], bonds: [], realEstateAssets: [],
+      });
 
       const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
 
@@ -723,6 +725,8 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        bonds: [],
+        realEstateAssets: [],
       });
 
       const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
@@ -749,6 +753,8 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        bonds: [],
+        realEstateAssets: [],
       });
 
       const result = await service.getPortfolioReturns('p1', 'year', OWNER_ID);
@@ -770,6 +776,8 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        bonds: [],
+        realEstateAssets: [],
       });
 
       const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
@@ -790,11 +798,228 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        bonds: [],
+        realEstateAssets: [],
       });
 
       const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
 
       expect(result).toEqual({ pctReturn: null, dollarReturn: null });
+    });
+
+    describe('bond income', () => {
+      it('includes a full year of coupon income for "all" time on a bond held over a year', async () => {
+        const twoYearsAgo = new Date();
+        twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          realEstateAssets: [],
+          bonds: [
+            {
+              faceValue: 1000,
+              couponRate: 5,
+              quantity: 10,
+              purchasePrice: 950,
+              purchaseDate: twoYearsAgo,
+              maturityDate: null,
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        // annual income = 1000 * 0.05 * 10 = 500/yr, held ~2 years -> ~1000 income
+        // cost = 950 * 10 = 9500
+        expect(result.dollarReturn).toBeCloseTo(1000, -1);
+        expect(result.pctReturn).toBeCloseTo((1000 / 9500) * 100, 0);
+      });
+
+      it('prorates income to only the days held within the "month" period', async () => {
+        const twoYearsAgo = new Date();
+        twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          realEstateAssets: [],
+          bonds: [
+            {
+              faceValue: 1000,
+              couponRate: 12,
+              quantity: 1,
+              purchasePrice: 1000,
+              purchaseDate: twoYearsAgo,
+              maturityDate: null,
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'month', OWNER_ID);
+
+        // annual income = 1000 * 0.12 * 1 = 120/yr; a partial month should earn
+        // a small fraction of that, not the full annual figure
+        expect(result.dollarReturn).toBeGreaterThan(0);
+        expect(result.dollarReturn).toBeLessThan(120);
+      });
+
+      it('excludes a bond that matured before the requested period started', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          realEstateAssets: [],
+          bonds: [
+            {
+              faceValue: 1000,
+              couponRate: 5,
+              quantity: 10,
+              purchasePrice: 950,
+              purchaseDate: new Date('2015-01-01'),
+              maturityDate: new Date('2018-01-01'),
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'year', OWNER_ID);
+
+        expect(result).toEqual({ pctReturn: null, dollarReturn: null });
+      });
+
+      it('excludes bonds with zero or negative quantity', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          realEstateAssets: [],
+          bonds: [
+            {
+              faceValue: 1000,
+              couponRate: 5,
+              quantity: 0,
+              purchasePrice: 950,
+              purchaseDate: new Date('2020-01-01'),
+              maturityDate: null,
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        expect(result).toEqual({ pctReturn: null, dollarReturn: null });
+      });
+    });
+
+    describe('real estate income', () => {
+      it('includes rental income overlapping the period and always counts the purchase price as cost', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          bonds: [],
+          realEstateAssets: [
+            {
+              purchasePrice: 100000,
+              transactions: [
+                { startDate: new Date('2020-01-01'), endDate: new Date('2020-02-01'), monthlyRent: 1000 },
+              ],
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        // January (31 days) of rent at 30.4375 days/month average
+        const expectedIncome = (31 / 30.4375) * 1000;
+        expect(result.dollarReturn).toBeCloseTo(expectedIncome, 5);
+        expect(result.pctReturn).toBeCloseTo((expectedIncome / 100000) * 100, 5);
+      });
+
+      it('still counts the purchase price as cost even with no rental transactions', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          bonds: [],
+          realEstateAssets: [
+            { purchasePrice: 100000, transactions: [] },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        expect(result.dollarReturn).toBe(0);
+        expect(result.pctReturn).toBe(0);
+      });
+
+      it('excludes rental income from outside the requested period', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          portfolioAssets: [],
+          bonds: [],
+          realEstateAssets: [
+            {
+              purchasePrice: 100000,
+              transactions: [
+                { startDate: new Date('2015-01-01'), endDate: new Date('2015-02-01'), monthlyRent: 1000 },
+              ],
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'month', OWNER_ID);
+
+        expect(result.dollarReturn).toBe(0);
+      });
+    });
+
+    it('combines stock, bond and real estate returns into one total', async () => {
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        portfolioAssets: [
+          {
+            asset: { currentPrice: 150 },
+            transactions: [
+              { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100, date: new Date('2020-01-01') },
+            ],
+          },
+        ],
+        bonds: [
+          {
+            faceValue: 1000,
+            couponRate: 5,
+            quantity: 1,
+            purchasePrice: 950,
+            purchaseDate: twoYearsAgo,
+            maturityDate: null,
+          },
+        ],
+        realEstateAssets: [
+          {
+            purchasePrice: 50000,
+            transactions: [
+              { startDate: new Date('2020-01-01'), endDate: new Date('2020-02-01'), monthlyRent: 500 },
+            ],
+          },
+        ],
+      });
+
+      const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+      // stock: cost 1000, return 500 | bond: cost 950, ~2yrs of 50/yr income ~= 100
+      // real estate: cost 50000, ~500 rental income
+      // totalCost = 1000 + 950 + 50000 = 51950; totalReturn ~= 500 + 100 + 500 = 1100
+      expect(result.dollarReturn).toBeGreaterThan(1000);
+      expect(result.dollarReturn).toBeLessThan(1200);
+      expect(result.pctReturn).toBeCloseTo((result.dollarReturn! / 51950) * 100, 5);
     });
   });
 });

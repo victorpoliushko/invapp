@@ -63,6 +63,59 @@ function calcPeriodPosition(
   return { quantity, avgPrice: cost / quantity };
 }
 
+// Days of overlap between the requested period window ([periodStart, now], or
+// (-infinity, now] when periodStart is null for "all time") and an arbitrary
+// [rangeStart, rangeEnd] window (a bond's holding period, a rental period).
+// Used to prorate income-generating assets (bonds, real estate) to the
+// requested period the same way calcPeriodPosition does for stocks/crypto,
+// except by continuous accrual/rental-day overlap rather than discrete
+// BUY/SELL transactions, since neither bonds nor real estate have those.
+function daysOverlap(periodStart: Date | null, now: Date, rangeStart: Date, rangeEnd: Date): number {
+  const start = periodStart && periodStart > rangeStart ? periodStart : rangeStart;
+  const end = now < rangeEnd ? now : rangeEnd;
+  const ms = end.getTime() - start.getTime();
+  return ms > 0 ? ms / (1000 * 60 * 60 * 24) : 0;
+}
+
+interface PeriodBond {
+  faceValue: number;
+  couponRate: number;
+  quantity: number;
+  purchaseDate: Date;
+  maturityDate: Date | null;
+}
+
+// Coupon income only — bonds have no tracked current market price, so this
+// is not a capital-gains figure (see GO_LIVE_STRATEGY.md §1d).
+function calcBondIncome(bond: PeriodBond, periodStart: Date | null, now: Date): number {
+  const holdingEnd = bond.maturityDate ?? now;
+  const days = daysOverlap(periodStart, now, bond.purchaseDate, holdingEnd);
+  if (days <= 0) return 0;
+  const annualIncome = bond.faceValue * (bond.couponRate / 100) * bond.quantity;
+  return annualIncome * (days / 365.25);
+}
+
+interface PeriodRentalTransaction {
+  startDate: Date;
+  endDate: Date;
+  monthlyRent: number;
+}
+
+// Rental income only — same caveat as bonds, no tracked current market value.
+function calcRealEstateIncome(
+  transactions: PeriodRentalTransaction[],
+  periodStart: Date | null,
+  now: Date,
+): number {
+  let income = 0;
+  for (const t of transactions) {
+    const days = daysOverlap(periodStart, now, t.startDate, t.endDate);
+    if (days <= 0) continue;
+    income += (days / 30.4375) * t.monthlyRent;
+  }
+  return income;
+}
+
 @Injectable()
 export class PortfoliosService {
   constructor(
@@ -317,14 +370,17 @@ export class PortfoliosService {
             transactions: { where: { portfolioId: id } },
           },
         },
+        bonds: true,
+        realEstateAssets: { include: { transactions: true } },
       },
     });
 
     if (!portfolio) throw new NotFoundException('Portfolio not found');
 
     const periodStart = periodStartDate(period);
+    const now = new Date();
     let totalCost = 0;
-    let totalCurrent = 0;
+    let totalDollarReturn = 0;
     let hasPosition = false;
 
     for (const pa of portfolio.portfolioAssets) {
@@ -333,8 +389,28 @@ export class PortfoliosService {
       if (!position || position.avgPrice === 0) continue;
 
       hasPosition = true;
-      totalCost += position.avgPrice * position.quantity;
-      totalCurrent += pa.asset.currentPrice * position.quantity;
+      const cost = position.avgPrice * position.quantity;
+      totalCost += cost;
+      totalDollarReturn += pa.asset.currentPrice * position.quantity - cost;
+    }
+
+    for (const bond of portfolio.bonds) {
+      if (bond.quantity <= 0) continue;
+      const income = calcBondIncome(bond, periodStart, now);
+      if (income <= 0) continue;
+
+      hasPosition = true;
+      totalCost += bond.purchasePrice * bond.quantity;
+      totalDollarReturn += income;
+    }
+
+    // Real estate has no maturity/exit concept — a property is treated as
+    // owned through to "now" for every period, so its cost basis always
+    // counts; only the rental income is bounded to the period window.
+    for (const property of portfolio.realEstateAssets) {
+      hasPosition = true;
+      totalCost += property.purchasePrice;
+      totalDollarReturn += calcRealEstateIncome(property.transactions, periodStart, now);
     }
 
     if (!hasPosition || totalCost === 0) {
@@ -342,8 +418,8 @@ export class PortfoliosService {
     }
 
     return {
-      pctReturn: ((totalCurrent - totalCost) / totalCost) * 100,
-      dollarReturn: totalCurrent - totalCost,
+      pctReturn: (totalDollarReturn / totalCost) * 100,
+      dollarReturn: totalDollarReturn,
     };
   }
 }
