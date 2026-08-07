@@ -123,4 +123,14 @@ export class PortfoliosController {
   ) {
     return this.portfoliosService.getPortfolioReturns(id, period, user.id);
   }
+
+  @Get(':id/movers')
+  @UseGuards(AuthGuard('jwt'))
+  getTopMovers(
+    @Param('id') id: string,
+    @Query('period') period: ReturnPeriod = 'all',
+    @GetUser() user: User,
+  ) {
+    return this.portfoliosService.getTopMovers(id, period, user.id);
+  }
 }

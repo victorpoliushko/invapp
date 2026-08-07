@@ -1022,6 +1022,125 @@ describe('PortfoliosService', () => {
       expect(result.pctReturn).toBeCloseTo((result.dollarReturn! / 51950) * 100, 5);
     });
   });
+
+  describe('getTopMovers', () => {
+    it('throws NotFoundException when the portfolio does not exist', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue(null);
+
+      await expect(service.getTopMovers('missing', 'all', OWNER_ID)).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.getTopMovers('p1', 'all', OWNER_ID)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('ranks stocks by price-change % and bonds/real estate by income yield %, highest first', async () => {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        portfolioAssets: [
+          {
+            asset: { ticker: 'WINNER', type: 'Stock', currentPrice: 200 },
+            transactions: [{ type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 100, date: new Date('2020-01-01') }],
+          },
+          {
+            asset: { ticker: 'LOSER', type: 'Stock', currentPrice: 50 },
+            transactions: [{ type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 100, date: new Date('2020-01-01') }],
+          },
+        ],
+        bonds: [
+          {
+            isin: 'US-BOND-1',
+            faceValue: 1000,
+            couponRate: 5,
+            quantity: 1,
+            purchasePrice: 1000,
+            purchaseDate: sixMonthsAgo,
+            maturityDate: null,
+          },
+        ],
+        realEstateAssets: [
+          {
+            code: 'PROP-1',
+            purchasePrice: 100000,
+            transactions: [{ startDate: sixMonthsAgo, endDate: new Date('2030-01-01'), monthlyRent: 100 }],
+          },
+        ],
+      });
+
+      const result = await service.getTopMovers('p1', 'all', OWNER_ID);
+
+      // WINNER: +100%, bond ~5% yield, real estate ~small yield, LOSER: -50%
+      expect(result.topPerformers[0].label).toBe('WINNER');
+      expect(result.topPerformers.map((m: any) => m.label)).not.toContain('LOSER');
+      expect(result.topLosers[0].label).toBe('LOSER');
+      expect(result.topLosers[0].pct).toBeLessThan(0);
+    });
+
+    it('limits each list to 3 entries', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        portfolioAssets: [1, 2, 3, 4, 5].map((n) => ({
+          asset: { ticker: `T${n}`, type: 'Stock', currentPrice: 100 + n },
+          transactions: [{ type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 100, date: new Date('2020-01-01') }],
+        })),
+        bonds: [],
+        realEstateAssets: [],
+      });
+
+      const result = await service.getTopMovers('p1', 'all', OWNER_ID);
+
+      expect(result.topPerformers.length).toBeLessThanOrEqual(3);
+    });
+
+    it('excludes a bond with zero income (not held during the period) from both lists', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        portfolioAssets: [],
+        bonds: [
+          {
+            isin: 'MATURED-BOND',
+            faceValue: 1000,
+            couponRate: 5,
+            quantity: 1,
+            purchasePrice: 1000,
+            purchaseDate: new Date('2015-01-01'),
+            maturityDate: new Date('2018-01-01'),
+          },
+        ],
+        realEstateAssets: [],
+      });
+
+      const result = await service.getTopMovers('p1', 'year', OWNER_ID);
+
+      expect(result.topPerformers).toEqual([]);
+      expect(result.topLosers).toEqual([]);
+    });
+
+    it('includes a real estate property with zero rental income among performers at 0%, never as a loser', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        portfolioAssets: [],
+        bonds: [],
+        realEstateAssets: [{ code: 'VACANT', purchasePrice: 100000, transactions: [] }],
+      });
+
+      const result = await service.getTopMovers('p1', 'all', OWNER_ID);
+
+      expect(result.topPerformers).toEqual([
+        expect.objectContaining({ label: 'VACANT', pct: 0, dollarReturn: 0 }),
+      ]);
+      expect(result.topLosers).toEqual([]);
+    });
+  });
 });
 
 describe('toggleExpanded', () => {

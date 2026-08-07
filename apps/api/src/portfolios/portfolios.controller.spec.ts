@@ -18,6 +18,7 @@ describe('PortfoliosController', () => {
       deleteAsset: jest.fn(),
       getPortfolioBalance: jest.fn(),
       getPortfolioReturns: jest.fn(),
+      getTopMovers: jest.fn(),
     };
 
     controller = new PortfoliosController(service);
@@ -117,6 +118,20 @@ describe('PortfoliosController', () => {
       controller.getReturns('p1', 'year', user);
 
       expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'year', 'u1');
+    });
+  });
+
+  describe('getTopMovers', () => {
+    it('defaults to the "all" period when none is provided', () => {
+      controller.getTopMovers('p1', undefined as any, user);
+
+      expect(service.getTopMovers).toHaveBeenCalledWith('p1', 'all', 'u1');
+    });
+
+    it('passes through an explicit period', () => {
+      controller.getTopMovers('p1', 'month', user);
+
+      expect(service.getTopMovers).toHaveBeenCalledWith('p1', 'month', 'u1');
     });
   });
 });

@@ -81,6 +81,7 @@ interface PeriodBond {
   faceValue: number;
   couponRate: number;
   quantity: number;
+  purchasePrice: number;
   purchaseDate: Date;
   maturityDate: Date | null;
 }
@@ -114,6 +115,62 @@ function calcRealEstateIncome(
     income += (days / 30.4375) * t.monthlyRent;
   }
   return income;
+}
+
+export interface Mover {
+  label: string;
+  type: string;
+  pct: number;
+  dollarReturn: number;
+}
+
+// Stocks/crypto rank by price-change %; bonds/real estate rank by income
+// yield % (see calcBondIncome/calcRealEstateIncome — income only, no
+// capital gains tracked for those two types). Different mechanisms, same
+// normalized unit (% return on cost basis), so they can share one ranking.
+function buildStockMovers(
+  portfolioAssets: { asset: { ticker: string; type: string | null; currentPrice: number | null }; transactions: PeriodTransaction[] }[],
+  periodStart: Date | null,
+): Mover[] {
+  const movers: Mover[] = [];
+  for (const pa of portfolioAssets) {
+    if (pa.asset.currentPrice == null) continue;
+    const position = calcPeriodPosition(pa.transactions, periodStart);
+    if (!position || position.avgPrice === 0) continue;
+
+    const cost = position.avgPrice * position.quantity;
+    const dollarReturn = pa.asset.currentPrice * position.quantity - cost;
+    movers.push({ label: pa.asset.ticker, type: pa.asset.type ?? 'Stock', pct: (dollarReturn / cost) * 100, dollarReturn });
+  }
+  return movers;
+}
+
+function buildBondMovers(bonds: (PeriodBond & { isin: string })[], periodStart: Date | null, now: Date): Mover[] {
+  const movers: Mover[] = [];
+  for (const bond of bonds) {
+    if (bond.quantity <= 0) continue;
+    const cost = bond.purchasePrice * bond.quantity;
+    if (cost <= 0) continue;
+    const income = calcBondIncome(bond, periodStart, now);
+    if (income <= 0) continue;
+
+    movers.push({ label: bond.isin, type: 'BOND', pct: (income / cost) * 100, dollarReturn: income });
+  }
+  return movers;
+}
+
+function buildRealEstateMovers(
+  properties: { code: string; purchasePrice: number; transactions: PeriodRentalTransaction[] }[],
+  periodStart: Date | null,
+  now: Date,
+): Mover[] {
+  const movers: Mover[] = [];
+  for (const property of properties) {
+    if (property.purchasePrice <= 0) continue;
+    const income = calcRealEstateIncome(property.transactions, periodStart, now);
+    movers.push({ label: property.code, type: 'REAL_ESTATE', pct: (income / property.purchasePrice) * 100, dollarReturn: income });
+  }
+  return movers;
 }
 
 @Injectable()
@@ -421,5 +478,43 @@ export class PortfoliosService {
       pctReturn: (totalDollarReturn / totalCost) * 100,
       dollarReturn: totalDollarReturn,
     };
+  }
+
+  async getTopMovers(
+    id: string,
+    period: ReturnPeriod,
+    userId: string,
+  ): Promise<{ topPerformers: Mover[]; topLosers: Mover[] }> {
+    await this.assertOwnership(id, userId);
+
+    const portfolio = await this.prismaService.portfolio.findUnique({
+      where: { id },
+      include: {
+        portfolioAssets: {
+          include: {
+            asset: true,
+            transactions: { where: { portfolioId: id } },
+          },
+        },
+        bonds: true,
+        realEstateAssets: { include: { transactions: true } },
+      },
+    });
+
+    if (!portfolio) throw new NotFoundException('Portfolio not found');
+
+    const periodStart = periodStartDate(period);
+    const now = new Date();
+
+    const movers = [
+      ...buildStockMovers(portfolio.portfolioAssets, periodStart),
+      ...buildBondMovers(portfolio.bonds, periodStart, now),
+      ...buildRealEstateMovers(portfolio.realEstateAssets, periodStart, now),
+    ];
+
+    const topPerformers = [...movers].sort((a, b) => b.pct - a.pct).slice(0, 3);
+    const topLosers = movers.filter((m) => m.pct < 0).sort((a, b) => a.pct - b.pct).slice(0, 3);
+
+    return { topPerformers, topLosers };
   }
 }
