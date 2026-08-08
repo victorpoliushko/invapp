@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { alertMissingFields } from "../../utils/formValidation";
 
 type Props = { onAdded: () => void; totalPurchasePrice: number };
 
@@ -18,8 +19,16 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleAdd = async () => {
+    if (!portfolioId) return;
     const { code, name, type, purchaseDate, purchasePrice, rooms, totalArea } = form;
-    if (!portfolioId || !code || !name || !purchaseDate || !purchasePrice || !rooms || !totalArea) return;
+    if (alertMissingFields({
+      Code: code,
+      Name: name,
+      "Purchase date": purchaseDate,
+      "Purchase price": purchasePrice,
+      Rooms: rooms,
+      "Total area": totalArea,
+    })) return;
 
     const token = localStorage.getItem("accessToken");
     const res = await fetch("/api/real-estate", {

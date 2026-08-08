@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { alertMissingFields } from "../../utils/formValidation";
 
 type Props = { onAdded: () => void };
 
@@ -12,8 +13,18 @@ export function AddBondTransaction({ onAdded }: Props) {
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleAdd = async () => {
+    if (!portfolioId) return;
     const { isin, name, purchaseDate, maturityDate, quantity, purchasePrice, faceValue, couponRate, couponFrequency } = form;
-    if (!portfolioId || !isin || !name || !purchaseDate || !maturityDate || !quantity || !purchasePrice || !faceValue || !couponRate) return;
+    if (alertMissingFields({
+      ISIN: isin,
+      Name: name,
+      "Purchase date": purchaseDate,
+      "Maturity date": maturityDate,
+      Quantity: quantity,
+      "Purchase price": purchasePrice,
+      "Face value": faceValue,
+      "Coupon %": couponRate,
+    })) return;
 
     const token = localStorage.getItem("accessToken");
     const res = await fetch("/api/bonds", {

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { TRANSACTION_COLORS } from "./transactionColors";
+import { alertMissingFields } from "../../utils/formValidation";
 
 type StockSuggestion = { assetSymbol: string; name: string };
 type CryptoSuggestion = { id: string; symbol: string; name: string };
@@ -89,8 +90,14 @@ export function AddAsset({
   }, [suggestions]);
 
   const handleAddAsset = async () => {
+    if (!portfolioId) return;
     const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
-    if (!portfolioId || !assetName || !dueDate || !quantityChange || !pricePerUnit) return;
+    if (alertMissingFields({
+      Asset: assetName,
+      Date: dueDate,
+      Quantity: quantityChange,
+      Price: pricePerUnit,
+    })) return;
 
     const token = localStorage.getItem("accessToken");
 
@@ -125,6 +132,7 @@ export function AddAsset({
       await refreshPortfolio();
     } catch (err) {
       console.error("Add asset error:", err);
+      alert("Failed to add asset");
     }
   };
 
