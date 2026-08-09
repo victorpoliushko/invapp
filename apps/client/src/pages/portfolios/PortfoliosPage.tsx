@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
-import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import deleteIcon from "../../assets/crud-icons/delete.svg";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",

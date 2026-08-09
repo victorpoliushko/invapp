@@ -1,4 +1,4 @@
-import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { Bond } from "./types";
 
@@ -27,7 +27,7 @@ export function BondRow({ bond, onDelete }: { bond: Bond; onDelete: (id: string)
       <td data-label="Annual income">{annualIncome > 0 ? Math.round(annualIncome).toLocaleString() : "—"}</td>
       <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
       <td className="actions">
-        <button onClick={() => onDelete(bond.id)}>
+        <button className="icon-btn" onClick={() => onDelete(bond.id)}>
           <img src={deleteIcon} height={30} width={30} alt="delete" />
         </button>
       </td>

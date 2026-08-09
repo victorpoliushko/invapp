@@ -1,5 +1,5 @@
 import { usePortfolio } from "../../context/PortfolioContext";
-import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { PortfolioAssetDto } from "../../../../api/src/portfolios/dto/PortfolioAsset.dto";
 
@@ -52,7 +52,7 @@ export const AssetRow = ({
         {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn).toLocaleString()}`}
       </td>
       <td className="actions">
-        <button onClick={() => deleteAsset(portfolioAsset.assetId)}>
+        <button className="icon-btn" onClick={() => deleteAsset(portfolioAsset.assetId)}>
           <img src={deleteIcon} height={30} width={30} alt="delete" />
         </button>
       </td>

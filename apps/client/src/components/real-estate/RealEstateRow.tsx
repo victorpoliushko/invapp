@@ -1,6 +1,6 @@
 import { useState } from "react";
-import deleteIcon from "../../assets/delete-svgrepo-com.svg";
-import editIcon from "../../assets/pencil-svgrepo-com.svg";
+import deleteIcon from "../../assets/crud-icons/delete.svg";
+import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstate } from "./types";
 
@@ -158,10 +158,10 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
         {Math.round(totalReturn).toLocaleString()}
       </td>
       <td className="actions">
-        <button onClick={startEditing}>
+        <button className="icon-btn" onClick={startEditing}>
           <img src={editIcon} height={24} width={24} alt="edit" />
         </button>
-        <button onClick={() => onDelete(property.id)}>
+        <button className="icon-btn" onClick={() => onDelete(property.id)}>
           <img src={deleteIcon} height={30} width={30} alt="delete" />
         </button>
       </td>

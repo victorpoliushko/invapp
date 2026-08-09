@@ -1,3 +1,22 @@
+/* Reset for icon-only buttons (edit/delete pencil & trash icons) — without
+   this they fall back to the browser's default light button chrome, which
+   reads as a stray white box against the dark theme. The icon svgs use
+   stroke="currentColor" but render black when loaded via <img> (no CSS
+   color context to inherit), so invert them to white to match the theme. */
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn img {
+  filter: brightness(0) invert(1);
+}
+
 .assets {
   display: flex;
   flex-wrap: wrap;

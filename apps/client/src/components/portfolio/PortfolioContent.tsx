@@ -4,7 +4,7 @@ import { RealEstateTable } from "../real-estate/RealEstateTable";
 import { BondTable } from "../bonds/BondTable";
 import "../../pages/portfolio/PortfolioPage.css";
 import { useEffect, useState } from "react";
-import editIcon from "../../assets/pencil-svgrepo-com.svg";
+import editIcon from "../../assets/crud-icons/update.svg";
 
 export function PortfolioContent() {
   const { portfolio, updatePortfolioName } = usePortfolio();
@@ -50,7 +50,7 @@ export function PortfolioContent() {
         <div className="row-container">
           <h1 className="assets-h1">{portfolio.name}</h1>
           <div className="title-button-stack">
-            <button onClick={() => setIsEditing(true)}>
+            <button className="icon-btn" onClick={() => setIsEditing(true)}>
               <img src={editIcon} alt="Edit" height={30} width={30} />
             </button>
             {/* `<button onClick={() => deletePortfolio(portfolio.id)}>

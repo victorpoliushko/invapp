@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { TransactionsDto } from "../../../../api/src/transactions/dto/Transations.dto";
 import { usePortfolio } from "../../context/PortfolioContext";
-import editIcon from "../../assets/pencil-svgrepo-com.svg";
-import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import editIcon from "../../assets/crud-icons/update.svg";
+import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { TRANSACTION_COLORS } from "./transactionColors";
 
@@ -138,10 +138,10 @@ export function AssetTransactions({
                     <td>{transaction.quantityChange}</td>
                     <td>{transaction.pricePerUnit}</td>
                     <td className="actions">
-                      <button title="Edit" onClick={() => startEdit(transaction)}>
+                      <button className="icon-btn" title="Edit" onClick={() => startEdit(transaction)}>
                         <img src={editIcon} height={20} width={20} alt="edit" />
                       </button>
-                      <button onClick={() => onDeleteTransaction(transaction.id)}>
+                      <button className="icon-btn" onClick={() => onDeleteTransaction(transaction.id)}>
                         <img src={deleteIcon} height={20} width={20} alt="delete" />
                       </button>
                     </td>

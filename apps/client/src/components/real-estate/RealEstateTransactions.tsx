@@ -1,6 +1,7 @@
 import { useState } from "react";
-import editIcon from "../../assets/pencil-svgrepo-com.svg";
-import deleteIcon from "../../assets/delete-svgrepo-com.svg";
+import editIcon from "../../assets/crud-icons/update.svg";
+import deleteIcon from "../../assets/crud-icons/delete.svg";
+import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstateTransaction } from "./types";
 
 type Props = {
@@ -131,10 +132,10 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
                     <td>{new Date(t.endDate).toLocaleDateString()}</td>
                     <td>{t.monthlyRent.toLocaleString()}</td>
                     <td className="actions">
-                      <button onClick={() => startEdit(t)}>
+                      <button className="icon-btn" onClick={() => startEdit(t)}>
                         <img src={editIcon} height={20} width={20} alt="edit" />
                       </button>
-                      <button onClick={() => handleDelete(t.id)}>
+                      <button className="icon-btn" onClick={() => handleDelete(t.id)}>
                         <img src={deleteIcon} height={20} width={20} alt="delete" />
                       </button>
                     </td>

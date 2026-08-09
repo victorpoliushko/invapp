@@ -1,5 +1,5 @@
 import { useState } from "react";
-import editIcon from "../../assets/pencil-svgrepo-com.svg";
+import editIcon from "../../assets/crud-icons/update.svg";
 import { useParams } from "react-router-dom";
 
 export default function TransactionButton({ assetId }: { assetId: string}) {
