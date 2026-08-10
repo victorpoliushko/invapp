@@ -517,4 +517,51 @@ export class PortfoliosService {
 
     return { topPerformers, topLosers };
   }
+
+  // Net worth across every portfolio a user owns, not just one. Stocks/crypto
+  // use the live currentPrice (falling back to cost basis if a price hasn't
+  // been fetched yet); bonds and real estate have no tracked market value at
+  // all yet, so they're valued at cost basis (purchasePrice) until Phase 1
+  // item #3 (manual current-value override) lands — see GO_LIVE_STRATEGY.md.
+  // MixedAssets is excluded: it has no portfolioId/userId relation (§1c).
+  async getNetWorth(userId: string): Promise<{
+    total: number;
+    byType: { stocks: number; crypto: number; bonds: number; realEstate: number };
+  }> {
+    const portfolios = await this.prismaService.portfolio.findMany({
+      where: { userId },
+      include: {
+        portfolioAssets: { include: { asset: true } },
+        bonds: true,
+        realEstateAssets: true,
+      },
+    });
+
+    let stocks = 0;
+    let crypto = 0;
+    let bonds = 0;
+    let realEstate = 0;
+
+    for (const portfolio of portfolios) {
+      for (const pa of portfolio.portfolioAssets) {
+        const value = (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
+        if (pa.asset.type === 'CRYPTOCURRENCY') {
+          crypto += value;
+        } else {
+          stocks += value;
+        }
+      }
+      for (const bond of portfolio.bonds) {
+        bonds += bond.purchasePrice * bond.quantity;
+      }
+      for (const property of portfolio.realEstateAssets) {
+        realEstate += property.purchasePrice;
+      }
+    }
+
+    return {
+      total: stocks + crypto + bonds + realEstate,
+      byType: { stocks, crypto, bonds, realEstate },
+    };
+  }
 }

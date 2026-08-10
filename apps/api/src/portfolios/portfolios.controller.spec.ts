@@ -19,6 +19,7 @@ describe('PortfoliosController', () => {
       getPortfolioBalance: jest.fn(),
       getPortfolioReturns: jest.fn(),
       getTopMovers: jest.fn(),
+      getNetWorth: jest.fn(),
     };
 
     controller = new PortfoliosController(service);
@@ -78,6 +79,19 @@ describe('PortfoliosController', () => {
     it('throws Forbidden when requesting another user\'s portfolios', () => {
       expect(() => controller.getPortfoliosByUserId('someone-else', user)).toThrow(ForbiddenException);
       expect(service.getByUserId).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getNetWorth', () => {
+    it('delegates to the service when the requested user id matches the authenticated user', () => {
+      controller.getNetWorth('u1', user);
+
+      expect(service.getNetWorth).toHaveBeenCalledWith('u1');
+    });
+
+    it('throws Forbidden when requesting another user\'s net worth', () => {
+      expect(() => controller.getNetWorth('someone-else', user)).toThrow(ForbiddenException);
+      expect(service.getNetWorth).not.toHaveBeenCalled();
     });
   });
 

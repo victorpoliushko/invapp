@@ -1141,6 +1141,92 @@ describe('PortfoliosService', () => {
       expect(result.topLosers).toEqual([]);
     });
   });
+
+  describe('getNetWorth', () => {
+    it('returns zero for a user with no portfolios', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      expect(result).toEqual({
+        total: 0,
+        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0 },
+      });
+    });
+
+    it('sums current value across stocks, crypto, bonds and real estate in a single portfolio', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          portfolioAssets: [
+            { asset: { type: 'Stock', currentPrice: 150 }, price: 100, quantity: 10 },
+            { asset: { type: 'CRYPTOCURRENCY', currentPrice: 50000 }, price: 40000, quantity: 0.5 },
+          ],
+          bonds: [{ purchasePrice: 950, quantity: 10 }],
+          realEstateAssets: [{ purchasePrice: 200000 }],
+        },
+      ]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      // stocks: 150*10 = 1500 | crypto: 50000*0.5 = 25000
+      // bonds: 950*10 = 9500 | real estate: 200000
+      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000 });
+      expect(result.total).toBe(1500 + 25000 + 9500 + 200000);
+    });
+
+    it('sums across multiple portfolios, not just one', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          portfolioAssets: [{ asset: { type: 'Stock', currentPrice: 100 }, price: 100, quantity: 1 }],
+          bonds: [],
+          realEstateAssets: [],
+        },
+        {
+          id: 'p2',
+          portfolioAssets: [{ asset: { type: 'Stock', currentPrice: 200 }, price: 200, quantity: 1 }],
+          bonds: [],
+          realEstateAssets: [],
+        },
+      ]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      expect(result.byType.stocks).toBe(300);
+      expect(result.total).toBe(300);
+    });
+
+    it('falls back to the average cost when currentPrice has not been fetched yet', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          portfolioAssets: [{ asset: { type: 'Stock', currentPrice: null }, price: 80, quantity: 5 }],
+          bonds: [],
+          realEstateAssets: [],
+        },
+      ]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      expect(result.byType.stocks).toBe(400);
+    });
+
+    it('scopes the query to the given user', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([]);
+
+      await service.getNetWorth(OWNER_ID);
+
+      expect(prisma.portfolio.findMany).toHaveBeenCalledWith({
+        where: { userId: OWNER_ID },
+        include: {
+          portfolioAssets: { include: { asset: true } },
+          bonds: true,
+          realEstateAssets: true,
+        },
+      });
+    });
+  });
 });
 
 describe('toggleExpanded', () => {

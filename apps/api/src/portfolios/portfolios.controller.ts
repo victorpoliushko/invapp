@@ -82,6 +82,15 @@ export class PortfoliosController {
     return this.portfoliosService.getByUserId(userId);
   }
 
+  @Get('/user/:userId/net-worth')
+  @UseGuards(AuthGuard('jwt'))
+  getNetWorth(@Param('userId') userId: string, @GetUser() user: User) {
+    if (userId !== user.id) {
+      throw new ForbiddenException('You do not have access to this user\'s net worth');
+    }
+    return this.portfoliosService.getNetWorth(userId);
+  }
+
   @Post('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
