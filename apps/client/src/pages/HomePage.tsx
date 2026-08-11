@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../App.css";
 import { LocationPicker } from "../components/LocationPicker";
 
@@ -18,7 +19,7 @@ export const HomePage = () => {
         </p>
       </section>
       <section className="section-container section-flex-container try-section-1">
-        <button className="try-section-1-btn">Give it a try. It's free!</button>
+        <Link to="/login" className="try-section-1-btn">Give it a try. It's free!</Link>
         <img
           src="/invapp-preview.png"
           height={500}
