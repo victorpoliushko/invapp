@@ -2,6 +2,7 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { AssetTable } from "./AssetTable";
 import { RealEstateTable } from "../real-estate/RealEstateTable";
 import { BondTable } from "../bonds/BondTable";
+import { MixedAssetTable } from "../mixed-assets/MixedAssetTable";
 import "../../pages/portfolio/PortfolioPage.css";
 import { useEffect, useState } from "react";
 import editIcon from "../../assets/crud-icons/update.svg";
@@ -107,6 +108,18 @@ export function PortfolioContent() {
         <label htmlFor="tab-crypto">Crypto</label>
         <div className="tab">
           <AssetTable portfolio={portfolio} assetType="crypto" />
+        </div>
+
+        <input
+          type="radio"
+          name="tabs"
+          id="tab-mixed"
+          onChange={() => setSelectedTab("tab-mixed")}
+          checked={selectedTab === "tab-mixed"}
+        />
+        <label htmlFor="tab-mixed">Other</label>
+        <div className="tab">
+          <MixedAssetTable />
         </div>
       </div>
     </section>

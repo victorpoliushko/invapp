@@ -84,6 +84,7 @@ model Portfolio {
   portfolioAssets  PortfolioAsset[]
   realEstateAssets RealEstate[]
   bonds            Bond[]
+  mixedAssets      MixedAsset[]
 }
 
 enum RealEstateType {
@@ -140,17 +141,16 @@ model InvestStrategy {
   userId String
 }
 
-enum MixedAssetType {
-  REAL_ESTATE
-  APPS
-}
+model MixedAsset {
+  id            String    @id @default(uuid())
+  name          String
+  quantity      Float     @default(1)
+  purchasePrice Float
+  purchaseDate  DateTime  @default(now())
+  currentValue  Float?
 
-model MixedAssets {
-  id       String         @id @default(uuid())
-  title    String
-  type     MixedAssetType
-  quantity Int
-  price    Float
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId String
 }
 
 model Transaction {

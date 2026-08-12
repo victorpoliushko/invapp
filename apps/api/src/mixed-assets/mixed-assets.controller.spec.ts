@@ -1,66 +1,55 @@
 import { MixedAssetsController } from './mixed-assets.controller';
 
 describe('MixedAssetsController', () => {
+  const user = { id: 'u1' } as any;
+
   let service: any;
   let controller: MixedAssetsController;
 
   beforeEach(() => {
     service = {
+      getByPortfolio: jest.fn(),
       create: jest.fn(),
-      findAll: jest.fn(),
-      findOne: jest.fn(),
       update: jest.fn(),
-      remove: jest.fn(),
+      delete: jest.fn(),
     };
 
     controller = new MixedAssetsController(service);
   });
 
-  it('is defined', () => {
-    expect(controller).toBeDefined();
+  describe('getByPortfolio', () => {
+    it('delegates to the service with the portfolio id and authenticated user id', () => {
+      controller.getByPortfolio('p1', user);
+
+      expect(service.getByPortfolio).toHaveBeenCalledWith('p1', 'u1');
+    });
   });
 
   describe('create', () => {
-    it('delegates to the service with the create dto', () => {
-      const dto = { title: 'Vintage Watch', type: 'APPS', quantity: 1, price: 5000 };
+    it('delegates to the service with the request body and authenticated user id', () => {
+      const body = { name: 'Vintage Watch', portfolioId: 'p1' };
 
-      controller.create(dto as any);
+      controller.create(body, user);
 
-      expect(service.create).toHaveBeenCalledWith(dto);
-    });
-  });
-
-  describe('findAll', () => {
-    it('delegates to the service with the parsed limit', () => {
-      controller.findAll(10);
-
-      expect(service.findAll).toHaveBeenCalledWith(10);
-    });
-  });
-
-  describe('findOne', () => {
-    it('delegates to the service with the id from the param dto', () => {
-      controller.findOne({ id: 'm1' });
-
-      expect(service.findOne).toHaveBeenCalledWith('m1');
+      expect(service.create).toHaveBeenCalledWith(body, 'u1');
     });
   });
 
   describe('update', () => {
-    it('delegates to the service with the id and update dto', () => {
-      const dto = { title: 'Updated Name' };
+    it('delegates to the service with the mixed asset id, request body and authenticated user id', () => {
+      const body = { name: 'Updated Asset' };
 
-      controller.update('m1', dto as any);
+      controller.update('a1', body, user);
 
-      expect(service.update).toHaveBeenCalledWith('m1', dto);
+      expect(service.update).toHaveBeenCalledWith('a1', body, 'u1');
     });
   });
 
-  describe('remove', () => {
-    it('delegates to the service with the id', () => {
-      controller.remove('m1');
+  describe('delete', () => {
+    it('delegates to the service with the mixed asset id and authenticated user id', () => {
+      controller.delete('a1', user);
 
-      expect(service.remove).toHaveBeenCalledWith('m1');
+      expect(service.delete).toHaveBeenCalledWith('a1', 'u1');
     });
   });
 });

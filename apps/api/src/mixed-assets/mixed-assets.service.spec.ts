@@ -1,95 +1,157 @@
+/// <reference types="jest" />
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { MixedAssetsService } from './mixed-assets.service';
 
 describe('MixedAssetsService', () => {
+  const OWNER_ID = 'u1';
+  const OTHER_USER_ID = 'u2';
+
   let prisma: any;
+  let portfoliosService: any;
   let service: MixedAssetsService;
 
   beforeEach(() => {
     prisma = {
-      mixedAssets: {
-        create: jest.fn(),
+      mixedAsset: {
+        findUnique: jest.fn().mockResolvedValue({ portfolioId: 'p1' }),
         findMany: jest.fn(),
-        findFirstOrThrow: jest.fn(),
+        create: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
       },
     };
-
-    service = new MixedAssetsService(prisma);
+    portfoliosService = { assertOwnership: jest.fn() };
+    service = new MixedAssetsService(prisma as any, portfoliosService);
   });
 
   describe('create', () => {
-    it('creates a mixed asset from the dto', async () => {
-      const dto = { title: 'Vintage Watch', type: 'APPS', quantity: 1, price: 5000 };
-      prisma.mixedAssets.create.mockResolvedValue({ id: 'm1', ...dto });
+    it('coerces numeric string inputs and parses the purchase date', async () => {
+      await service.create({
+        portfolioId: 'p1',
+        name: 'Vintage Watch',
+        quantity: '1' as any,
+        purchasePrice: '5000' as any,
+        purchaseDate: '2026-01-01',
+      }, OWNER_ID);
 
-      const result = await service.create(dto as any);
-
-      expect(prisma.mixedAssets.create).toHaveBeenCalledWith({ data: dto });
-      expect(result).toEqual({ id: 'm1', ...dto });
-    });
-  });
-
-  describe('findAll', () => {
-    it('limits results to the given count', async () => {
-      prisma.mixedAssets.findMany.mockResolvedValue([{ id: 'm1' }, { id: 'm2' }]);
-
-      const result = await service.findAll(2);
-
-      expect(prisma.mixedAssets.findMany).toHaveBeenCalledWith({ take: 2 });
-      expect(result).toHaveLength(2);
-    });
-
-    it('returns an empty array when there are no mixed assets', async () => {
-      prisma.mixedAssets.findMany.mockResolvedValue([]);
-
-      const result = await service.findAll(10);
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('findOne', () => {
-    it('returns the mixed asset matching the id', async () => {
-      prisma.mixedAssets.findFirstOrThrow.mockResolvedValue({ id: 'm1', name: 'Vintage Watch' });
-
-      const result = await service.findOne('m1');
-
-      expect(prisma.mixedAssets.findFirstOrThrow).toHaveBeenCalledWith({ where: { id: 'm1' } });
-      expect(result.id).toBe('m1');
+      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
+      expect(prisma.mixedAsset.create).toHaveBeenCalledWith({
+        data: {
+          portfolioId: 'p1',
+          name: 'Vintage Watch',
+          quantity: 1,
+          purchasePrice: 5000,
+          purchaseDate: new Date('2026-01-01'),
+          currentValue: undefined,
+        },
+      });
     });
 
-    it('propagates the error when no matching asset exists', async () => {
-      prisma.mixedAssets.findFirstOrThrow.mockRejectedValue(new Error('not found'));
+    it('coerces currentValue when provided', async () => {
+      await service.create({
+        portfolioId: 'p1',
+        name: 'Vintage Watch',
+        quantity: 1,
+        purchasePrice: 5000,
+        purchaseDate: '2026-01-01',
+        currentValue: '6200' as any,
+      }, OWNER_ID);
 
-      await expect(service.findOne('missing')).rejects.toThrow('not found');
+      expect(prisma.mixedAsset.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: 6200 }) }),
+      );
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
+
+      await expect(service.create({
+        portfolioId: 'p1',
+        name: 'Vintage Watch',
+        quantity: 1,
+        purchasePrice: 5000,
+        purchaseDate: '2026-01-01',
+      }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      expect(prisma.mixedAsset.create).not.toHaveBeenCalled();
     });
   });
 
   describe('update', () => {
-    it('updates the mixed asset with the given fields', async () => {
-      prisma.mixedAssets.update.mockResolvedValue({ id: 'm1', title: 'Updated Name' });
+    it('only includes fields that were provided', async () => {
+      await service.update('asset-1', { quantity: 2 }, OWNER_ID);
 
-      const result = await service.update('m1', { title: 'Updated Name' } as any);
-
-      expect(prisma.mixedAssets.update).toHaveBeenCalledWith({
-        where: { id: 'm1' },
-        data: { title: 'Updated Name' },
+      expect(prisma.mixedAsset.findUnique).toHaveBeenCalledWith({
+        where: { id: 'asset-1' },
+        select: { portfolioId: true },
       });
-      expect(result.title).toBe('Updated Name');
+      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
+      expect(prisma.mixedAsset.update).toHaveBeenCalledWith({
+        where: { id: 'asset-1' },
+        data: { quantity: 2 },
+      });
+    });
+
+    it('omits purchaseDate when not provided', async () => {
+      await service.update('asset-1', { name: 'Renamed' }, OWNER_ID);
+
+      const call = prisma.mixedAsset.update.mock.calls[0][0];
+      expect(call.data).not.toHaveProperty('purchaseDate');
+      expect(call.data).toEqual({ name: 'Renamed' });
+    });
+
+    it('parses currentValue when provided', async () => {
+      await service.update('asset-1', { currentValue: 7000 }, OWNER_ID);
+
+      expect(prisma.mixedAsset.update).toHaveBeenCalledWith({
+        where: { id: 'asset-1' },
+        data: { currentValue: 7000 },
+      });
+    });
+
+    it('throws NotFound when the mixed asset does not exist', async () => {
+      prisma.mixedAsset.findUnique.mockResolvedValue(null);
+
+      await expect(service.update('missing', { quantity: 2 }, OWNER_ID)).rejects.toThrow(NotFoundException);
+      expect(prisma.mixedAsset.update).not.toHaveBeenCalled();
+    });
+
+    it('throws Forbidden when the owning portfolio belongs to another user', async () => {
+      portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
+
+      await expect(service.update('asset-1', { quantity: 2 }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      expect(prisma.mixedAsset.update).not.toHaveBeenCalled();
     });
   });
 
-  describe('remove', () => {
-    it('deletes the asset and returns the remaining list', async () => {
-      prisma.mixedAssets.delete.mockResolvedValue({ id: 'm1' });
-      prisma.mixedAssets.findMany.mockResolvedValue([{ id: 'm2' }]);
+  describe('getByPortfolio', () => {
+    it('queries mixed assets scoped to the given portfolio', async () => {
+      await service.getByPortfolio('p1', OWNER_ID);
 
-      const result = await service.remove('m1');
+      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
+      expect(prisma.mixedAsset.findMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
+    });
 
-      expect(prisma.mixedAssets.delete).toHaveBeenCalledWith({ where: { id: 'm1' } });
-      expect(prisma.mixedAssets.findMany).toHaveBeenCalledWith();
-      expect(result).toEqual([{ id: 'm2' }]);
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
+
+      await expect(service.getByPortfolio('p1', OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      expect(prisma.mixedAsset.findMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('delete', () => {
+    it('deletes the mixed asset by id', async () => {
+      await service.delete('asset-1', OWNER_ID);
+
+      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
+      expect(prisma.mixedAsset.delete).toHaveBeenCalledWith({ where: { id: 'asset-1' } });
+    });
+
+    it('throws Forbidden when the owning portfolio belongs to another user', async () => {
+      portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
+
+      await expect(service.delete('asset-1', OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      expect(prisma.mixedAsset.delete).not.toHaveBeenCalled();
     });
   });
 });

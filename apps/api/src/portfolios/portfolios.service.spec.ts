@@ -370,6 +370,7 @@ describe('PortfoliosService', () => {
           portfolioAssets: { include: { asset: true } },
           bonds: true,
           realEstateAssets: true,
+          mixedAssets: true,
         },
       });
       expect(result).toHaveLength(2);
@@ -1150,11 +1151,11 @@ describe('PortfoliosService', () => {
 
       expect(result).toEqual({
         total: 0,
-        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0 },
+        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0 },
       });
     });
 
-    it('sums current value across stocks, crypto, bonds and real estate in a single portfolio', async () => {
+    it('sums current value across stocks, crypto, bonds, real estate and mixed assets in a single portfolio', async () => {
       prisma.portfolio.findMany.mockResolvedValue([
         {
           id: 'p1',
@@ -1164,15 +1165,32 @@ describe('PortfoliosService', () => {
           ],
           bonds: [{ purchasePrice: 950, quantity: 10 }],
           realEstateAssets: [{ purchasePrice: 200000 }],
+          mixedAssets: [{ purchasePrice: 5000, currentValue: 6000, quantity: 1 }],
         },
       ]);
 
       const result = await service.getNetWorth(OWNER_ID);
 
       // stocks: 150*10 = 1500 | crypto: 50000*0.5 = 25000
-      // bonds: 950*10 = 9500 | real estate: 200000
-      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000 });
-      expect(result.total).toBe(1500 + 25000 + 9500 + 200000);
+      // bonds: 950*10 = 9500 | real estate: 200000 | mixed assets: 6000*1 = 6000
+      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000, mixedAssets: 6000 });
+      expect(result.total).toBe(1500 + 25000 + 9500 + 200000 + 6000);
+    });
+
+    it('falls back to purchasePrice for a mixed asset with no currentValue set yet', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          portfolioAssets: [],
+          bonds: [],
+          realEstateAssets: [],
+          mixedAssets: [{ purchasePrice: 5000, currentValue: null, quantity: 2 }],
+        },
+      ]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      expect(result.byType.mixedAssets).toBe(10000);
     });
 
     it('sums across multiple portfolios, not just one', async () => {
@@ -1223,6 +1241,7 @@ describe('PortfoliosService', () => {
           portfolioAssets: { include: { asset: true } },
           bonds: true,
           realEstateAssets: true,
+          mixedAssets: true,
         },
       });
     });

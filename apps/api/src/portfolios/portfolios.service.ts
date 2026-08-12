@@ -173,6 +173,23 @@ function buildRealEstateMovers(
   return movers;
 }
 
+// Mixed assets have a manually-entered currentValue instead of a live price
+// feed, so returns are capital-gains only (no income component), same math
+// shape as stocks but user-entered instead of fetched.
+function buildMixedAssetMovers(
+  mixedAssets: { name: string; quantity: number; purchasePrice: number; currentValue: number | null }[],
+): Mover[] {
+  const movers: Mover[] = [];
+  for (const asset of mixedAssets) {
+    if (asset.currentValue == null || asset.quantity <= 0) continue;
+    const cost = asset.purchasePrice * asset.quantity;
+    if (cost <= 0) continue;
+    const dollarReturn = asset.currentValue * asset.quantity - cost;
+    movers.push({ label: asset.name, type: 'MIXED_ASSET', pct: (dollarReturn / cost) * 100, dollarReturn });
+  }
+  return movers;
+}
+
 @Injectable()
 export class PortfoliosService {
   constructor(
@@ -254,6 +271,7 @@ export class PortfoliosService {
         portfolioAssets: { include: { asset: true } },
         bonds: true,
         realEstateAssets: true,
+        mixedAssets: true,
       },
     });
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
@@ -429,6 +447,7 @@ export class PortfoliosService {
         },
         bonds: true,
         realEstateAssets: { include: { transactions: true } },
+        mixedAssets: true,
       },
     });
 
@@ -470,6 +489,20 @@ export class PortfoliosService {
       totalDollarReturn += calcRealEstateIncome(property.transactions, periodStart, now);
     }
 
+    // Mixed assets have no income accrual — the capital gain is a single
+    // point-in-time figure (currentValue vs purchasePrice), so it counts in
+    // full whenever the holding period overlaps the requested window, same
+    // overlap rule bonds/real estate use to decide if a position counts at all.
+    for (const asset of portfolio.mixedAssets ?? []) {
+      if (asset.currentValue == null || asset.quantity <= 0) continue;
+      if (daysOverlap(periodStart, now, asset.purchaseDate, now) <= 0) continue;
+
+      hasPosition = true;
+      const cost = asset.purchasePrice * asset.quantity;
+      totalCost += cost;
+      totalDollarReturn += asset.currentValue * asset.quantity - cost;
+    }
+
     if (!hasPosition || totalCost === 0) {
       return { pctReturn: null, dollarReturn: null };
     }
@@ -498,6 +531,7 @@ export class PortfoliosService {
         },
         bonds: true,
         realEstateAssets: { include: { transactions: true } },
+        mixedAssets: true,
       },
     });
 
@@ -510,6 +544,7 @@ export class PortfoliosService {
       ...buildStockMovers(portfolio.portfolioAssets, periodStart),
       ...buildBondMovers(portfolio.bonds, periodStart, now),
       ...buildRealEstateMovers(portfolio.realEstateAssets, periodStart, now),
+      ...buildMixedAssetMovers(portfolio.mixedAssets ?? []),
     ];
 
     const topPerformers = [...movers].sort((a, b) => b.pct - a.pct).slice(0, 3);
@@ -523,10 +558,11 @@ export class PortfoliosService {
   // been fetched yet); bonds and real estate have no tracked market value at
   // all yet, so they're valued at cost basis (purchasePrice) until Phase 1
   // item #3 (manual current-value override) lands — see GO_LIVE_STRATEGY.md.
-  // MixedAssets is excluded: it has no portfolioId/userId relation (§1c).
+  // Mixed assets use the user-entered currentValue, falling back to cost
+  // basis when it hasn't been set yet.
   async getNetWorth(userId: string): Promise<{
     total: number;
-    byType: { stocks: number; crypto: number; bonds: number; realEstate: number };
+    byType: { stocks: number; crypto: number; bonds: number; realEstate: number; mixedAssets: number };
   }> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
@@ -534,6 +570,7 @@ export class PortfoliosService {
         portfolioAssets: { include: { asset: true } },
         bonds: true,
         realEstateAssets: true,
+        mixedAssets: true,
       },
     });
 
@@ -541,6 +578,7 @@ export class PortfoliosService {
     let crypto = 0;
     let bonds = 0;
     let realEstate = 0;
+    let mixedAssets = 0;
 
     for (const portfolio of portfolios) {
       for (const pa of portfolio.portfolioAssets) {
@@ -557,11 +595,14 @@ export class PortfoliosService {
       for (const property of portfolio.realEstateAssets) {
         realEstate += property.purchasePrice;
       }
+      for (const asset of portfolio.mixedAssets ?? []) {
+        mixedAssets += (asset.currentValue ?? asset.purchasePrice) * asset.quantity;
+      }
     }
 
     return {
-      total: stocks + crypto + bonds + realEstate,
-      byType: { stocks, crypto, bonds, realEstate },
+      total: stocks + crypto + bonds + realEstate + mixedAssets,
+      byType: { stocks, crypto, bonds, realEstate, mixedAssets },
     };
   }
 }

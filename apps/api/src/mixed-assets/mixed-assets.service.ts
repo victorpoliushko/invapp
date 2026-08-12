@@ -1,34 +1,84 @@
-import { Injectable } from '@nestjs/common';
-import { CreateMixedAssetDto } from './dto/create-mixed-asset.dto';
-import { UpdateMixedAssetDto } from './dto/update-mixed-asset.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { MixedAssets } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { PortfoliosService } from '../portfolios/portfolios.service';
 
 @Injectable()
 export class MixedAssetsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private portfoliosService: PortfoliosService,
+  ) {}
 
-  async create(createMixedAssetDto: CreateMixedAssetDto): Promise<MixedAssets> {
-    return await this.prismaService.mixedAssets.create({
-      data: createMixedAssetDto
+  private async getPortfolioIdForMixedAsset(id: string): Promise<string> {
+    const mixedAsset = await this.prisma.mixedAsset.findUnique({
+      where: { id },
+      select: { portfolioId: true },
     });
-    // return plainToInstance(MixedAssetsDto, createdAsset);
+    if (!mixedAsset) throw new NotFoundException('Mixed asset not found');
+    return mixedAsset.portfolioId;
   }
 
-  async findAll(limit: number): Promise<MixedAssets[]> {
-    return await this.prismaService.mixedAssets.findMany({ take: limit });
+  async getByPortfolio(portfolioId: string, userId: string) {
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
+    return this.prisma.mixedAsset.findMany({ where: { portfolioId } });
   }
 
-  async findOne(id: string): Promise<MixedAssets> {
-    return await this.prismaService.mixedAssets.findFirstOrThrow({ where: { id } });
+  async create(
+    data: {
+      portfolioId: string;
+      name: string;
+      quantity: number;
+      purchasePrice: number;
+      purchaseDate: string;
+      currentValue?: number;
+    },
+    userId: string,
+  ) {
+    await this.portfoliosService.assertOwnership(data.portfolioId, userId);
+
+    return this.prisma.mixedAsset.create({
+      data: {
+        portfolioId: data.portfolioId,
+        name: data.name,
+        quantity: Number(data.quantity),
+        purchasePrice: Number(data.purchasePrice),
+        purchaseDate: new Date(data.purchaseDate),
+        currentValue: data.currentValue != null ? Number(data.currentValue) : undefined,
+      },
+    });
   }
 
-  async update(id: string, updateMixedAssetDto: UpdateMixedAssetDto): Promise<MixedAssets> {
-    return await this.prismaService.mixedAssets.update({ where: { id }, data: updateMixedAssetDto });
+  async update(
+    id: string,
+    data: Partial<{
+      name: string;
+      quantity: number;
+      purchasePrice: number;
+      purchaseDate: string;
+      currentValue: number;
+    }>,
+    userId: string,
+  ) {
+    const portfolioId = await this.getPortfolioIdForMixedAsset(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
+    return this.prisma.mixedAsset.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.quantity != null && { quantity: Number(data.quantity) }),
+        ...(data.purchasePrice != null && { purchasePrice: Number(data.purchasePrice) }),
+        ...(data.purchaseDate && { purchaseDate: new Date(data.purchaseDate) }),
+        ...(data.currentValue != null && { currentValue: Number(data.currentValue) }),
+      },
+    });
   }
 
-  async remove(id: string): Promise<MixedAssets[]> {
-    await this.prismaService.mixedAssets.delete({ where: { id } });
-    return await this.prismaService.mixedAssets.findMany();
+  async delete(id: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForMixedAsset(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
+    return this.prisma.mixedAsset.delete({ where: { id } });
   }
 }
