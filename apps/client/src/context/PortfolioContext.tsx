@@ -90,9 +90,10 @@ export const PortfolioProvider = ({
     const data = await res.json();
     setPortfolio(data);
 
-    if (data?.portfolioAssets?.length) {
+    const positions = [...(data?.stockPositions ?? []), ...(data?.cryptoPositions ?? [])];
+    if (positions.length) {
       fetchCurrentPrices(
-        data.portfolioAssets.map((pa: any) => ({ assetId: pa.assetId, ticker: pa.asset.ticker }))
+        positions.map((pa: any) => ({ assetId: pa.assetId, ticker: pa.asset.ticker }))
       );
     }
   };

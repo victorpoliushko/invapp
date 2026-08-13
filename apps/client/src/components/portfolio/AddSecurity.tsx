@@ -14,7 +14,7 @@ function isCrypto(s: Suggestion): s is CryptoSuggestion {
   return "id" in s;
 }
 
-export function AddAsset({
+export function AddSecurity({
   assetType = "stock",
   totalPositionSum,
 }: {

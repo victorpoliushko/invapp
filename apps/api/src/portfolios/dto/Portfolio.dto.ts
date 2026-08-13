@@ -1,7 +1,7 @@
 import { IsArray, IsDefined, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
 import { UserDto } from "../../users/dto/User.dto";
 import { Type } from "class-transformer";
-import { PortfolioAssetDto } from "./PortfolioAsset.dto";
+import { PositionDto } from "./Position.dto";
 import { Bond, RealEstate, MixedAsset } from "@prisma/client";
 
 export class PortfolioDto {
@@ -20,8 +20,13 @@ export class PortfolioDto {
 
   @IsArray()
   @ValidateNested({each: true})
-  @Type(() => PortfolioAssetDto)
-  portfolioAssets: PortfolioAssetDto[];
+  @Type(() => PositionDto)
+  stockPositions: PositionDto[];
+
+  @IsArray()
+  @ValidateNested({each: true})
+  @Type(() => PositionDto)
+  cryptoPositions: PositionDto[];
 
   @IsOptional()
   @IsArray()

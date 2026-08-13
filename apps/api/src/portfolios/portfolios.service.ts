@@ -128,12 +128,12 @@ export interface Mover {
 // yield % (see calcBondIncome/calcRealEstateIncome — income only, no
 // capital gains tracked for those two types). Different mechanisms, same
 // normalized unit (% return on cost basis), so they can share one ranking.
-function buildStockMovers(
-  portfolioAssets: { asset: { ticker: string; type: string | null; currentPrice: number | null }; transactions: PeriodTransaction[] }[],
+function buildPositionMovers(
+  positions: { asset: { ticker: string; type: string | null; currentPrice: number | null }; transactions: PeriodTransaction[] }[],
   periodStart: Date | null,
 ): Mover[] {
   const movers: Mover[] = [];
-  for (const pa of portfolioAssets) {
+  for (const pa of positions) {
     if (pa.asset.currentPrice == null) continue;
     const position = calcPeriodPosition(pa.transactions, periodStart);
     if (!position || position.avgPrice === 0) continue;
@@ -226,7 +226,16 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
-        portfolioAssets: {
+        stockPositions: {
+          include: {
+            asset: true,
+            transactions: {
+              where: { portfolioId: id },
+              orderBy: { date: 'desc' },
+            },
+          },
+        },
+        cryptoPositions: {
           include: {
             asset: true,
             transactions: {
@@ -249,7 +258,10 @@ export class PortfoliosService {
       data: {
         name: input.name,
       },
-      include: { portfolioAssets: { include: { asset: true } } },
+      include: {
+        stockPositions: { include: { asset: true } },
+        cryptoPositions: { include: { asset: true } },
+      },
     });
     return plainToInstance(PortfolioDto, portfolio);
   }
@@ -258,8 +270,10 @@ export class PortfoliosService {
     await this.assertOwnership(id, userId);
 
     await this.prismaService.$transaction([
-      this.prismaService.transaction.deleteMany({ where: { portfolioId: id } }),
-      this.prismaService.portfolioAsset.deleteMany({ where: { portfolioId: id } }),
+      this.prismaService.stockTransaction.deleteMany({ where: { portfolioId: id } }),
+      this.prismaService.cryptoTransaction.deleteMany({ where: { portfolioId: id } }),
+      this.prismaService.stockPosition.deleteMany({ where: { portfolioId: id } }),
+      this.prismaService.cryptoPosition.deleteMany({ where: { portfolioId: id } }),
       this.prismaService.portfolio.delete({ where: { id } }),
     ]);
   }
@@ -268,7 +282,8 @@ export class PortfoliosService {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
       include: {
-        portfolioAssets: { include: { asset: true } },
+        stockPositions: { include: { asset: true } },
+        cryptoPositions: { include: { asset: true } },
         bonds: true,
         realEstateAssets: true,
         mixedAssets: true,
@@ -307,33 +322,59 @@ export class PortfoliosService {
       });
     }
 
-    let portfolioAsset = await this.prismaService.portfolioAsset.findUnique({
-      where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
+    const isCrypto = asset.type === 'CRYPTOCURRENCY';
+
+    if (isCrypto) {
+      await this.upsertPosition(this.prismaService.cryptoPosition, this.prismaService.cryptoTransaction, id, asset.id, input);
+    } else {
+      await this.upsertPosition(this.prismaService.stockPosition, this.prismaService.stockTransaction, id, asset.id, input);
+    }
+
+    const updatedPortfolio =
+      await this.prismaService.portfolio.findUniqueOrThrow({
+        where: { id },
+        include: {
+          stockPositions: { include: { asset: true } },
+          cryptoPositions: { include: { asset: true } },
+        },
+      });
+
+    return plainToInstance(PortfolioDto, updatedPortfolio);
+  }
+
+  // Shared by the stock and crypto branches of addAssetToPortfolio: ensures a
+  // position row exists, records the new transaction, then recomputes the
+  // position's quantity/avg price from the full transaction history.
+  private async upsertPosition(
+    position: { findUnique: Function; create: Function; update: Function },
+    transaction: { create: Function; findMany: Function },
+    portfolioId: string,
+    assetId: string,
+    input: AddAssetInputDto,
+  ) {
+    const existing = await position.findUnique({
+      where: { portfolioId_assetId: { portfolioId, assetId } },
     });
 
-    if (!portfolioAsset) {
-      portfolioAsset = await this.prismaService.portfolioAsset.create({
-        data: {
-          assetId: asset.id,
-          portfolioId: id,
-          quantity: 0,
-        },
+    if (!existing) {
+      await position.create({
+        data: { assetId, portfolioId, quantity: 0 },
       });
     }
 
-    await this.prismaService.transaction.create({
+    await transaction.create({
       data: {
         type: input.type,
         quantityChange: input.quantityChange,
         date: new Date(input.date),
         pricePerUnit: input.pricePerUnit,
-        portfolioId: id,
-        assetId: asset.id,
+        portfolioId,
+        assetId,
       },
     });
 
-    const allTransactions = await this.prismaService.transaction.findMany({
-      where: { portfolioId: id, assetId: asset.id },
+    const allTransactions: PeriodTransaction[] = await transaction.findMany({
+      where: { portfolioId, assetId },
     });
 
     let totalQuantity = 0;
@@ -351,21 +392,13 @@ export class PortfoliosService {
 
     const avgPrice = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
-    await this.prismaService.portfolioAsset.update({
-      where: { portfolioId_assetId: { portfolioId: id, assetId: asset.id } },
+    await position.update({
+      where: { portfolioId_assetId: { portfolioId, assetId } },
       data: {
         quantity: totalQuantity,
         price: Math.round(avgPrice),
       },
     });
-
-    const updatedPortfolio =
-      await this.prismaService.portfolio.findUniqueOrThrow({
-        where: { id },
-        include: { portfolioAssets: { include: { asset: true } } },
-      });
-
-    return plainToInstance(PortfolioDto, updatedPortfolio);
   }
 
   async deleteAsset(
@@ -375,26 +408,28 @@ export class PortfoliosService {
   ): Promise<PortfolioDto> {
     await this.assertOwnership(id, userId);
 
-    await this.prismaService.transaction.deleteMany({
-      where: {
-        portfolioId: id,
-        assetId: input.assetId,
-      },
-    });
+    const asset = await this.prismaService.asset.findUnique({ where: { id: input.assetId } });
+    const isCrypto = asset?.type === 'CRYPTOCURRENCY';
 
-    await this.prismaService.portfolioAsset.delete({
-      where: {
-        portfolioId_assetId: {
-          portfolioId: id,
-          assetId: input.assetId,
-        },
-      },
-    });
+    if (isCrypto) {
+      await this.prismaService.cryptoTransaction.deleteMany({ where: { portfolioId: id, assetId: input.assetId } });
+      await this.prismaService.cryptoPosition.delete({
+        where: { portfolioId_assetId: { portfolioId: id, assetId: input.assetId } },
+      });
+    } else {
+      await this.prismaService.stockTransaction.deleteMany({ where: { portfolioId: id, assetId: input.assetId } });
+      await this.prismaService.stockPosition.delete({
+        where: { portfolioId_assetId: { portfolioId: id, assetId: input.assetId } },
+      });
+    }
 
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
-        include: { portfolioAssets: { include: { asset: true } } },
+        include: {
+          stockPositions: { include: { asset: true } },
+          cryptoPositions: { include: { asset: true } },
+        },
       });
 
     return plainToInstance(PortfolioDto, updatedPortfolio);
@@ -406,18 +441,17 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
-        portfolioAssets: {
-          include: {
-            asset: true,
-          },
-        },
+        stockPositions: { include: { asset: true } },
+        cryptoPositions: { include: { asset: true } },
       },
     });
 
     if (!portfolio) throw new NotFoundException('Portfolio not found');
 
+    const positions = [...portfolio.stockPositions, ...portfolio.cryptoPositions];
+
     return Promise.all(
-      portfolio.portfolioAssets.map(async (pa) => ({
+      positions.map(async (pa) => ({
         assetId: pa.assetId,
         symbol: pa.asset.ticker,
         actualPrice: await this.assetsService.getSharePrice(pa.asset.ticker),
@@ -439,7 +473,13 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
-        portfolioAssets: {
+        stockPositions: {
+          include: {
+            asset: true,
+            transactions: { where: { portfolioId: id } },
+          },
+        },
+        cryptoPositions: {
           include: {
             asset: true,
             transactions: { where: { portfolioId: id } },
@@ -459,7 +499,7 @@ export class PortfoliosService {
     let totalDollarReturn = 0;
     let hasPosition = false;
 
-    for (const pa of portfolio.portfolioAssets) {
+    for (const pa of [...portfolio.stockPositions, ...portfolio.cryptoPositions]) {
       if (pa.asset.currentPrice == null) continue;
       const position = calcPeriodPosition(pa.transactions, periodStart);
       if (!position || position.avgPrice === 0) continue;
@@ -523,7 +563,13 @@ export class PortfoliosService {
     const portfolio = await this.prismaService.portfolio.findUnique({
       where: { id },
       include: {
-        portfolioAssets: {
+        stockPositions: {
+          include: {
+            asset: true,
+            transactions: { where: { portfolioId: id } },
+          },
+        },
+        cryptoPositions: {
           include: {
             asset: true,
             transactions: { where: { portfolioId: id } },
@@ -541,7 +587,8 @@ export class PortfoliosService {
     const now = new Date();
 
     const movers = [
-      ...buildStockMovers(portfolio.portfolioAssets, periodStart),
+      ...buildPositionMovers(portfolio.stockPositions, periodStart),
+      ...buildPositionMovers(portfolio.cryptoPositions, periodStart),
       ...buildBondMovers(portfolio.bonds, periodStart, now),
       ...buildRealEstateMovers(portfolio.realEstateAssets, periodStart, now),
       ...buildMixedAssetMovers(portfolio.mixedAssets ?? []),
@@ -567,7 +614,8 @@ export class PortfoliosService {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
       include: {
-        portfolioAssets: { include: { asset: true } },
+        stockPositions: { include: { asset: true } },
+        cryptoPositions: { include: { asset: true } },
         bonds: true,
         realEstateAssets: true,
         mixedAssets: true,
@@ -581,13 +629,11 @@ export class PortfoliosService {
     let mixedAssets = 0;
 
     for (const portfolio of portfolios) {
-      for (const pa of portfolio.portfolioAssets) {
-        const value = (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
-        if (pa.asset.type === 'CRYPTOCURRENCY') {
-          crypto += value;
-        } else {
-          stocks += value;
-        }
+      for (const pa of portfolio.stockPositions) {
+        stocks += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
+      }
+      for (const pa of portfolio.cryptoPositions) {
+        crypto += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
       }
       for (const bond of portfolio.bonds) {
         bonds += bond.purchasePrice * bond.quantity;

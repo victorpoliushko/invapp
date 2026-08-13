@@ -3,7 +3,7 @@ import { Type } from "class-transformer";
 import { AssetDto } from "../../assets/dto/Asset.dto";
 import { TransactionsDto } from "src/transactions/dto/Transations.dto";
 
-export class PortfolioAssetDto {
+export class PositionDto {
   @IsDefined()
   portfolioId: string;
 

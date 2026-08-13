@@ -1,5 +1,5 @@
 import { usePortfolio } from "../../context/PortfolioContext";
-import { AssetTable } from "./AssetTable";
+import { SecurityTable } from "./SecurityTable";
 import { RealEstateTable } from "../real-estate/RealEstateTable";
 import { BondTable } from "../bonds/BondTable";
 import { MixedAssetTable } from "../mixed-assets/MixedAssetTable";
@@ -71,7 +71,7 @@ export function PortfolioContent() {
         <label htmlFor="tab-stocks">Stocks</label>
 
         <div className="tab">
-          <AssetTable portfolio={portfolio} />
+          <SecurityTable portfolio={portfolio} />
         </div>
 
         <input
@@ -107,7 +107,7 @@ export function PortfolioContent() {
         />
         <label htmlFor="tab-crypto">Crypto</label>
         <div className="tab">
-          <AssetTable portfolio={portfolio} assetType="crypto" />
+          <SecurityTable portfolio={portfolio} assetType="crypto" />
         </div>
 
         <input

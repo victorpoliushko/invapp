@@ -12,12 +12,12 @@ type EditState = {
   pricePerUnit: string;
 };
 
-export function AssetTransactions({
+export function SecurityTransactions({
   assetTicker,
-  portfolioAssetTransactions,
+  transactions,
 }: {
   assetTicker: string;
-  portfolioAssetTransactions: TransactionsDto[];
+  transactions: TransactionsDto[];
 }) {
   const { refreshPortfolio } = usePortfolio();
   const token = localStorage.getItem("accessToken");
@@ -95,7 +95,7 @@ export function AssetTransactions({
               </tr>
             </thead>
             <tbody>
-              {portfolioAssetTransactions?.map((transaction) =>
+              {transactions?.map((transaction) =>
                 editingId === transaction.id && editState ? (
                   <tr key={transaction.id}>
                     <td style={{ color: TRANSACTION_COLORS[transaction.type as "BUY" | "SELL"] }}>

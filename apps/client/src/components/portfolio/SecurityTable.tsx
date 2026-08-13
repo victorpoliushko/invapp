@@ -1,23 +1,23 @@
 import { Fragment, useState } from "react";
-import { AssetRow } from "./AssetRow";
-import { AssetTransactions } from "./AssetTransactions";
+import { SecurityRow } from "./SecurityRow";
+import { SecurityTransactions } from "./SecurityTransactions";
 import "../../pages/portfolio/PortfolioPage.css";
 import { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
-import { AddAsset } from "./AddAsset";
+import { AddSecurity } from "./AddSecurity";
 import { usePortfolio } from "../../context/PortfolioContext";
 
 type SortCol = "pctChange" | "totalPosition" | "totalReturn";
 type SortDir = "asc" | "desc";
 
-type PA = PortfolioDto["portfolioAssets"][number];
+type Position = PortfolioDto["stockPositions"][number];
 
-function totalPosition(pa: PA): number {
+function totalPosition(pa: Position): number {
   return pa.transactions
     .filter((t) => t.type === "BUY")
     .reduce((sum, t) => sum + t.quantityChange * t.pricePerUnit, 0);
 }
 
-function pctChange(pa: PA, prices: Record<string, number>): number {
+function pctChange(pa: Position, prices: Record<string, number>): number {
   const cur = prices[pa.assetId];
   const avg = pa.price;
   return cur != null && avg != null && avg !== 0
@@ -25,7 +25,7 @@ function pctChange(pa: PA, prices: Record<string, number>): number {
     : -Infinity;
 }
 
-function totalReturn(pa: PA, prices: Record<string, number>): number {
+function totalReturn(pa: Position, prices: Record<string, number>): number {
   const cur = prices[pa.assetId];
   const avg = pa.price;
   return cur != null && avg != null
@@ -33,7 +33,7 @@ function totalReturn(pa: PA, prices: Record<string, number>): number {
     : -Infinity;
 }
 
-export const AssetTable = ({
+export const SecurityTable = ({
   portfolio,
   assetType = "stock",
 }: {
@@ -50,7 +50,7 @@ export const AssetTable = ({
     else { setSortCol(col); setSortDir("desc"); }
   };
 
-  const sortValue = (pa: PA) => {
+  const sortValue = (pa: Position) => {
     if (sortCol === "pctChange") return pctChange(pa, currentPrices);
     if (sortCol === "totalReturn") return totalReturn(pa, currentPrices);
     return totalPosition(pa);
@@ -59,19 +59,14 @@ export const AssetTable = ({
   const indicator = (col: SortCol) =>
     sortCol === col ? (sortDir === "desc" ? "▼" : "▲") : "↕";
 
-  const portfolioAssets = portfolio.portfolioAssets
-    .filter((pa) =>
-      assetType === "crypto"
-        ? pa.asset.type === "CRYPTOCURRENCY"
-        : pa.asset.type !== "CRYPTOCURRENCY",
-    )
+  const positions = (assetType === "crypto" ? portfolio.cryptoPositions : portfolio.stockPositions)
     .slice()
     .sort((a, b) => {
       const diff = sortValue(b) - sortValue(a);
       return sortDir === "desc" ? diff : -diff;
     });
 
-  const totalPositionSum = portfolioAssets.reduce((sum, pa) => sum + totalPosition(pa), 0);
+  const totalPositionSum = positions.reduce((sum, pa) => sum + totalPosition(pa), 0);
 
   return (
     <div className="table-scroll">
@@ -97,28 +92,28 @@ export const AssetTable = ({
         </tr>
       </thead>
       <tbody>
-        {portfolioAssets.map((portfolioAsset) => (
-          <Fragment key={portfolioAsset.assetId}>
-            <AssetRow
-              portfolioAsset={portfolioAsset}
-              isExpanded={expandedIds.has(portfolioAsset.assetId)}
+        {positions.map((position) => (
+          <Fragment key={position.assetId}>
+            <SecurityRow
+              position={position}
+              isExpanded={expandedIds.has(position.assetId)}
               onExpand={() =>
                 setExpandedIds((prev) => {
                   const next = new Set(prev);
-                  next.has(portfolioAsset.assetId) ? next.delete(portfolioAsset.assetId) : next.add(portfolioAsset.assetId);
+                  next.has(position.assetId) ? next.delete(position.assetId) : next.add(position.assetId);
                   return next;
                 })
               }
             />
-            {expandedIds.has(portfolioAsset.assetId) && (
-              <AssetTransactions
-                assetTicker={portfolioAsset.asset.ticker}
-                portfolioAssetTransactions={portfolioAsset.transactions}
+            {expandedIds.has(position.assetId) && (
+              <SecurityTransactions
+                assetTicker={position.asset.ticker}
+                transactions={position.transactions}
               />
             )}
           </Fragment>
         ))}
-        <AddAsset assetType={assetType} totalPositionSum={totalPositionSum} />
+        <AddSecurity assetType={assetType} totalPositionSum={totalPositionSum} />
       </tbody>
     </table>
     </div>

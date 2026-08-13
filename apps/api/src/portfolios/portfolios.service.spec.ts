@@ -223,13 +223,29 @@ describe('PortfoliosService', () => {
         findMany: jest.fn(),
         findUniqueOrThrow: jest.fn(),
       },
-      portfolioAsset: {
+      asset: {
+        findUnique: jest.fn(),
+      },
+      stockPosition: {
         findUnique: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
+        deleteMany: jest.fn(),
       },
-      transaction: {
+      cryptoPosition: {
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+        deleteMany: jest.fn(),
+      },
+      stockTransaction: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+        deleteMany: jest.fn(),
+      },
+      cryptoTransaction: {
         create: jest.fn(),
         findMany: jest.fn(),
         deleteMany: jest.fn(),
@@ -285,7 +301,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [],
+        stockPositions: [],
+        cryptoPositions: [],
         realEstateAssets: [],
       });
 
@@ -319,7 +336,10 @@ describe('PortfoliosService', () => {
       expect(prisma.portfolio.update).toHaveBeenCalledWith({
         where: { id: 'p1' },
         data: { name: 'New Name' },
-        include: { portfolioAssets: { include: { asset: true } } },
+        include: {
+          stockPositions: { include: { asset: true } },
+          cryptoPositions: { include: { asset: true } },
+        },
       });
     });
 
@@ -334,17 +354,18 @@ describe('PortfoliosService', () => {
   });
 
   describe('delete', () => {
-    it('deletes transactions, portfolio assets and the portfolio in one transaction', async () => {
-      prisma.portfolioAsset.deleteMany = jest.fn();
+    it('deletes transactions, positions and the portfolio in one transaction', async () => {
       prisma.$transaction.mockResolvedValue(undefined);
 
       await service.delete('p1', OWNER_ID);
 
-      expect(prisma.transaction.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
-      expect(prisma.portfolioAsset.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
+      expect(prisma.stockTransaction.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
+      expect(prisma.cryptoTransaction.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
+      expect(prisma.stockPosition.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
+      expect(prisma.cryptoPosition.deleteMany).toHaveBeenCalledWith({ where: { portfolioId: 'p1' } });
       expect(prisma.portfolio.delete).toHaveBeenCalledWith({ where: { id: 'p1' } });
       expect(prisma.$transaction).toHaveBeenCalledTimes(1);
-      expect(prisma.$transaction.mock.calls[0][0]).toHaveLength(3);
+      expect(prisma.$transaction.mock.calls[0][0]).toHaveLength(5);
     });
 
     it('throws Forbidden when the portfolio belongs to another user', async () => {
@@ -358,8 +379,8 @@ describe('PortfoliosService', () => {
   describe('getByUserId', () => {
     it('returns all portfolios for a user, including bonds and real estate', async () => {
       prisma.portfolio.findMany.mockResolvedValue([
-        { id: 'p1', portfolioAssets: [], bonds: [], realEstateAssets: [] },
-        { id: 'p2', portfolioAssets: [], bonds: [], realEstateAssets: [] },
+        { id: 'p1', stockPositions: [], cryptoPositions: [], bonds: [], realEstateAssets: [] },
+        { id: 'p2', stockPositions: [], cryptoPositions: [], bonds: [], realEstateAssets: [] },
       ]);
 
       const result = await service.getByUserId('u1');
@@ -367,7 +388,8 @@ describe('PortfoliosService', () => {
       expect(prisma.portfolio.findMany).toHaveBeenCalledWith({
         where: { userId: 'u1' },
         include: {
-          portfolioAssets: { include: { asset: true } },
+          stockPositions: { include: { asset: true } },
+          cryptoPositions: { include: { asset: true } },
           bonds: true,
           realEstateAssets: true,
           mixedAssets: true,
@@ -380,7 +402,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findMany.mockResolvedValue([
         {
           id: 'p1',
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           bonds: [{ id: 'b1', isin: 'US123' }],
           realEstateAssets: [{ id: 're1', code: 'LVIV-01' }],
         },
@@ -428,73 +451,73 @@ describe('PortfoliosService', () => {
     it('creates a new asset when it does not exist yet', async () => {
       assetsService.findAssetByName.mockResolvedValue(null);
       assetsService.createAsset.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
-      prisma.portfolioAsset.findUnique.mockResolvedValue(null);
-      prisma.portfolioAsset.create.mockResolvedValue({ id: 'pa1' });
-      prisma.transaction.create.mockResolvedValue({});
-      prisma.transaction.findMany.mockResolvedValue([
+      prisma.stockPosition.findUnique.mockResolvedValue(null);
+      prisma.stockPosition.create.mockResolvedValue({ id: 'pa1' });
+      prisma.stockTransaction.create.mockResolvedValue({});
+      prisma.stockTransaction.findMany.mockResolvedValue([
         { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100 },
       ]);
-      prisma.portfolioAsset.update.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.stockPosition.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       expect(assetsService.createAsset).toHaveBeenCalledWith(
         expect.objectContaining({ ticker: 'AAPL' }),
       );
-      expect(prisma.portfolioAsset.create).toHaveBeenCalledWith({
+      expect(prisma.stockPosition.create).toHaveBeenCalledWith({
         data: { assetId: 'a1', portfolioId: 'p1', quantity: 0 },
       });
     });
 
-    it('reuses an existing asset and portfolioAsset without recreating them', async () => {
+    it('reuses an existing asset and position without recreating them', async () => {
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
-      prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
-      prisma.transaction.create.mockResolvedValue({});
-      prisma.transaction.findMany.mockResolvedValue([
+      prisma.stockPosition.findUnique.mockResolvedValue({ id: 'pa1' });
+      prisma.stockTransaction.create.mockResolvedValue({});
+      prisma.stockTransaction.findMany.mockResolvedValue([
         { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100 },
       ]);
-      prisma.portfolioAsset.update.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.stockPosition.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       expect(assetsService.createAsset).not.toHaveBeenCalled();
-      expect(prisma.portfolioAsset.create).not.toHaveBeenCalled();
+      expect(prisma.stockPosition.create).not.toHaveBeenCalled();
     });
 
     it('recomputes quantity and rounded average price from all transactions', async () => {
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
-      prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
-      prisma.transaction.create.mockResolvedValue({});
-      prisma.transaction.findMany.mockResolvedValue([
+      prisma.stockPosition.findUnique.mockResolvedValue({ id: 'pa1' });
+      prisma.stockTransaction.create.mockResolvedValue({});
+      prisma.stockTransaction.findMany.mockResolvedValue([
         { type: TransactionType.BUY, quantityChange: 10, pricePerUnit: 100 },
         { type: TransactionType.BUY, quantityChange: 5, pricePerUnit: 133 },
         { type: TransactionType.SELL, quantityChange: 3, pricePerUnit: 999 },
       ]);
-      prisma.portfolioAsset.update.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.stockPosition.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
       // quantity = 10 + 5 - 3 = 12, cost = 1000 + 665 - 2997 = -1332, avg = -1332/12 = -111 (rounded)
-      expect(prisma.portfolioAsset.update).toHaveBeenCalledWith({
+      expect(prisma.stockPosition.update).toHaveBeenCalledWith({
         where: { portfolioId_assetId: { portfolioId: 'p1', assetId: 'a1' } },
         data: { quantity: 12, price: Math.round(-1332 / 12) },
       });
     });
 
-    it('creates a cryptocurrency asset sourced from coingecko when a coingeckoId is provided', async () => {
+    it('creates a cryptocurrency asset sourced from coingecko when a coingeckoId is provided, routed to the crypto tables', async () => {
       assetsService.findAssetByName.mockResolvedValue(null);
-      assetsService.createAsset.mockResolvedValue({ id: 'a1', ticker: 'BTC' });
-      prisma.portfolioAsset.findUnique.mockResolvedValue(null);
-      prisma.portfolioAsset.create.mockResolvedValue({ id: 'pa1' });
-      prisma.transaction.create.mockResolvedValue({});
-      prisma.transaction.findMany.mockResolvedValue([
+      assetsService.createAsset.mockResolvedValue({ id: 'a1', ticker: 'BTC', type: 'CRYPTOCURRENCY' });
+      prisma.cryptoPosition.findUnique.mockResolvedValue(null);
+      prisma.cryptoPosition.create.mockResolvedValue({ id: 'pa1' });
+      prisma.cryptoTransaction.create.mockResolvedValue({});
+      prisma.cryptoTransaction.findMany.mockResolvedValue([
         { type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 50000 },
       ]);
-      prisma.portfolioAsset.update.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.cryptoPosition.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       await service.addAssetToPortfolio('p1', {
         ...baseInput,
@@ -508,17 +531,21 @@ describe('PortfoliosService', () => {
         type: 'CRYPTOCURRENCY',
         dataSource: 'COINGECKO',
       });
+      expect(prisma.cryptoPosition.create).toHaveBeenCalledWith({
+        data: { assetId: 'a1', portfolioId: 'p1', quantity: 0 },
+      });
+      expect(prisma.stockPosition.create).not.toHaveBeenCalled();
     });
 
     it('records a SELL-only position as a negative quantity with zero average price', async () => {
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
-      prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
-      prisma.transaction.create.mockResolvedValue({});
-      prisma.transaction.findMany.mockResolvedValue([
+      prisma.stockPosition.findUnique.mockResolvedValue({ id: 'pa1' });
+      prisma.stockTransaction.create.mockResolvedValue({});
+      prisma.stockTransaction.findMany.mockResolvedValue([
         { type: TransactionType.SELL, quantityChange: 4, pricePerUnit: 100 },
       ]);
-      prisma.portfolioAsset.update.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.stockPosition.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       await service.addAssetToPortfolio('p1', {
         ...baseInput,
@@ -526,7 +553,7 @@ describe('PortfoliosService', () => {
         quantityChange: 4,
       } as any, OWNER_ID);
 
-      expect(prisma.portfolioAsset.update).toHaveBeenCalledWith({
+      expect(prisma.stockPosition.update).toHaveBeenCalledWith({
         where: { portfolioId_assetId: { portfolioId: 'p1', assetId: 'a1' } },
         data: { quantity: -4, price: 0 },
       });
@@ -534,15 +561,15 @@ describe('PortfoliosService', () => {
 
     it('records the transaction with the given type, quantity, price and date', async () => {
       assetsService.findAssetByName.mockResolvedValue({ id: 'a1', ticker: 'AAPL' });
-      prisma.portfolioAsset.findUnique.mockResolvedValue({ id: 'pa1' });
-      prisma.transaction.create.mockResolvedValue({});
-      prisma.transaction.findMany.mockResolvedValue([]);
-      prisma.portfolioAsset.update.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+      prisma.stockPosition.findUnique.mockResolvedValue({ id: 'pa1' });
+      prisma.stockTransaction.create.mockResolvedValue({});
+      prisma.stockTransaction.findMany.mockResolvedValue([]);
+      prisma.stockPosition.update.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       await service.addAssetToPortfolio('p1', baseInput as any, OWNER_ID);
 
-      expect(prisma.transaction.create).toHaveBeenCalledWith({
+      expect(prisma.stockTransaction.create).toHaveBeenCalledWith({
         data: {
           type: TransactionType.BUY,
           quantityChange: 10,
@@ -556,20 +583,38 @@ describe('PortfoliosService', () => {
   });
 
   describe('deleteAsset', () => {
-    it('removes transactions and the portfolio asset, returning the updated portfolio', async () => {
-      prisma.transaction.deleteMany.mockResolvedValue({});
-      prisma.portfolioAsset.delete.mockResolvedValue({});
-      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', portfolioAssets: [] });
+    it('removes transactions and the stock position, returning the updated portfolio', async () => {
+      prisma.asset.findUnique.mockResolvedValue({ id: 'a1', type: 'Stock' });
+      prisma.stockTransaction.deleteMany.mockResolvedValue({});
+      prisma.stockPosition.delete.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
 
       const result = await service.deleteAsset('p1', { assetId: 'a1' } as any, OWNER_ID);
 
-      expect(prisma.transaction.deleteMany).toHaveBeenCalledWith({
+      expect(prisma.stockTransaction.deleteMany).toHaveBeenCalledWith({
         where: { portfolioId: 'p1', assetId: 'a1' },
       });
-      expect(prisma.portfolioAsset.delete).toHaveBeenCalledWith({
+      expect(prisma.stockPosition.delete).toHaveBeenCalledWith({
         where: { portfolioId_assetId: { portfolioId: 'p1', assetId: 'a1' } },
       });
       expect(result.id).toBe('p1');
+    });
+
+    it('removes transactions and the crypto position when the asset is a cryptocurrency', async () => {
+      prisma.asset.findUnique.mockResolvedValue({ id: 'a1', type: 'CRYPTOCURRENCY' });
+      prisma.cryptoTransaction.deleteMany.mockResolvedValue({});
+      prisma.cryptoPosition.delete.mockResolvedValue({});
+      prisma.portfolio.findUniqueOrThrow.mockResolvedValue({ id: 'p1', stockPositions: [], cryptoPositions: [] });
+
+      await service.deleteAsset('p1', { assetId: 'a1' } as any, OWNER_ID);
+
+      expect(prisma.cryptoTransaction.deleteMany).toHaveBeenCalledWith({
+        where: { portfolioId: 'p1', assetId: 'a1' },
+      });
+      expect(prisma.cryptoPosition.delete).toHaveBeenCalledWith({
+        where: { portfolioId_assetId: { portfolioId: 'p1', assetId: 'a1' } },
+      });
+      expect(prisma.stockTransaction.deleteMany).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden when the portfolio belongs to another user', async () => {
@@ -578,7 +623,7 @@ describe('PortfoliosService', () => {
       await expect(service.deleteAsset('p1', { assetId: 'a1' } as any, OWNER_ID)).rejects.toThrow(
         ForbiddenException,
       );
-      expect(prisma.transaction.deleteMany).not.toHaveBeenCalled();
+      expect(prisma.stockTransaction.deleteMany).not.toHaveBeenCalled();
     });
   });
 
@@ -599,14 +644,12 @@ describe('PortfoliosService', () => {
       );
     });
 
-    it('returns actual prices for each portfolio asset', async () => {
+    it('returns actual prices for each stock and crypto position', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
-          { assetId: 'a1', asset: { ticker: 'AAPL' } },
-          { assetId: 'a2', asset: { ticker: 'BTC' } },
-        ],
+        stockPositions: [{ assetId: 'a1', asset: { ticker: 'AAPL' } }],
+        cryptoPositions: [{ assetId: 'a2', asset: { ticker: 'BTC' } }],
       });
       assetsService.getSharePrice.mockResolvedValueOnce(150).mockResolvedValueOnce(50000);
 
@@ -622,10 +665,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
-          { assetId: 'a1', asset: { ticker: 'AAPL' } },
-          { assetId: 'a2', asset: { ticker: 'BTC' } },
-        ],
+        stockPositions: [{ assetId: 'a1', asset: { ticker: 'AAPL' } }],
+        cryptoPositions: [{ assetId: 'a2', asset: { ticker: 'BTC' } }],
       });
       assetsService.getSharePrice.mockResolvedValue(100);
 
@@ -635,8 +676,8 @@ describe('PortfoliosService', () => {
       expect(Date.now() - start).toBeLessThan(500);
     });
 
-    it('returns an empty array when the portfolio has no assets', async () => {
-      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', userId: OWNER_ID, portfolioAssets: [] });
+    it('returns an empty array when the portfolio has no positions', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ id: 'p1', userId: OWNER_ID, stockPositions: [], cryptoPositions: [] });
 
       const result = await service.getPortfolioBalance('p1', 'USD' as any, OWNER_ID);
 
@@ -700,7 +741,7 @@ describe('PortfoliosService', () => {
 
     it('returns null for both fields when there is no valid position data', async () => {
       prisma.portfolio.findUnique.mockResolvedValue({
-        id: 'p1', userId: OWNER_ID, portfolioAssets: [], bonds: [], realEstateAssets: [],
+        id: 'p1', userId: OWNER_ID, stockPositions: [], cryptoPositions: [], bonds: [], realEstateAssets: [],
       });
 
       const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
@@ -712,7 +753,7 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
+        stockPositions: [
           {
             asset: { currentPrice: 150 },
             transactions: [
@@ -726,6 +767,7 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        cryptoPositions: [],
         bonds: [],
         realEstateAssets: [],
       });
@@ -745,7 +787,7 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
+        stockPositions: [
           {
             asset: { currentPrice: 200 },
             transactions: [
@@ -754,6 +796,7 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        cryptoPositions: [],
         bonds: [],
         realEstateAssets: [],
       });
@@ -769,7 +812,7 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
+        stockPositions: [
           {
             asset: { currentPrice: null },
             transactions: [
@@ -777,6 +820,7 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        cryptoPositions: [],
         bonds: [],
         realEstateAssets: [],
       });
@@ -790,7 +834,7 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
+        stockPositions: [
           {
             asset: { currentPrice: 150 },
             transactions: [
@@ -799,6 +843,7 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        cryptoPositions: [],
         bonds: [],
         realEstateAssets: [],
       });
@@ -816,7 +861,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           realEstateAssets: [],
           bonds: [
             {
@@ -845,7 +891,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           realEstateAssets: [],
           bonds: [
             {
@@ -871,7 +918,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           realEstateAssets: [],
           bonds: [
             {
@@ -894,7 +942,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           realEstateAssets: [],
           bonds: [
             {
@@ -919,7 +968,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [
             {
@@ -943,7 +993,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [
             { purchasePrice: 100000, transactions: [] },
@@ -960,7 +1011,8 @@ describe('PortfoliosService', () => {
         prisma.portfolio.findUnique.mockResolvedValue({
           id: 'p1',
           userId: OWNER_ID,
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [
             {
@@ -985,7 +1037,7 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
+        stockPositions: [
           {
             asset: { currentPrice: 150 },
             transactions: [
@@ -993,6 +1045,7 @@ describe('PortfoliosService', () => {
             ],
           },
         ],
+        cryptoPositions: [],
         bonds: [
           {
             faceValue: 1000,
@@ -1044,7 +1097,7 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [
+        stockPositions: [
           {
             asset: { ticker: 'WINNER', type: 'Stock', currentPrice: 200 },
             transactions: [{ type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 100, date: new Date('2020-01-01') }],
@@ -1054,6 +1107,7 @@ describe('PortfoliosService', () => {
             transactions: [{ type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 100, date: new Date('2020-01-01') }],
           },
         ],
+        cryptoPositions: [],
         bonds: [
           {
             isin: 'US-BOND-1',
@@ -1087,10 +1141,11 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [1, 2, 3, 4, 5].map((n) => ({
+        stockPositions: [1, 2, 3, 4, 5].map((n) => ({
           asset: { ticker: `T${n}`, type: 'Stock', currentPrice: 100 + n },
           transactions: [{ type: TransactionType.BUY, quantityChange: 1, pricePerUnit: 100, date: new Date('2020-01-01') }],
         })),
+        cryptoPositions: [],
         bonds: [],
         realEstateAssets: [],
       });
@@ -1104,7 +1159,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [],
+        stockPositions: [],
+        cryptoPositions: [],
         bonds: [
           {
             isin: 'MATURED-BOND',
@@ -1129,7 +1185,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findUnique.mockResolvedValue({
         id: 'p1',
         userId: OWNER_ID,
-        portfolioAssets: [],
+        stockPositions: [],
+        cryptoPositions: [],
         bonds: [],
         realEstateAssets: [{ code: 'VACANT', purchasePrice: 100000, transactions: [] }],
       });
@@ -1159,10 +1216,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findMany.mockResolvedValue([
         {
           id: 'p1',
-          portfolioAssets: [
-            { asset: { type: 'Stock', currentPrice: 150 }, price: 100, quantity: 10 },
-            { asset: { type: 'CRYPTOCURRENCY', currentPrice: 50000 }, price: 40000, quantity: 0.5 },
-          ],
+          stockPositions: [{ asset: { type: 'Stock', currentPrice: 150 }, price: 100, quantity: 10 }],
+          cryptoPositions: [{ asset: { type: 'CRYPTOCURRENCY', currentPrice: 50000 }, price: 40000, quantity: 0.5 }],
           bonds: [{ purchasePrice: 950, quantity: 10 }],
           realEstateAssets: [{ purchasePrice: 200000 }],
           mixedAssets: [{ purchasePrice: 5000, currentValue: 6000, quantity: 1 }],
@@ -1181,7 +1236,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findMany.mockResolvedValue([
         {
           id: 'p1',
-          portfolioAssets: [],
+          stockPositions: [],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [],
           mixedAssets: [{ purchasePrice: 5000, currentValue: null, quantity: 2 }],
@@ -1197,13 +1253,15 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findMany.mockResolvedValue([
         {
           id: 'p1',
-          portfolioAssets: [{ asset: { type: 'Stock', currentPrice: 100 }, price: 100, quantity: 1 }],
+          stockPositions: [{ asset: { type: 'Stock', currentPrice: 100 }, price: 100, quantity: 1 }],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [],
         },
         {
           id: 'p2',
-          portfolioAssets: [{ asset: { type: 'Stock', currentPrice: 200 }, price: 200, quantity: 1 }],
+          stockPositions: [{ asset: { type: 'Stock', currentPrice: 200 }, price: 200, quantity: 1 }],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [],
         },
@@ -1219,7 +1277,8 @@ describe('PortfoliosService', () => {
       prisma.portfolio.findMany.mockResolvedValue([
         {
           id: 'p1',
-          portfolioAssets: [{ asset: { type: 'Stock', currentPrice: null }, price: 80, quantity: 5 }],
+          stockPositions: [{ asset: { type: 'Stock', currentPrice: null }, price: 80, quantity: 5 }],
+          cryptoPositions: [],
           bonds: [],
           realEstateAssets: [],
         },
@@ -1238,7 +1297,8 @@ describe('PortfoliosService', () => {
       expect(prisma.portfolio.findMany).toHaveBeenCalledWith({
         where: { userId: OWNER_ID },
         include: {
-          portfolioAssets: { include: { asset: true } },
+          stockPositions: { include: { asset: true } },
+          cryptoPositions: { include: { asset: true } },
           bonds: true,
           realEstateAssets: true,
           mixedAssets: true,
