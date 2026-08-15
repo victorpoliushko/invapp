@@ -58,11 +58,9 @@ export default function PortfoliosPage() {
   const navigate = useNavigate();
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
     usePortfolio();
-  // const [portfolios, setPortfolios] = useState([]);
   const [portfolioName, setPortfolioName] = useState<string>("");
   const [portfolioGoal, setPortfolioGoal] = useState<string>("");
   const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState(null);
   const [returnPeriods, setReturnPeriods] = useState<Record<string, ReturnPeriod>>({});
   const [portfolioReturns, setPortfolioReturns] = useState<Record<string, PortfolioReturns>>({});
   const [portfolioMovers, setPortfolioMovers] = useState<Record<string, PortfolioMovers>>({});
@@ -93,9 +91,6 @@ export default function PortfoliosPage() {
       });
     });
   }, [portfolios, returnPeriods]);
-
-  // if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <section className="portfolios-section section-container">
