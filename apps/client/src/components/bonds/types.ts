@@ -9,6 +9,7 @@ export type Bond = {
   couponFrequency: CouponFrequency;
   quantity: number;
   purchasePrice: number;
+  currentValue: number | null;
   purchaseDate: string;
   maturityDate: string | null;
 };

@@ -38,8 +38,9 @@ function calcStats(property: RealEstate) {
   const yearsSincePurchase = totalDays / 365.25;
   const annualNet = yearsSincePurchase > 0 ? totalRentEarned / yearsSincePurchase : 0;
   const annualNetPct = property.purchasePrice > 0 ? (annualNet / property.purchasePrice) * 100 : 0;
+  const capitalGain = property.currentValue != null ? property.currentValue - property.purchasePrice : 0;
 
-  return { occupancyPct, annualNet, annualNetPct, totalReturn: totalRentEarned };
+  return { occupancyPct, annualNet, annualNetPct, totalReturn: totalRentEarned + capitalGain };
 }
 
 function toDateInputValue(iso: string): string {
@@ -57,6 +58,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
     type: property.type,
     purchaseDate: toDateInputValue(property.purchaseDate),
     purchasePrice: String(property.purchasePrice),
+    currentValue: property.currentValue != null ? String(property.currentValue) : "",
     rooms: property.rooms != null ? String(property.rooms) : "",
     totalArea: property.totalArea != null ? String(property.totalArea) : "",
   });
@@ -70,6 +72,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
       type: property.type,
       purchaseDate: toDateInputValue(property.purchaseDate),
       purchasePrice: String(property.purchasePrice),
+      currentValue: property.currentValue != null ? String(property.currentValue) : "",
       rooms: property.rooms != null ? String(property.rooms) : "",
       totalArea: property.totalArea != null ? String(property.totalArea) : "",
     });
@@ -77,7 +80,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
   };
 
   const handleSave = async () => {
-    const { code, name, type, purchaseDate, purchasePrice, rooms, totalArea } = form;
+    const { code, name, type, purchaseDate, purchasePrice, currentValue, rooms, totalArea } = form;
     if (!code || !name || !purchaseDate || !purchasePrice || !rooms || !totalArea) return;
 
     const token = localStorage.getItem("accessToken");
@@ -90,6 +93,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
         type,
         purchaseDate: new Date(purchaseDate).toISOString(),
         purchasePrice: Number(purchasePrice),
+        ...(currentValue !== "" && { currentValue: Number(currentValue) }),
         rooms: Number(rooms),
         totalArea: Number(totalArea),
       }),
@@ -124,6 +128,9 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
           <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" />
         </td>
         <td>
+          <input type="number" value={form.currentValue} onChange={(e) => set("currentValue", e.target.value)} placeholder="Current value" />
+        </td>
+        <td>
           <input type="number" value={form.rooms} onChange={(e) => set("rooms", e.target.value)} placeholder="Rooms" min={0} />
         </td>
         <td>
@@ -148,6 +155,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
       <td data-label="Type">{TYPE_LABELS[property.type] ?? property.type}</td>
       <td data-label="Purchase date">{new Date(property.purchaseDate).toLocaleDateString()}</td>
       <td data-label="Purchase price">{property.purchasePrice.toLocaleString()}</td>
+      <td data-label="Current value">{property.currentValue != null ? property.currentValue.toLocaleString() : "—"}</td>
       <td data-label="Rooms">{property.rooms ?? "—"}</td>
       <td data-label="Total area, m²">{property.totalArea != null ? property.totalArea.toLocaleString() : "—"}</td>
       <td data-label="Occupancy %">{occupancyPct.toFixed(1)}%</td>

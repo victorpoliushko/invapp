@@ -85,6 +85,7 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
       <td>
         <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" />
       </td>
+      <td></td>
       <td>
         <input
           type="number"

@@ -19,6 +19,10 @@ export class CreateRealEstateDto {
 
   @IsOptional()
   @IsNumber()
+  currentValue?: number;
+
+  @IsOptional()
+  @IsNumber()
   rooms?: number;
 
   @IsOptional()
@@ -49,6 +53,10 @@ export class UpdateRealEstateDto {
   @IsOptional()
   @IsNumber()
   purchasePrice?: number;
+
+  @IsOptional()
+  @IsNumber()
+  currentValue?: number;
 
   @IsOptional()
   @IsNumber()

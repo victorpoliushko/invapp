@@ -82,18 +82,29 @@ interface PeriodBond {
   couponRate: number;
   quantity: number;
   purchasePrice: number;
+  currentValue: number | null;
   purchaseDate: Date;
   maturityDate: Date | null;
 }
 
-// Coupon income only — bonds have no tracked current market price, so this
-// is not a capital-gains figure (see GO_LIVE_STRATEGY.md §1d).
+// Coupon income only — capital gains (from the manual currentValue override)
+// are computed separately by calcBondCapitalGain.
 function calcBondIncome(bond: PeriodBond, periodStart: Date | null, now: Date): number {
   const holdingEnd = bond.maturityDate ?? now;
   const days = daysOverlap(periodStart, now, bond.purchaseDate, holdingEnd);
   if (days <= 0) return 0;
   const annualIncome = bond.faceValue * (bond.couponRate / 100) * bond.quantity;
   return annualIncome * (days / 365.25);
+}
+
+// Capital gain from the manually-entered currentValue override, a
+// point-in-time figure like mixed assets — counted in full whenever the
+// holding period overlaps the requested window, not prorated like income.
+function calcBondCapitalGain(bond: PeriodBond, periodStart: Date | null, now: Date): number {
+  if (bond.currentValue == null) return 0;
+  const holdingEnd = bond.maturityDate ?? now;
+  if (daysOverlap(periodStart, now, bond.purchaseDate, holdingEnd) <= 0) return 0;
+  return (bond.currentValue - bond.purchasePrice) * bond.quantity;
 }
 
 interface PeriodRentalTransaction {
@@ -151,16 +162,16 @@ function buildBondMovers(bonds: (PeriodBond & { isin: string })[], periodStart: 
     if (bond.quantity <= 0) continue;
     const cost = bond.purchasePrice * bond.quantity;
     if (cost <= 0) continue;
-    const income = calcBondIncome(bond, periodStart, now);
-    if (income <= 0) continue;
+    const dollarReturn = calcBondIncome(bond, periodStart, now) + calcBondCapitalGain(bond, periodStart, now);
+    if (dollarReturn === 0) continue;
 
-    movers.push({ label: bond.isin, type: 'BOND', pct: (income / cost) * 100, dollarReturn: income });
+    movers.push({ label: bond.isin, type: 'BOND', pct: (dollarReturn / cost) * 100, dollarReturn });
   }
   return movers;
 }
 
 function buildRealEstateMovers(
-  properties: { code: string; purchasePrice: number; transactions: PeriodRentalTransaction[] }[],
+  properties: { code: string; purchasePrice: number; currentValue: number | null; transactions: PeriodRentalTransaction[] }[],
   periodStart: Date | null,
   now: Date,
 ): Mover[] {
@@ -168,7 +179,9 @@ function buildRealEstateMovers(
   for (const property of properties) {
     if (property.purchasePrice <= 0) continue;
     const income = calcRealEstateIncome(property.transactions, periodStart, now);
-    movers.push({ label: property.code, type: 'REAL_ESTATE', pct: (income / property.purchasePrice) * 100, dollarReturn: income });
+    const capitalGain = property.currentValue != null ? property.currentValue - property.purchasePrice : 0;
+    const dollarReturn = income + capitalGain;
+    movers.push({ label: property.code, type: 'REAL_ESTATE', pct: (dollarReturn / property.purchasePrice) * 100, dollarReturn });
   }
   return movers;
 }
@@ -512,21 +525,24 @@ export class PortfoliosService {
 
     for (const bond of portfolio.bonds) {
       if (bond.quantity <= 0) continue;
-      const income = calcBondIncome(bond, periodStart, now);
-      if (income <= 0) continue;
+      const dollarReturn = calcBondIncome(bond, periodStart, now) + calcBondCapitalGain(bond, periodStart, now);
+      if (dollarReturn === 0) continue;
 
       hasPosition = true;
       totalCost += bond.purchasePrice * bond.quantity;
-      totalDollarReturn += income;
+      totalDollarReturn += dollarReturn;
     }
 
     // Real estate has no maturity/exit concept — a property is treated as
-    // owned through to "now" for every period, so its cost basis always
-    // counts; only the rental income is bounded to the period window.
+    // owned through to "now" for every period, so its cost basis (and any
+    // capital gain from the currentValue override) always counts; only the
+    // rental income is bounded to the period window.
     for (const property of portfolio.realEstateAssets) {
       hasPosition = true;
       totalCost += property.purchasePrice;
-      totalDollarReturn += calcRealEstateIncome(property.transactions, periodStart, now);
+      const income = calcRealEstateIncome(property.transactions, periodStart, now);
+      const capitalGain = property.currentValue != null ? property.currentValue - property.purchasePrice : 0;
+      totalDollarReturn += income + capitalGain;
     }
 
     // Mixed assets have no income accrual — the capital gain is a single
@@ -602,11 +618,9 @@ export class PortfoliosService {
 
   // Net worth across every portfolio a user owns, not just one. Stocks/crypto
   // use the live currentPrice (falling back to cost basis if a price hasn't
-  // been fetched yet); bonds and real estate have no tracked market value at
-  // all yet, so they're valued at cost basis (purchasePrice) until Phase 1
-  // item #3 (manual current-value override) lands — see GO_LIVE_STRATEGY.md.
-  // Mixed assets use the user-entered currentValue, falling back to cost
-  // basis when it hasn't been set yet.
+  // been fetched yet); bonds, real estate, and mixed assets use the
+  // user-entered currentValue override, falling back to cost basis
+  // (purchasePrice) when it hasn't been set.
   async getNetWorth(userId: string): Promise<{
     total: number;
     byType: { stocks: number; crypto: number; bonds: number; realEstate: number; mixedAssets: number };
@@ -636,10 +650,10 @@ export class PortfoliosService {
         crypto += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
       }
       for (const bond of portfolio.bonds) {
-        bonds += bond.purchasePrice * bond.quantity;
+        bonds += (bond.currentValue ?? bond.purchasePrice) * bond.quantity;
       }
       for (const property of portfolio.realEstateAssets) {
-        realEstate += property.purchasePrice;
+        realEstate += property.currentValue ?? property.purchasePrice;
       }
       for (const asset of portfolio.mixedAssets ?? []) {
         mixedAssets += (asset.currentValue ?? asset.purchasePrice) * asset.quantity;

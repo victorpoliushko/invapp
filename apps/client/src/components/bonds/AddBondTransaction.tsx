@@ -46,7 +46,7 @@ export function AddBondTransaction({ onAdded }: Props) {
     onAdded();
   };
 
-  // 12 cols: ISIN | Name | Date bought | Maturity date | Qty | Price | Face val | Coupon% | Frequency | (empty) | (empty) | Add
+  // 14 cols: ISIN | Name | Date bought | Maturity date | Qty | Price | (empty: current value) | Face val | Coupon% | Frequency | (empty) x3 (income/position/gain) | Add
   return (
     <tr>
       <td><input type="text" value={form.isin} onChange={(e) => set("isin", e.target.value)} placeholder="ISIN" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
@@ -55,6 +55,7 @@ export function AddBondTransaction({ onAdded }: Props) {
       <td><input type="date" value={form.maturityDate} onChange={(e) => set("maturityDate", e.target.value)} /></td>
       <td><input type="number" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} placeholder="Qty" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
+      <td></td>
       <td><input type="number" value={form.faceValue} onChange={(e) => set("faceValue", e.target.value)} placeholder="Face val." onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.couponRate} onChange={(e) => set("couponRate", e.target.value)} placeholder="Coupon %" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td>
@@ -65,6 +66,7 @@ export function AddBondTransaction({ onAdded }: Props) {
           <option value="MONTHLY">Monthly</option>
         </select>
       </td>
+      <td></td>
       <td></td>
       <td></td>
       <td><button onClick={handleAdd}>Add</button></td>

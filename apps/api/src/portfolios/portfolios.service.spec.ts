@@ -961,6 +961,58 @@ describe('PortfoliosService', () => {
 
         expect(result).toEqual({ pctReturn: null, dollarReturn: null });
       });
+
+      it('adds capital gain from the currentValue override on top of coupon income', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          stockPositions: [],
+          cryptoPositions: [],
+          realEstateAssets: [],
+          bonds: [
+            {
+              faceValue: 0,
+              couponRate: 0,
+              quantity: 10,
+              purchasePrice: 950,
+              currentValue: 1000,
+              purchaseDate: new Date('2020-01-01'),
+              maturityDate: null,
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        // no coupon income (rate 0); capital gain = (1000 - 950) * 10 = 500
+        expect(result.dollarReturn).toBe(500);
+        expect(result.pctReturn).toBeCloseTo((500 / 9500) * 100, 5);
+      });
+
+      it('counts a capital loss from the currentValue override, even with no income', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          stockPositions: [],
+          cryptoPositions: [],
+          realEstateAssets: [],
+          bonds: [
+            {
+              faceValue: 0,
+              couponRate: 0,
+              quantity: 10,
+              purchasePrice: 950,
+              currentValue: 900,
+              purchaseDate: new Date('2020-01-01'),
+              maturityDate: null,
+            },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        expect(result.dollarReturn).toBe(-500);
+      });
     });
 
     describe('real estate income', () => {
@@ -1005,6 +1057,24 @@ describe('PortfoliosService', () => {
 
         expect(result.dollarReturn).toBe(0);
         expect(result.pctReturn).toBe(0);
+      });
+
+      it('adds capital gain from the currentValue override on top of rental income', async () => {
+        prisma.portfolio.findUnique.mockResolvedValue({
+          id: 'p1',
+          userId: OWNER_ID,
+          stockPositions: [],
+          cryptoPositions: [],
+          bonds: [],
+          realEstateAssets: [
+            { purchasePrice: 100000, currentValue: 120000, transactions: [] },
+          ],
+        });
+
+        const result = await service.getPortfolioReturns('p1', 'all', OWNER_ID);
+
+        expect(result.dollarReturn).toBe(20000);
+        expect(result.pctReturn).toBeCloseTo(20, 5);
       });
 
       it('excludes rental income from outside the requested period', async () => {
@@ -1198,6 +1268,53 @@ describe('PortfoliosService', () => {
       ]);
       expect(result.topLosers).toEqual([]);
     });
+
+    it('surfaces a bond as a top loser purely from a capital loss, with no income at all', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [],
+        cryptoPositions: [],
+        bonds: [
+          {
+            isin: 'DOWN-BOND',
+            faceValue: 0,
+            couponRate: 0,
+            quantity: 10,
+            purchasePrice: 1000,
+            currentValue: 900,
+            purchaseDate: new Date('2020-01-01'),
+            maturityDate: null,
+          },
+        ],
+        realEstateAssets: [],
+      });
+
+      const result = await service.getTopMovers('p1', 'all', OWNER_ID);
+
+      expect(result.topLosers).toEqual([
+        expect.objectContaining({ label: 'DOWN-BOND', pct: -10, dollarReturn: -1000 }),
+      ]);
+    });
+
+    it('ranks a real estate property by capital gain plus rental income', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [],
+        cryptoPositions: [],
+        bonds: [],
+        realEstateAssets: [
+          { code: 'APPRECIATED', purchasePrice: 100000, currentValue: 130000, transactions: [] },
+        ],
+      });
+
+      const result = await service.getTopMovers('p1', 'all', OWNER_ID);
+
+      expect(result.topPerformers).toEqual([
+        expect.objectContaining({ label: 'APPRECIATED', pct: 30, dollarReturn: 30000 }),
+      ]);
+    });
   });
 
   describe('getNetWorth', () => {
@@ -1247,6 +1364,42 @@ describe('PortfoliosService', () => {
       const result = await service.getNetWorth(OWNER_ID);
 
       expect(result.byType.mixedAssets).toBe(10000);
+    });
+
+    it('prefers currentValue over purchasePrice for bonds and real estate when set', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          stockPositions: [],
+          cryptoPositions: [],
+          bonds: [{ purchasePrice: 950, currentValue: 1000, quantity: 10 }],
+          realEstateAssets: [{ purchasePrice: 200000, currentValue: 220000 }],
+          mixedAssets: [],
+        },
+      ]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      expect(result.byType.bonds).toBe(10000);
+      expect(result.byType.realEstate).toBe(220000);
+    });
+
+    it('falls back to purchasePrice for bonds and real estate with no currentValue set yet', async () => {
+      prisma.portfolio.findMany.mockResolvedValue([
+        {
+          id: 'p1',
+          stockPositions: [],
+          cryptoPositions: [],
+          bonds: [{ purchasePrice: 950, currentValue: null, quantity: 10 }],
+          realEstateAssets: [{ purchasePrice: 200000, currentValue: null }],
+          mixedAssets: [],
+        },
+      ]);
+
+      const result = await service.getNetWorth(OWNER_ID);
+
+      expect(result.byType.bonds).toBe(9500);
+      expect(result.byType.realEstate).toBe(200000);
     });
 
     it('sums across multiple portfolios, not just one', async () => {

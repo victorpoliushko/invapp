@@ -107,6 +107,43 @@ describe('BondsService', () => {
       }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
       expect(prisma.bond.create).not.toHaveBeenCalled();
     });
+
+    it('coerces currentValue when provided', async () => {
+      await service.create({
+        portfolioId: 'p1',
+        isin: 'US123',
+        name: 'Treasury',
+        faceValue: 1000,
+        couponRate: 5,
+        couponFrequency: 'ANNUAL' as any,
+        quantity: 10,
+        purchasePrice: 980,
+        currentValue: '1010' as any,
+        purchaseDate: '2026-01-01',
+      }, OWNER_ID);
+
+      expect(prisma.bond.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: 1010 }) }),
+      );
+    });
+
+    it('leaves currentValue undefined when not provided', async () => {
+      await service.create({
+        portfolioId: 'p1',
+        isin: 'US123',
+        name: 'Treasury',
+        faceValue: 1000,
+        couponRate: 5,
+        couponFrequency: 'ANNUAL' as any,
+        quantity: 10,
+        purchasePrice: 980,
+        purchaseDate: '2026-01-01',
+      }, OWNER_ID);
+
+      expect(prisma.bond.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: undefined }) }),
+      );
+    });
   });
 
   describe('update', () => {
@@ -146,6 +183,22 @@ describe('BondsService', () => {
 
       const call = prisma.bond.update.mock.calls[0][0];
       expect(call.data).not.toHaveProperty('maturityDate');
+    });
+
+    it('parses currentValue when provided', async () => {
+      await service.update('bond-1', { currentValue: 1025 }, OWNER_ID);
+
+      expect(prisma.bond.update).toHaveBeenCalledWith({
+        where: { id: 'bond-1' },
+        data: { currentValue: 1025 },
+      });
+    });
+
+    it('omits currentValue when not provided', async () => {
+      await service.update('bond-1', { isin: 'US999' }, OWNER_ID);
+
+      const call = prisma.bond.update.mock.calls[0][0];
+      expect(call.data).not.toHaveProperty('currentValue');
     });
 
     it('throws NotFound when the bond does not exist', async () => {

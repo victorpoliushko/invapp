@@ -158,6 +158,24 @@ describe('RealEstateService', () => {
       ).rejects.toThrow(ForbiddenException);
       expect(prisma.realEstate.create).not.toHaveBeenCalled();
     });
+
+    it('persists currentValue when provided', async () => {
+      prisma.realEstate.create.mockResolvedValue({ id: 're-1' });
+
+      await service.create({
+        code: 'LVIV-01',
+        name: 'City Apartment',
+        type: 'APARTMENT' as any,
+        purchaseDate: '2026-01-01',
+        purchasePrice: 150000,
+        currentValue: 165000,
+        portfolioId: 'p1',
+      }, OWNER_ID);
+
+      expect(prisma.realEstate.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: 165000 }) }),
+      );
+    });
   });
 
   describe('update', () => {
@@ -211,6 +229,25 @@ describe('RealEstateService', () => {
         },
         include: { transactions: true },
       });
+    });
+
+    it('includes currentValue in the update when provided', async () => {
+      prisma.realEstate.update.mockResolvedValue({ id: 're-1' });
+
+      await service.update('re-1', { currentValue: 170000 }, OWNER_ID);
+
+      expect(prisma.realEstate.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: 170000 }) }),
+      );
+    });
+
+    it('omits currentValue from the update when not provided', async () => {
+      prisma.realEstate.update.mockResolvedValue({ id: 're-1' });
+
+      await service.update('re-1', { rooms: 2 }, OWNER_ID);
+
+      const call = prisma.realEstate.update.mock.calls[0][0];
+      expect(call.data).not.toHaveProperty('currentValue');
     });
 
     it('throws NotFound when the property does not exist', async () => {

@@ -35,6 +35,7 @@ export class BondsService {
       couponFrequency: CouponFrequency;
       quantity: number;
       purchasePrice: number;
+      currentValue?: number;
       purchaseDate: string;
       maturityDate?: string;
     },
@@ -52,6 +53,7 @@ export class BondsService {
         couponFrequency: data.couponFrequency,
         quantity: Number(data.quantity),
         purchasePrice: Number(data.purchasePrice),
+        currentValue: data.currentValue != null ? Number(data.currentValue) : undefined,
         purchaseDate: new Date(data.purchaseDate),
         maturityDate: data.maturityDate ? new Date(data.maturityDate) : undefined,
       },
@@ -68,6 +70,7 @@ export class BondsService {
       couponFrequency: CouponFrequency;
       quantity: number;
       purchasePrice: number;
+      currentValue: number;
       purchaseDate: string;
       maturityDate: string;
     }>,
@@ -86,6 +89,7 @@ export class BondsService {
         ...(data.couponFrequency && { couponFrequency: data.couponFrequency }),
         ...(data.quantity != null && { quantity: Number(data.quantity) }),
         ...(data.purchasePrice != null && { purchasePrice: Number(data.purchasePrice) }),
+        ...(data.currentValue != null && { currentValue: Number(data.currentValue) }),
         ...(data.purchaseDate && { purchaseDate: new Date(data.purchaseDate) }),
         ...(data.maturityDate && { maturityDate: new Date(data.maturityDate) }),
       },

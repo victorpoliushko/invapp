@@ -101,6 +101,7 @@ model RealEstate {
   type          RealEstateType
   purchaseDate  DateTime
   purchasePrice Float
+  currentValue  Float?
   rooms         Int?
   totalArea     Float?
 
@@ -217,6 +218,7 @@ model Bond {
   couponFrequency CouponFrequency
   quantity        Float           @default(0)
   purchasePrice   Float           @default(0)
+  currentValue    Float?
   purchaseDate    DateTime        @default(now())
   maturityDate    DateTime?
 

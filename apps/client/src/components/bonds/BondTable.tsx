@@ -41,17 +41,19 @@ export function BondTable() {
           <th scope="col">Maturity date</th>
           <th scope="col">Quantity</th>
           <th scope="col">Purchase price</th>
+          <th scope="col">Current value</th>
           <th scope="col">Face value</th>
           <th scope="col">Coupon %</th>
           <th scope="col">Frequency</th>
           <th scope="col">Annual income</th>
           <th scope="col">Total position</th>
+          <th scope="col">Capital gain</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
         {bonds.map((bond) => (
-          <BondRow key={bond.id} bond={bond} onDelete={handleDelete} />
+          <BondRow key={bond.id} bond={bond} onDelete={handleDelete} onUpdated={load} />
         ))}
         <AddBondTransaction onAdded={load} />
       </tbody>
