@@ -4,17 +4,6 @@ import { PortfoliosService } from './portfolios.service';
 import { TransactionType } from '@prisma/client';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
-interface AssetWithPrice {
-  asset: string;
-  price: number;
-  currency: string;
-  quantity: number;
-}
-
-function calculateAssetsTotalPrice(assets: AssetWithPrice[]): number {
-  return assets.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-}
-
 function calculateAvgPrice(
   transactions: { type: 'BUY' | 'SELL'; quantityChange: number; pricePerUnit: number }[],
 ): number {
@@ -84,20 +73,6 @@ function toggleExpanded(prev: Set<string>, id: string): Set<string> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-
-describe('calculateAssetsTotalPrice', () => {
-  it('sums price * quantity across assets', () => {
-    const assets = [
-      { asset: 'AAPL', price: 100, currency: 'USD', quantity: 2 },
-      { asset: 'BTC', price: 50000, currency: 'USD', quantity: 0.5 },
-    ];
-    expect(calculateAssetsTotalPrice(assets)).toBe(25200);
-  });
-
-  it('returns 0 for empty list', () => {
-    expect(calculateAssetsTotalPrice([])).toBe(0);
-  });
-});
 
 describe('calculateAvgPrice', () => {
   it('computes weighted average for multiple BUY transactions', () => {
@@ -682,43 +657,6 @@ describe('PortfoliosService', () => {
       const result = await service.getPortfolioBalance('p1', 'USD' as any, OWNER_ID);
 
       expect(result).toEqual([]);
-    });
-  });
-
-  describe('calculateAssetsTotalPrice (service method)', () => {
-    it('sums price * quantity across assets', () => {
-      const assets = [
-        { asset: 'AAPL', price: 100, currency: 'USD' as any, quantity: 2 },
-        { asset: 'BTC', price: 50000, currency: 'USD' as any, quantity: 0.5 },
-      ];
-      expect(service.calculateAssetsTotalPrice(assets)).toBe(25200);
-    });
-
-    it('returns 0 for an empty list', () => {
-      expect(service.calculateAssetsTotalPrice([])).toBe(0);
-    });
-  });
-
-  describe('syncAssetPrice', () => {
-    it('looks up the asset by id when an id is provided', async () => {
-      prisma.asset = { findUnique: jest.fn().mockResolvedValue({ ticker: 'AAPL' }) };
-      assetsService.getSharePrice.mockResolvedValue(150);
-
-      const result = await service.syncAssetPrice([{ id: 'a1', assetSymbol: 'AAPL' }]);
-
-      expect(prisma.asset.findUnique).toHaveBeenCalledWith({ where: { id: 'a1' } });
-      expect(assetsService.getSharePrice).toHaveBeenCalledWith('AAPL');
-      expect(result).toBe(150);
-    });
-
-    it('falls back to looking up by ticker symbol when no id is provided', async () => {
-      prisma.asset = { findUnique: jest.fn().mockResolvedValue({ ticker: 'BTC' }) };
-      assetsService.getSharePrice.mockResolvedValue(50000);
-
-      const result = await service.syncAssetPrice([{ assetSymbol: 'BTC' }]);
-
-      expect(prisma.asset.findUnique).toHaveBeenCalledWith({ where: { ticker: 'BTC' } });
-      expect(result).toBe(50000);
     });
   });
 

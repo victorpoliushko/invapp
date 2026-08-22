@@ -10,13 +10,6 @@ import { AssetsService } from '../assets/assets.service';
 import { UpdatePortfolioDto } from './dto/UpdatePortfolio.dto';
 import { TransactionType } from '@prisma/client';
 
-interface AssetsWithPrices {
-  asset: string;
-  price: number;
-  currency: Currency;
-  quantity: number;
-}
-
 export type ReturnPeriod = 'all' | 'year' | 'month';
 
 interface PeriodTransaction {
@@ -135,10 +128,11 @@ export interface Mover {
   dollarReturn: number;
 }
 
-// Stocks/crypto rank by price-change %; bonds/real estate rank by income
-// yield % (see calcBondIncome/calcRealEstateIncome — income only, no
-// capital gains tracked for those two types). Different mechanisms, same
-// normalized unit (% return on cost basis), so they can share one ranking.
+// Stocks/crypto rank by live price-change %; bonds/real estate rank by
+// income yield % plus any capital gain from a manual currentValue override
+// (see calcBondIncome/calcBondCapitalGain/buildRealEstateMovers). Different
+// mechanisms, same normalized unit (% return on cost basis), so they can
+// share one ranking.
 function buildPositionMovers(
   positions: { asset: { ticker: string; type: string | null; currentPrice: number | null }; transactions: PeriodTransaction[] }[],
   periodStart: Date | null,
@@ -305,16 +299,6 @@ export class PortfoliosService {
     return portfolios.map((p) => plainToInstance(PortfolioDto, p));
   }
 
-  async syncAssetPrice(asset: any) {
-    const exsitingAsset = await this.prismaService.asset.findUnique({
-      where: asset[0].id
-        ? { id: asset[0].id }
-        : { ticker: asset[0].assetSymbol },
-    });
-
-    return await this.assetsService.getSharePrice(exsitingAsset.ticker);
-  }
-
   async addAssetToPortfolio(
     id: string,
     input: AddAssetInputDto,
@@ -470,10 +454,6 @@ export class PortfoliosService {
         actualPrice: await this.assetsService.getSharePrice(pa.asset.ticker),
       })),
     );
-  }
-
-  calculateAssetsTotalPrice(assets: AssetsWithPrices[]) {
-    return assets.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   }
 
   async getPortfolioReturns(
