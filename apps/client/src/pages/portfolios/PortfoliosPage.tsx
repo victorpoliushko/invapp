@@ -3,7 +3,6 @@ import "./PortfoliosPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
-import { NetWorthAllocation } from "../../components/networth/NetWorthAllocation";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -94,7 +93,6 @@ export default function PortfoliosPage() {
 
   return (
     <section className="portfolios-section section-container">
-      <NetWorthAllocation />
       {portfolios && portfolios.length > 0 &&
         portfolios.map((p: any) => {
           const period = returnPeriods[p.id] ?? "all";

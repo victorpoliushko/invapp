@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useAuth } from "../../AuthContext";
 import "./NetWorthAllocation.css";
 
 type NetWorth = {
@@ -16,7 +16,7 @@ const ASSET_CLASSES: { key: keyof NetWorth["byType"]; label: string; color: stri
 ];
 
 export function NetWorthAllocation() {
-  const { userId } = useParams<{ userId: string }>();
+  const { userId } = useAuth();
   const [netWorth, setNetWorth] = useState<NetWorth | null>(null);
 
   useEffect(() => {
@@ -38,37 +38,39 @@ export function NetWorthAllocation() {
     .map((c) => ({ ...c, pct: (c.value / netWorth.total) * 100 }));
 
   return (
-    <div className="net-worth-allocation">
-      <div className="net-worth-allocation-header">
-        <span className="net-worth-allocation-label">Net worth</span>
-        <span className="net-worth-allocation-total">
-          ${Math.round(netWorth.total).toLocaleString()}
-        </span>
-      </div>
+    <section className="section-container">
+      <div className="net-worth-allocation">
+        <div className="net-worth-allocation-header">
+          <span className="net-worth-allocation-label">Net worth</span>
+          <span className="net-worth-allocation-total">
+            ${Math.round(netWorth.total).toLocaleString()}
+          </span>
+        </div>
 
-      <div className="net-worth-allocation-bar">
-        {segments.map((s) => (
-          <div
-            key={s.key}
-            className="net-worth-allocation-segment"
-            style={{ width: `${s.pct}%`, backgroundColor: s.color }}
-            title={`${s.label}: ${s.pct.toFixed(1)}%`}
-          />
-        ))}
-      </div>
+        <div className="net-worth-allocation-bar">
+          {segments.map((s) => (
+            <div
+              key={s.key}
+              className="net-worth-allocation-segment"
+              style={{ width: `${s.pct}%`, backgroundColor: s.color }}
+              title={`${s.label}: ${s.pct.toFixed(1)}%`}
+            />
+          ))}
+        </div>
 
-      <div className="net-worth-allocation-legend">
-        {segments.map((s) => (
-          <div key={s.key} className="net-worth-allocation-legend-item">
-            <span className="net-worth-allocation-swatch" style={{ backgroundColor: s.color }} />
-            <span className="net-worth-allocation-legend-label">{s.label}</span>
-            <span className="net-worth-allocation-legend-pct">{s.pct.toFixed(1)}%</span>
-            <span className="net-worth-allocation-legend-value">
-              ${Math.round(s.value).toLocaleString()}
-            </span>
-          </div>
-        ))}
+        <div className="net-worth-allocation-legend">
+          {segments.map((s) => (
+            <div key={s.key} className="net-worth-allocation-legend-item">
+              <span className="net-worth-allocation-swatch" style={{ backgroundColor: s.color }} />
+              <span className="net-worth-allocation-legend-label">{s.label}</span>
+              <span className="net-worth-allocation-legend-pct">{s.pct.toFixed(1)}%</span>
+              <span className="net-worth-allocation-legend-value">
+                ${Math.round(s.value).toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

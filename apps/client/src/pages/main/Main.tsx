@@ -3,6 +3,7 @@ import { LocationPicker } from "../../components/LocationPicker";
 import MarketTicker from "../../components/marketData";
 import MarketNews from "../../components/marketNews";
 import { PropertyCard } from "../../components/PropertyCard";
+import { NetWorthAllocation } from "../../components/networth/NetWorthAllocation";
 
 const SAMPLE_PROPERTIES = [
   {
@@ -57,6 +58,8 @@ const SAMPLE_PROPERTIES = [
 export const MainPage = () => {
   return (
     <>
+      <NetWorthAllocation />
+
       <div className="">{/* <MarketHeatmap /> */}</div>
 
       <section className="stocks-section section-container">
