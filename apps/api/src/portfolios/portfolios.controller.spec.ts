@@ -20,6 +20,7 @@ describe('PortfoliosController', () => {
       getPortfolioReturns: jest.fn(),
       getTopMovers: jest.fn(),
       getNetWorth: jest.fn(),
+      getPortfolioNetWorth: jest.fn(),
     };
 
     controller = new PortfoliosController(service);
@@ -146,6 +147,14 @@ describe('PortfoliosController', () => {
       controller.getTopMovers('p1', 'month', user);
 
       expect(service.getTopMovers).toHaveBeenCalledWith('p1', 'month', 'u1');
+    });
+  });
+
+  describe('getPortfolioNetWorth', () => {
+    it('delegates to the service with the portfolio id and authenticated user id', () => {
+      controller.getPortfolioNetWorth('p1', user);
+
+      expect(service.getPortfolioNetWorth).toHaveBeenCalledWith('p1', 'u1');
     });
   });
 });

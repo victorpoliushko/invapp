@@ -1397,6 +1397,56 @@ describe('PortfoliosService', () => {
       });
     });
   });
+
+  describe('getPortfolioNetWorth', () => {
+    it('throws NotFoundException when the portfolio does not exist', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue(null);
+
+      await expect(service.getPortfolioNetWorth('missing', OWNER_ID)).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws Forbidden when the portfolio belongs to another user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({ userId: OTHER_USER_ID });
+
+      await expect(service.getPortfolioNetWorth('p1', OWNER_ID)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('sums current value across asset types for a single portfolio', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [{ asset: { currentPrice: 150 }, price: 100, quantity: 10 }],
+        cryptoPositions: [{ asset: { currentPrice: 50000 }, price: 40000, quantity: 0.5 }],
+        bonds: [{ purchasePrice: 950, currentValue: null, quantity: 10 }],
+        realEstateAssets: [{ purchasePrice: 200000, currentValue: null }],
+        mixedAssets: [{ purchasePrice: 5000, currentValue: 6000, quantity: 1 }],
+      });
+
+      const result = await service.getPortfolioNetWorth('p1', OWNER_ID);
+
+      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000, mixedAssets: 6000 });
+      expect(result.total).toBe(1500 + 25000 + 9500 + 200000 + 6000);
+    });
+
+    it('does not include other portfolios owned by the same user', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [{ asset: { currentPrice: 100 }, price: 100, quantity: 1 }],
+        cryptoPositions: [],
+        bonds: [],
+        realEstateAssets: [],
+        mixedAssets: [],
+      });
+
+      const result = await service.getPortfolioNetWorth('p1', OWNER_ID);
+
+      expect(prisma.portfolio.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 'p1' } }),
+      );
+      expect(result.total).toBe(100);
+    });
+  });
 });
 
 describe('toggleExpanded', () => {

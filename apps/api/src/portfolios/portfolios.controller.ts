@@ -142,4 +142,10 @@ export class PortfoliosController {
   ) {
     return this.portfoliosService.getTopMovers(id, period, user.id);
   }
+
+  @Get(':id/net-worth')
+  @UseGuards(AuthGuard('jwt'))
+  getPortfolioNetWorth(@Param('id') id: string, @GetUser() user: User) {
+    return this.portfoliosService.getPortfolioNetWorth(id, user.id);
+  }
 }

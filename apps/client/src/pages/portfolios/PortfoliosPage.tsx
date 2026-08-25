@@ -33,6 +33,7 @@ const RETURN_PERIOD_OPTIONS: { value: ReturnPeriod; label: string }[] = [
 type PortfolioReturns = { pctReturn: number | null; dollarReturn: number | null };
 type Mover = { label: string; type: string; pct: number; dollarReturn: number };
 type PortfolioMovers = { topPerformers: Mover[]; topLosers: Mover[] };
+type PortfolioNetWorth = { total: number };
 
 async function fetchPortfolioReturns(portfolioId: string, period: ReturnPeriod): Promise<PortfolioReturns | null> {
   const token = localStorage.getItem("accessToken");
@@ -52,6 +53,15 @@ async function fetchTopMovers(portfolioId: string, period: ReturnPeriod): Promis
   return res.json();
 }
 
+async function fetchPortfolioNetWorth(portfolioId: string): Promise<PortfolioNetWorth | null> {
+  const token = localStorage.getItem("accessToken");
+  const res = await fetch(`http://localhost:5173/api/portfolios/${portfolioId}/net-worth`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export default function PortfoliosPage() {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -63,6 +73,7 @@ export default function PortfoliosPage() {
   const [returnPeriods, setReturnPeriods] = useState<Record<string, ReturnPeriod>>({});
   const [portfolioReturns, setPortfolioReturns] = useState<Record<string, PortfolioReturns>>({});
   const [portfolioMovers, setPortfolioMovers] = useState<Record<string, PortfolioMovers>>({});
+  const [portfolioNetWorth, setPortfolioNetWorth] = useState<Record<string, PortfolioNetWorth>>({});
 
   const handleCreate = () => {
     if (portfolioName.trim()) {
@@ -91,6 +102,15 @@ export default function PortfoliosPage() {
     });
   }, [portfolios, returnPeriods]);
 
+  useEffect(() => {
+    if (!portfolios) return;
+    portfolios.forEach((p: any) => {
+      fetchPortfolioNetWorth(p.id).then((data) => {
+        if (data) setPortfolioNetWorth((prev) => ({ ...prev, [p.id]: data }));
+      });
+    });
+  }, [portfolios]);
+
   return (
     <section className="portfolios-section section-container">
       {portfolios && portfolios.length > 0 &&
@@ -99,13 +119,19 @@ export default function PortfoliosPage() {
           const movers = portfolioMovers[p.id];
           const performers = movers?.topPerformers ?? [];
           const losers = movers?.topLosers ?? [];
+          const netWorth = portfolioNetWorth[p.id]?.total;
           return (
           <div
             className="portfolio-min portfolio-min--clickable"
             key={p.id}
             onClick={() => navigate(`/portfolios/${p.id}`)}
           >
-            <h2>{p.name}</h2>
+            <div className="portfolio-min-header">
+              <h2>{p.name}</h2>
+              <span className="portfolio-min-networth">
+                {netWorth != null ? `$${Math.round(netWorth).toLocaleString()}` : "—"}
+              </span>
+            </div>
             <div className="portfolio-min-cols">
                 <div className="portfolio-min-col">
                   <div className="portfolio-returns-header">

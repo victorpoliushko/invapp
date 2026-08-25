@@ -12,6 +12,25 @@
   cursor: pointer;
 }
 
+.portfolio-min-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.portfolio-min-header h2 {
+  margin: 0;
+}
+
+.portfolio-min-networth {
+  font-size: var(--font-l);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
 .portfolio-min-cols {
   display: flex;
   flex-direction: row;

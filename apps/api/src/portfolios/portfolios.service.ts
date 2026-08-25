@@ -197,6 +197,60 @@ function buildMixedAssetMovers(
   return movers;
 }
 
+export interface NetWorthByType {
+  stocks: number;
+  crypto: number;
+  bonds: number;
+  realEstate: number;
+  mixedAssets: number;
+}
+
+// Net worth for a single portfolio. Stocks/crypto use the live currentPrice
+// (falling back to cost basis if a price hasn't been fetched yet); bonds,
+// real estate, and mixed assets use the user-entered currentValue override,
+// falling back to cost basis (purchasePrice) when it hasn't been set. Shared
+// by PortfoliosService.getNetWorth (summed across every portfolio a user
+// owns) and getPortfolioNetWorth (a single portfolio).
+function computeNetWorthByType(portfolio: {
+  stockPositions: { asset: { currentPrice: number | null }; price: number | null; quantity: number }[];
+  cryptoPositions: { asset: { currentPrice: number | null }; price: number | null; quantity: number }[];
+  bonds: { currentValue: number | null; purchasePrice: number; quantity: number }[];
+  realEstateAssets: { currentValue: number | null; purchasePrice: number }[];
+  mixedAssets?: { currentValue: number | null; purchasePrice: number; quantity: number }[];
+}): NetWorthByType {
+  let stocks = 0;
+  let crypto = 0;
+  let bonds = 0;
+  let realEstate = 0;
+  let mixedAssets = 0;
+
+  for (const pa of portfolio.stockPositions) {
+    stocks += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
+  }
+  for (const pa of portfolio.cryptoPositions) {
+    crypto += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
+  }
+  for (const bond of portfolio.bonds) {
+    bonds += (bond.currentValue ?? bond.purchasePrice) * bond.quantity;
+  }
+  for (const property of portfolio.realEstateAssets) {
+    realEstate += property.currentValue ?? property.purchasePrice;
+  }
+  for (const asset of portfolio.mixedAssets ?? []) {
+    mixedAssets += (asset.currentValue ?? asset.purchasePrice) * asset.quantity;
+  }
+
+  return { stocks, crypto, bonds, realEstate, mixedAssets };
+}
+
+const NET_WORTH_INCLUDE = {
+  stockPositions: { include: { asset: true } },
+  cryptoPositions: { include: { asset: true } },
+  bonds: true,
+  realEstateAssets: true,
+  mixedAssets: true,
+} as const;
+
 @Injectable()
 export class PortfoliosService {
   constructor(
@@ -596,53 +650,43 @@ export class PortfoliosService {
     return { topPerformers, topLosers };
   }
 
-  // Net worth across every portfolio a user owns, not just one. Stocks/crypto
-  // use the live currentPrice (falling back to cost basis if a price hasn't
-  // been fetched yet); bonds, real estate, and mixed assets use the
-  // user-entered currentValue override, falling back to cost basis
-  // (purchasePrice) when it hasn't been set.
-  async getNetWorth(userId: string): Promise<{
-    total: number;
-    byType: { stocks: number; crypto: number; bonds: number; realEstate: number; mixedAssets: number };
-  }> {
+  // Net worth across every portfolio a user owns, not just one — see
+  // computeNetWorthByType for the per-portfolio valuation rules.
+  async getNetWorth(userId: string): Promise<{ total: number; byType: NetWorthByType }> {
     const portfolios = await this.prismaService.portfolio.findMany({
       where: { userId },
-      include: {
-        stockPositions: { include: { asset: true } },
-        cryptoPositions: { include: { asset: true } },
-        bonds: true,
-        realEstateAssets: true,
-        mixedAssets: true,
-      },
+      include: NET_WORTH_INCLUDE,
     });
 
-    let stocks = 0;
-    let crypto = 0;
-    let bonds = 0;
-    let realEstate = 0;
-    let mixedAssets = 0;
+    const byType: NetWorthByType = { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0 };
 
     for (const portfolio of portfolios) {
-      for (const pa of portfolio.stockPositions) {
-        stocks += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
-      }
-      for (const pa of portfolio.cryptoPositions) {
-        crypto += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
-      }
-      for (const bond of portfolio.bonds) {
-        bonds += (bond.currentValue ?? bond.purchasePrice) * bond.quantity;
-      }
-      for (const property of portfolio.realEstateAssets) {
-        realEstate += property.currentValue ?? property.purchasePrice;
-      }
-      for (const asset of portfolio.mixedAssets ?? []) {
-        mixedAssets += (asset.currentValue ?? asset.purchasePrice) * asset.quantity;
-      }
+      const portfolioByType = computeNetWorthByType(portfolio);
+      byType.stocks += portfolioByType.stocks;
+      byType.crypto += portfolioByType.crypto;
+      byType.bonds += portfolioByType.bonds;
+      byType.realEstate += portfolioByType.realEstate;
+      byType.mixedAssets += portfolioByType.mixedAssets;
     }
 
-    return {
-      total: stocks + crypto + bonds + realEstate + mixedAssets,
-      byType: { stocks, crypto, bonds, realEstate, mixedAssets },
-    };
+    const total = byType.stocks + byType.crypto + byType.bonds + byType.realEstate + byType.mixedAssets;
+    return { total, byType };
+  }
+
+  // Net worth for a single portfolio — same valuation rules as getNetWorth,
+  // scoped to one portfolio instead of summed across all of a user's.
+  async getPortfolioNetWorth(id: string, userId: string): Promise<{ total: number; byType: NetWorthByType }> {
+    await this.assertOwnership(id, userId);
+
+    const portfolio = await this.prismaService.portfolio.findUnique({
+      where: { id },
+      include: NET_WORTH_INCLUDE,
+    });
+
+    if (!portfolio) throw new NotFoundException('Portfolio not found');
+
+    const byType = computeNetWorthByType(portfolio);
+    const total = byType.stocks + byType.crypto + byType.bonds + byType.realEstate + byType.mixedAssets;
+    return { total, byType };
   }
 }
