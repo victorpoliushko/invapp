@@ -1446,6 +1446,65 @@ describe('PortfoliosService', () => {
       );
       expect(result.total).toBe(100);
     });
+
+    it('returns zero for a portfolio with no holdings of any kind', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [],
+        cryptoPositions: [],
+        bonds: [],
+        realEstateAssets: [],
+        mixedAssets: [],
+      });
+
+      const result = await service.getPortfolioNetWorth('p1', OWNER_ID);
+
+      expect(result).toEqual({
+        total: 0,
+        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0 },
+      });
+    });
+
+    it('tolerates a missing mixedAssets relation', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [],
+        cryptoPositions: [],
+        bonds: [],
+        realEstateAssets: [],
+      });
+
+      const result = await service.getPortfolioNetWorth('p1', OWNER_ID);
+
+      expect(result.byType.mixedAssets).toBe(0);
+    });
+
+    it('requests every asset relation needed to value the portfolio', async () => {
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [],
+        cryptoPositions: [],
+        bonds: [],
+        realEstateAssets: [],
+        mixedAssets: [],
+      });
+
+      await service.getPortfolioNetWorth('p1', OWNER_ID);
+
+      expect(prisma.portfolio.findUnique).toHaveBeenCalledWith({
+        where: { id: 'p1' },
+        include: {
+          stockPositions: { include: { asset: true } },
+          cryptoPositions: { include: { asset: true } },
+          bonds: true,
+          realEstateAssets: true,
+          mixedAssets: true,
+        },
+      });
+    });
   });
 });
 
