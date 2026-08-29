@@ -5,6 +5,7 @@ import editIcon from "../../assets/crud-icons/update.svg";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { TRANSACTION_COLORS } from "./transactionColors";
+import { formatQuantity } from "../../utils/formatQuantity";
 
 type EditState = {
   date: string;
@@ -14,9 +15,11 @@ type EditState = {
 
 export function SecurityTransactions({
   assetTicker,
+  assetType,
   transactions,
 }: {
   assetTicker: string;
+  assetType: "stock" | "crypto";
   transactions: TransactionsDto[];
 }) {
   const { refreshPortfolio } = usePortfolio();
@@ -135,7 +138,7 @@ export function SecurityTransactions({
                     </td>
                     <td>{assetTicker}</td>
                     <td>{new Date(transaction.date).toLocaleDateString()}</td>
-                    <td>{transaction.quantityChange}</td>
+                    <td>{formatQuantity(transaction.quantityChange, assetType)}</td>
                     <td>{transaction.pricePerUnit}</td>
                     <td className="actions">
                       <button className="icon-btn" title="Edit" onClick={() => startEdit(transaction)}>

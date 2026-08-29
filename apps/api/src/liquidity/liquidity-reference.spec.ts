@@ -1,5 +1,9 @@
 /// <reference types="jest" />
-import { realEstatePriceTier, realEstateLiquidity, REAL_ESTATE_PRICE_TIERS } from './liquidity-reference';
+import {
+  realEstatePriceTier,
+  realEstateLiquidity,
+  REAL_ESTATE_PRICE_TIERS,
+} from './liquidity-reference';
 
 describe('realEstatePriceTier', () => {
   it('classifies a price at or below the LOW ceiling as LOW', () => {
@@ -34,7 +38,8 @@ describe('realEstateLiquidity', () => {
   it('a full-value sale always takes at least as long as a fast sale', () => {
     (['APARTMENT', 'HOUSE', 'COMMERCIAL'] as const).forEach((type) => {
       (['LOW', 'MID', 'HIGH'] as const).forEach((tier) => {
-        const price = tier === 'HIGH' ? 1_000_000 : REAL_ESTATE_PRICE_TIERS[tier];
+        const price =
+          tier === 'HIGH' ? 1_000_000 : REAL_ESTATE_PRICE_TIERS[tier];
         const { fast, full } = realEstateLiquidity(type, price);
         expect(full.minDays).toBeGreaterThanOrEqual(fast.minDays);
         expect(full.maxDays).toBeGreaterThanOrEqual(fast.maxDays);

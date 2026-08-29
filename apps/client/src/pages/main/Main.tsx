@@ -4,6 +4,7 @@ import MarketTicker from "../../components/marketData";
 import MarketNews from "../../components/marketNews";
 import { PropertyCard } from "../../components/PropertyCard";
 import { NetWorthAllocation } from "../../components/networth/NetWorthAllocation";
+import { LiquiditySummary } from "../../components/liquidity/LiquiditySummary";
 
 const SAMPLE_PROPERTIES = [
   {
@@ -59,6 +60,7 @@ export const MainPage = () => {
   return (
     <>
       <NetWorthAllocation />
+      <LiquiditySummary />
 
       <div className="">{/* <MarketHeatmap /> */}</div>
 

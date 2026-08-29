@@ -96,6 +96,7 @@ export const SecurityTable = ({
           <Fragment key={position.assetId}>
             <SecurityRow
               position={position}
+              assetType={assetType}
               isExpanded={expandedIds.has(position.assetId)}
               onExpand={() =>
                 setExpandedIds((prev) => {
@@ -108,6 +109,7 @@ export const SecurityTable = ({
             {expandedIds.has(position.assetId) && (
               <SecurityTransactions
                 assetTicker={position.asset.ticker}
+                assetType={assetType}
                 transactions={position.transactions}
               />
             )}

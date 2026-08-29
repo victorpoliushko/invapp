@@ -2,13 +2,16 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { PositionDto } from "../../../../api/src/portfolios/dto/Position.dto";
+import { formatQuantity } from "../../utils/formatQuantity";
 
 export const SecurityRow = ({
   position,
+  assetType,
   onExpand,
   isExpanded,
 }: {
   position: PositionDto;
+  assetType: "stock" | "crypto";
   onExpand: any;
   isExpanded: boolean;
 }) => {
@@ -39,7 +42,7 @@ export const SecurityRow = ({
           ? new Date(position.transactions[0].date).toLocaleDateString()
           : "—"}
       </td>
-      <td data-label="Quantity">{position.quantity}</td>
+      <td data-label="Quantity">{formatQuantity(position.quantity, assetType)}</td>
       <td className="col-avg-price" data-label="Avg price">{position.price ?? "—"}</td>
       <td data-label="Current price">
         {loadingPrices[position.assetId] ? "..." : (currentPrice ?? "—")}

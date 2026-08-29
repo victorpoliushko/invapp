@@ -16,7 +16,19 @@ import {
 // imports and manual entry — no enum). Anything not recognized as EU is
 // assumed US, since that's the app's dominant market and T+1 (US) is the
 // faster/more optimistic default of the two — see classifyStockMarket.
-const EU_EXCHANGES = new Set(['LSE', 'LON', 'XETRA', 'FRA', 'EURONEXT', 'AMS', 'PAR', 'MIL', 'MCE', 'SWX', 'VIE']);
+const EU_EXCHANGES = new Set([
+  'LSE',
+  'LON',
+  'XETRA',
+  'FRA',
+  'EURONEXT',
+  'AMS',
+  'PAR',
+  'MIL',
+  'MCE',
+  'SWX',
+  'VIE',
+]);
 
 function classifyStockMarket(exchange: string | null | undefined): StockMarket {
   const key = exchange?.trim().toUpperCase();
@@ -28,8 +40,27 @@ function classifyStockMarket(exchange: string | null | undefined): StockMarket {
 // exit criteria (GO_LIVE_STRATEGY.md Phase 2). Anything not listed here is
 // treated as LONG_TAIL. Update by hand if the market cap ranking shifts.
 const MAJOR_CRYPTO_TICKERS = new Set([
-  'BTC', 'ETH', 'USDT', 'BNB', 'SOL', 'XRP', 'USDC', 'ADA', 'DOGE', 'TRX',
-  'AVAX', 'DOT', 'MATIC', 'POL', 'LINK', 'TON', 'SHIB', 'LTC', 'BCH', 'UNI', 'ATOM',
+  'BTC',
+  'ETH',
+  'USDT',
+  'BNB',
+  'SOL',
+  'XRP',
+  'USDC',
+  'ADA',
+  'DOGE',
+  'TRX',
+  'AVAX',
+  'DOT',
+  'MATIC',
+  'POL',
+  'LINK',
+  'TON',
+  'SHIB',
+  'LTC',
+  'BCH',
+  'UNI',
+  'ATOM',
 ]);
 
 function classifyCryptoTier(ticker: string): CryptoTier {
@@ -85,8 +116,12 @@ function addToLine(line: LiquidityLine, amount: number, range: DayRange): void {
   if (amount <= 0) return;
   const hadAmount = line.amount > 0;
   line.amount += amount;
-  line.minDays = hadAmount ? Math.min(line.minDays, range.minDays) : range.minDays;
-  line.maxDays = hadAmount ? Math.max(line.maxDays, range.maxDays) : range.maxDays;
+  line.minDays = hadAmount
+    ? Math.min(line.minDays, range.minDays)
+    : range.minDays;
+  line.maxDays = hadAmount
+    ? Math.max(line.maxDays, range.maxDays)
+    : range.maxDays;
 }
 
 function mergeLines(a: LiquidityLine, b: LiquidityLine): LiquidityLine {
@@ -96,10 +131,26 @@ function mergeLines(a: LiquidityLine, b: LiquidityLine): LiquidityLine {
 }
 
 export interface LiquidityPortfolioInput {
-  stockPositions: { asset: { currentPrice: number | null; exchange: string | null }; price: number | null; quantity: number }[];
-  cryptoPositions: { asset: { currentPrice: number | null; ticker: string }; price: number | null; quantity: number }[];
-  bonds: { currentValue: number | null; purchasePrice: number; quantity: number }[];
-  realEstateAssets: { currentValue: number | null; purchasePrice: number; type: 'APARTMENT' | 'HOUSE' | 'COMMERCIAL' }[];
+  stockPositions: {
+    asset: { currentPrice: number | null; exchange: string | null };
+    price: number | null;
+    quantity: number;
+  }[];
+  cryptoPositions: {
+    asset: { currentPrice: number | null; ticker: string };
+    price: number | null;
+    quantity: number;
+  }[];
+  bonds: {
+    currentValue: number | null;
+    purchasePrice: number;
+    quantity: number;
+  }[];
+  realEstateAssets: {
+    currentValue: number | null;
+    purchasePrice: number;
+    type: 'APARTMENT' | 'HOUSE' | 'COMMERCIAL';
+  }[];
 }
 
 // Pure aggregation: one portfolio's holdings -> a per-asset-class liquidity
@@ -107,20 +158,33 @@ export interface LiquidityPortfolioInput {
 // computeNetWorthByType in portfolios.service.ts (live price falling back to
 // cost basis for stocks/crypto, currentValue falling back to purchasePrice
 // for bonds/real estate) so the dollar amounts here always match net worth.
-export function computeLiquidity(portfolio: LiquidityPortfolioInput): LiquiditySummary {
+export function computeLiquidity(
+  portfolio: LiquidityPortfolioInput,
+): LiquiditySummary {
   const stocks = emptyLine();
   const bonds = emptyLine();
   const crypto = emptyLine();
-  const realEstate: RealEstateLiquidityLine = { ...emptyLine(), full: emptyLine() };
+  const realEstate: RealEstateLiquidityLine = {
+    ...emptyLine(),
+    full: emptyLine(),
+  };
 
   for (const pa of portfolio.stockPositions) {
     const amount = (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
-    addToLine(stocks, amount, STOCK_LIQUIDITY[classifyStockMarket(pa.asset.exchange)]);
+    addToLine(
+      stocks,
+      amount,
+      STOCK_LIQUIDITY[classifyStockMarket(pa.asset.exchange)],
+    );
   }
 
   for (const pa of portfolio.cryptoPositions) {
     const amount = (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
-    addToLine(crypto, amount, CRYPTO_LIQUIDITY[classifyCryptoTier(pa.asset.ticker)]);
+    addToLine(
+      crypto,
+      amount,
+      CRYPTO_LIQUIDITY[classifyCryptoTier(pa.asset.ticker)],
+    );
   }
 
   for (const bond of portfolio.bonds) {
@@ -141,18 +205,31 @@ export function computeLiquidity(portfolio: LiquidityPortfolioInput): LiquidityS
   return { byType: { stocks, bonds, crypto, realEstate }, liquid, illiquid };
 }
 
-export function mergeLiquiditySummaries(summaries: LiquiditySummary[]): LiquiditySummary {
+export function mergeLiquiditySummaries(
+  summaries: LiquiditySummary[],
+): LiquiditySummary {
   const stocks = emptyLine();
   const bonds = emptyLine();
   const crypto = emptyLine();
-  const realEstate: RealEstateLiquidityLine = { ...emptyLine(), full: emptyLine() };
+  const realEstate: RealEstateLiquidityLine = {
+    ...emptyLine(),
+    full: emptyLine(),
+  };
 
   for (const summary of summaries) {
     addToLine(stocks, summary.byType.stocks.amount, summary.byType.stocks);
     addToLine(bonds, summary.byType.bonds.amount, summary.byType.bonds);
     addToLine(crypto, summary.byType.crypto.amount, summary.byType.crypto);
-    addToLine(realEstate, summary.byType.realEstate.amount, summary.byType.realEstate);
-    addToLine(realEstate.full, summary.byType.realEstate.full.amount, summary.byType.realEstate.full);
+    addToLine(
+      realEstate,
+      summary.byType.realEstate.amount,
+      summary.byType.realEstate,
+    );
+    addToLine(
+      realEstate.full,
+      summary.byType.realEstate.full.amount,
+      summary.byType.realEstate.full,
+    );
   }
 
   const liquid = [stocks, bonds, crypto].reduce(mergeLines, emptyLine());
@@ -176,7 +253,10 @@ export class LiquidityService {
   ) {}
 
   // Liquidity for a single portfolio.
-  async getPortfolioLiquidity(portfolioId: string, userId: string): Promise<LiquiditySummary> {
+  async getPortfolioLiquidity(
+    portfolioId: string,
+    userId: string,
+  ): Promise<LiquiditySummary> {
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
     const portfolio = await this.prismaService.portfolio.findUnique({

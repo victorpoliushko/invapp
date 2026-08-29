@@ -29,7 +29,10 @@ export const STOCK_LIQUIDITY: Record<StockMarket, DayRange> = {
 };
 
 // Bonds -----------------------------------------------------------------
-export type BondClass = 'GOVERNMENT' | 'CORPORATE_INVESTMENT_GRADE' | 'CORPORATE_HIGH_YIELD';
+export type BondClass =
+  | 'GOVERNMENT'
+  | 'CORPORATE_INVESTMENT_GRADE'
+  | 'CORPORATE_HIGH_YIELD';
 
 export const BOND_LIQUIDITY: Record<BondClass, DayRange> = {
   GOVERNMENT: { minDays: 1, maxDays: 2 }, // e.g. US Treasuries: T+1 settlement, deep secondary market
@@ -73,24 +76,57 @@ export function realEstatePriceTier(price: number): RealEstatePriceTier {
 // Days-on-market by property type/tier. Apartments move fastest (broadest
 // buyer pool), houses next, commercial slowest (specialized buyers);
 // higher price tiers take longer within each type.
-export const REAL_ESTATE_LIQUIDITY: Record<RealEstateCategory, Record<RealEstatePriceTier, RealEstateLiquidity>> = {
+export const REAL_ESTATE_LIQUIDITY: Record<
+  RealEstateCategory,
+  Record<RealEstatePriceTier, RealEstateLiquidity>
+> = {
   APARTMENT: {
-    LOW: { fast: { minDays: 14, maxDays: 21 }, full: { minDays: 30, maxDays: 60 } },
-    MID: { fast: { minDays: 21, maxDays: 30 }, full: { minDays: 45, maxDays: 90 } },
-    HIGH: { fast: { minDays: 30, maxDays: 45 }, full: { minDays: 60, maxDays: 120 } },
+    LOW: {
+      fast: { minDays: 14, maxDays: 21 },
+      full: { minDays: 30, maxDays: 60 },
+    },
+    MID: {
+      fast: { minDays: 21, maxDays: 30 },
+      full: { minDays: 45, maxDays: 90 },
+    },
+    HIGH: {
+      fast: { minDays: 30, maxDays: 45 },
+      full: { minDays: 60, maxDays: 120 },
+    },
   },
   HOUSE: {
-    LOW: { fast: { minDays: 21, maxDays: 30 }, full: { minDays: 45, maxDays: 90 } },
-    MID: { fast: { minDays: 30, maxDays: 45 }, full: { minDays: 60, maxDays: 120 } },
-    HIGH: { fast: { minDays: 45, maxDays: 60 }, full: { minDays: 90, maxDays: 150 } },
+    LOW: {
+      fast: { minDays: 21, maxDays: 30 },
+      full: { minDays: 45, maxDays: 90 },
+    },
+    MID: {
+      fast: { minDays: 30, maxDays: 45 },
+      full: { minDays: 60, maxDays: 120 },
+    },
+    HIGH: {
+      fast: { minDays: 45, maxDays: 60 },
+      full: { minDays: 90, maxDays: 150 },
+    },
   },
   COMMERCIAL: {
-    LOW: { fast: { minDays: 30, maxDays: 45 }, full: { minDays: 90, maxDays: 150 } },
-    MID: { fast: { minDays: 45, maxDays: 60 }, full: { minDays: 120, maxDays: 180 } },
-    HIGH: { fast: { minDays: 60, maxDays: 90 }, full: { minDays: 150, maxDays: 270 } },
+    LOW: {
+      fast: { minDays: 30, maxDays: 45 },
+      full: { minDays: 90, maxDays: 150 },
+    },
+    MID: {
+      fast: { minDays: 45, maxDays: 60 },
+      full: { minDays: 120, maxDays: 180 },
+    },
+    HIGH: {
+      fast: { minDays: 60, maxDays: 90 },
+      full: { minDays: 150, maxDays: 270 },
+    },
   },
 };
 
-export function realEstateLiquidity(type: RealEstateCategory, price: number): RealEstateLiquidity {
+export function realEstateLiquidity(
+  type: RealEstateCategory,
+  price: number,
+): RealEstateLiquidity {
   return REAL_ESTATE_LIQUIDITY[type][realEstatePriceTier(price)];
 }
