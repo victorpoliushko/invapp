@@ -56,8 +56,9 @@ export class PassportAuthController {
       expires: new Date(Date.now() + 1000 * 60 * 15)
     });
     
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173';
     res.redirect(
-    `http://localhost:5173/auth-redirect?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&userId=${req.user.id}`
+    `${frontendUrl}/auth-redirect?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&userId=${req.user.id}`
   );
   }
 }
