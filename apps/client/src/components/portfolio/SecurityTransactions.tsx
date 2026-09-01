@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TransactionsDto } from "../../../../api/src/transactions/dto/Transations.dto";
+import { TransactionsDto } from "../../types/portfolio";
 import { usePortfolio } from "../../context/PortfolioContext";
 import editIcon from "../../assets/crud-icons/update.svg";
 import deleteIcon from "../../assets/crud-icons/delete.svg";

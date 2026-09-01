@@ -1,4 +1,4 @@
-import { PortfolioDto } from "../../api/src/portfolios/dto/portfolio.dto";
+import { PortfolioDto } from "./types/portfolio";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 

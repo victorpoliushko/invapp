@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
-import { PortfolioDto } from "../../../api/src/portfolios/dto/portfolio.dto";
+import { PortfolioDto } from "../types/portfolio";
 import { useAuth } from "../AuthContext";
 
 interface PortfolioContextType {

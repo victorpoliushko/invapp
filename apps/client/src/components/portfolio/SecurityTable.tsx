@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import { SecurityRow } from "./SecurityRow";
 import { SecurityTransactions } from "./SecurityTransactions";
 import "../../pages/portfolio/PortfolioPage.css";
-import { PortfolioDto } from "../../../../api/src/portfolios/dto/portfolio.dto";
+import { PortfolioDto } from "../../types/portfolio";
 import { AddSecurity } from "./AddSecurity";
 import { usePortfolio } from "../../context/PortfolioContext";
 

@@ -1,7 +1,7 @@
 import { usePortfolio } from "../../context/PortfolioContext";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
-import { PositionDto } from "../../../../api/src/portfolios/dto/Position.dto";
+import { PositionDto } from "../../types/portfolio";
 import { formatQuantity } from "../../utils/formatQuantity";
 
 export const SecurityRow = ({

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import "../App.css";
-import { LocationPicker } from "../components/LocationPicker";
 
 export const HomePage = () => {
   return (
