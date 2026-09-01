@@ -29,4 +29,4 @@ RUN npx prisma generate
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/src/main.js"]
+CMD npx prisma migrate deploy && node dist/src/main.js
