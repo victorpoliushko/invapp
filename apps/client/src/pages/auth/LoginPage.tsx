@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import "../../App.css";
 import { useAuth } from "../../AuthContext";
+import { API_BASE_URL } from "../../config";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5173/api/auth-v2/login", {
+      const response = await fetch(`${API_BASE_URL}/auth-v2/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -50,7 +51,7 @@ export default function LoginPage() {
   };
 
   const handeGoogleLogin = () => {
-    window.location.href = "http://localhost:5173/api/auth-v2/google/login";
+    window.location.href = `${API_BASE_URL}/auth-v2/google/login`;
   };
 
   return (

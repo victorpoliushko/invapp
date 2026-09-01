@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
 import { PortfolioDto } from "../types/portfolio";
 import { useAuth } from "../AuthContext";
+import { API_BASE_URL } from "../config";
 
 interface PortfolioContextType {
   portfolio: PortfolioDto | undefined;
@@ -43,7 +44,7 @@ export const PortfolioProvider = ({
 
     const token = localStorage.getItem("accessToken");
     try {
-      const res = await fetch(`http://localhost:5173/api/portfolios/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/portfolios/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +65,7 @@ export const PortfolioProvider = ({
   const fetchCurrentPrices = async (assets: { assetId: string; ticker: string }[]) => {
     assets.forEach(({ assetId, ticker }) => {
       setLoadingPrices((prev) => ({ ...prev, [assetId]: true }));
-      fetchWithRedirect(`http://localhost:5173/api/assets/price?asset=${ticker}`)
+      fetchWithRedirect(`${API_BASE_URL}/assets/price?asset=${ticker}`)
         .then((res) => res.json())
         .then(({ price }) => {
           setCurrentPrices((prev) => ({ ...prev, [assetId]: price }));
@@ -78,7 +79,7 @@ export const PortfolioProvider = ({
   const refreshPortfolio = async () => {
     if (!id) return;
     const res = await fetchWithRedirect(
-      `http://localhost:5173/api/portfolios/${id}`,
+      `${API_BASE_URL}/portfolios/${id}`,
       {
         method: "GET",
         headers: {
@@ -101,7 +102,7 @@ export const PortfolioProvider = ({
   const refreshUserPortfolios = useCallback(async () => {
   setLoadingPortfolios(true);
     const res = await fetchWithRedirect(
-      `http://localhost:5173/api/portfolios/user/${userId}`,
+      `${API_BASE_URL}/portfolios/user/${userId}`,
       {
         method: "GET",
         headers: {
@@ -131,7 +132,7 @@ export const PortfolioProvider = ({
   }, [userId, token, fetchWithRedirect]);
 
   const deleteAsset = async (assetId: string) => {
-    await fetch(`http://localhost:5173/api/portfolios/${id}/assets`, {
+    await fetch(`${API_BASE_URL}/portfolios/${id}/assets`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -144,7 +145,7 @@ export const PortfolioProvider = ({
   };
 
   const deletePortfolio = async (id: string) => {
-    const res = await fetch(`http://localhost:5173/api/portfolios/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/portfolios/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -163,7 +164,7 @@ export const PortfolioProvider = ({
   }, [id]);
 
   const createPortolio = async (name: string, userId: string, goal?: number) => {
-    const res = await fetch(`http://localhost:5173/api/portfolios`, {
+    const res = await fetch(`${API_BASE_URL}/portfolios`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 async function tryRefresh(): Promise<boolean> {
   const storedRefresh = localStorage.getItem("refreshToken");
   if (!storedRefresh) return false;
   try {
-    const res = await fetch("http://localhost:5173/api/auth-v2/refresh", {
+    const res = await fetch(`${API_BASE_URL}/auth-v2/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: storedRefresh }),

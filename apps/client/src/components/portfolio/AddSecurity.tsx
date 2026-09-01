@@ -5,6 +5,7 @@ import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { TRANSACTION_COLORS } from "./transactionColors";
 import { alertMissingFields } from "../../utils/formValidation";
+import { API_BASE_URL } from "../../config";
 
 type StockSuggestion = { assetSymbol: string; name: string };
 type CryptoSuggestion = { id: string; symbol: string; name: string };
@@ -49,8 +50,8 @@ export function AddSecurity({
     const token = localStorage.getItem("accessToken");
     const endpoint =
       assetType === "crypto"
-        ? `http://localhost:5173/api/assets/search-crypto?q=${searchTerm}`
-        : `http://localhost:5173/api/assets/search?q=${searchTerm}`;
+        ? `${API_BASE_URL}/assets/search-crypto?q=${searchTerm}`
+        : `${API_BASE_URL}/assets/search?q=${searchTerm}`;
 
     const timer = setTimeout(async () => {
       try {
@@ -114,7 +115,7 @@ export function AddSecurity({
       }
 
       const res = await fetchWithRedirect(
-        `http://localhost:5173/api/portfolios/${portfolioId}/assets`,
+        `${API_BASE_URL}/portfolios/${portfolioId}/assets`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

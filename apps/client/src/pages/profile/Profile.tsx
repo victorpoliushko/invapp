@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../AuthContext";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import "./Profile.css";
+import { API_BASE_URL } from "../../config";
 
 interface UserProfile {
   id: string;
@@ -26,7 +27,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (!userId) return;
-    fetchWithRedirect(`http://localhost:5173/api/users/${userId}`)
+    fetchWithRedirect(`${API_BASE_URL}/users/${userId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load profile");
         return res.json();
@@ -45,7 +46,7 @@ export default function Profile() {
     setSaving(true);
     setSaveError(null);
     try {
-      const res = await fetchWithRedirect(`http://localhost:5173/api/users/${userId}`, {
+      const res = await fetchWithRedirect(`${API_BASE_URL}/users/${userId}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({

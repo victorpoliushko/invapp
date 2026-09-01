@@ -6,7 +6,7 @@ import "./header.css";
 export function Header() {
   const { userId, logout } = useAuth();
   const handleLogin = () => {
-    window.location.href = "http://localhost:5173/login";
+    window.location.href = "/login";
   };
 
   const handleLogout = async () => {

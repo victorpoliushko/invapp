@@ -3,6 +3,7 @@ import "./PortfoliosPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
+import { API_BASE_URL } from "../../config";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -37,7 +38,7 @@ type PortfolioNetWorth = { total: number };
 
 async function fetchPortfolioReturns(portfolioId: string, period: ReturnPeriod): Promise<PortfolioReturns | null> {
   const token = localStorage.getItem("accessToken");
-  const res = await fetch(`http://localhost:5173/api/portfolios/${portfolioId}/returns?period=${period}`, {
+  const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}/returns?period=${period}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return null;
@@ -46,7 +47,7 @@ async function fetchPortfolioReturns(portfolioId: string, period: ReturnPeriod):
 
 async function fetchTopMovers(portfolioId: string, period: ReturnPeriod): Promise<PortfolioMovers | null> {
   const token = localStorage.getItem("accessToken");
-  const res = await fetch(`http://localhost:5173/api/portfolios/${portfolioId}/movers?period=${period}`, {
+  const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}/movers?period=${period}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return null;
@@ -55,7 +56,7 @@ async function fetchTopMovers(portfolioId: string, period: ReturnPeriod): Promis
 
 async function fetchPortfolioNetWorth(portfolioId: string): Promise<PortfolioNetWorth | null> {
   const token = localStorage.getItem("accessToken");
-  const res = await fetch(`http://localhost:5173/api/portfolios/${portfolioId}/net-worth`, {
+  const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}/net-worth`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return null;

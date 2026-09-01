@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { jwtDecode } from "jwt-decode";
+import { API_BASE_URL } from "./config";
 
 type AuthContextType = {
   userId: string | null;
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:5173/api/auth-v2/logout", {
+      await fetch(`${API_BASE_URL}/auth-v2/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -59,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
-      const response = await fetch("http://localhost:5173/api/auth-v2/refresh", {
+      const response = await fetch(`${API_BASE_URL}/auth-v2/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken: storedRefresh }),
