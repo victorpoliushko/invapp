@@ -10,7 +10,14 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: 'http://localhost:5173', credentials: true });
+  app.enableCors({
+    origin: [
+      'http://localhost:5173',
+      'https://invapp-client.vercel.app',
+      /^https:\/\/invapp-client-.*\.vercel\.app$/,
+    ],
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
