@@ -4,6 +4,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { BondTransaction } from "./types";
 import { TRANSACTION_COLORS } from "../portfolio/transactionColors";
+import { API_BASE_URL } from "../../config";
 
 type EditState = { type: "BUY" | "SELL"; quantity: string; pricePerUnit: string; date: string };
 
@@ -36,7 +37,7 @@ export function BondTransactions({ bondId: _bondId, transactions, onChanged }: P
 
   const saveEdit = async (id: string) => {
     if (!editState) return;
-    const res = await fetch(`/api/bonds/transaction/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/bonds/transaction/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
       body: JSON.stringify({
@@ -52,7 +53,7 @@ export function BondTransactions({ bondId: _bondId, transactions, onChanged }: P
   };
 
   const handleDelete = async (id: string) => {
-    const res = await fetch(`/api/bonds/transaction/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/bonds/transaction/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token()}` },
     });

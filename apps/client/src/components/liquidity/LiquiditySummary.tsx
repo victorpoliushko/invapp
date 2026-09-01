@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../AuthContext";
 import "./LiquiditySummary.css";
+import { API_BASE_URL } from "../../config";
 
 type LiquidityLine = { amount: number; minDays: number; maxDays: number };
 type RealEstateLiquidityLine = LiquidityLine & { full: LiquidityLine };
@@ -44,7 +45,7 @@ export function LiquiditySummary() {
   useEffect(() => {
     if (!userId) return;
     const token = localStorage.getItem("accessToken");
-    fetch(`/api/users/${userId}/liquidity`, {
+    fetch(`${API_BASE_URL}/users/${userId}/liquidity`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))

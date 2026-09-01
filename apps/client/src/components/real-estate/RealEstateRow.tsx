@@ -3,6 +3,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstate } from "./types";
+import { API_BASE_URL } from "../../config";
 
 type Props = {
   property: RealEstate;
@@ -84,7 +85,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
     if (!code || !name || !purchaseDate || !purchasePrice || !rooms || !totalArea) return;
 
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/real-estate/${property.id}`, {
+    const res = await fetch(`${API_BASE_URL}/real-estate/${property.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({

@@ -4,6 +4,7 @@ import { BondRow } from "./BondRow";
 import { AddBondTransaction } from "./AddBondTransaction";
 import { Bond } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
+import { API_BASE_URL } from "../../config";
 
 export function BondTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
@@ -12,7 +13,7 @@ export function BondTable() {
   const load = useCallback(async () => {
     if (!portfolioId) return;
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/bonds/${portfolioId}`, {
+    const res = await fetch(`${API_BASE_URL}/bonds/${portfolioId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) setBonds(await res.json());
@@ -22,7 +23,7 @@ export function BondTable() {
 
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/bonds/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/bonds/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

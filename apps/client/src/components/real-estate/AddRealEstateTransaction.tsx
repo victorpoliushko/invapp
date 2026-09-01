@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from "../../config";
 
 type Props = { onAdded: () => void };
 
@@ -13,7 +14,7 @@ export function AddRealEstateTransaction({ onAdded }: Props) {
     if (!portfolioId || !code || !startDate || !endDate || !monthlyRent) return;
 
     const token = localStorage.getItem("accessToken");
-    const res = await fetch("/api/real-estate/transaction/by-code", {
+    const res = await fetch(`${API_BASE_URL}/real-estate/transaction/by-code`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({

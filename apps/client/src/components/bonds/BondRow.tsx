@@ -3,6 +3,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { Bond } from "./types";
+import { API_BASE_URL } from "../../config";
 
 const FREQUENCY_LABEL: Record<string, string> = {
   ANNUAL: "Annual",
@@ -30,7 +31,7 @@ export function BondRow({ bond, onDelete, onUpdated }: Props) {
 
   const saveCurrentValue = async () => {
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/bonds/${bond.id}`, {
+    const res = await fetch(`${API_BASE_URL}/bonds/${bond.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({

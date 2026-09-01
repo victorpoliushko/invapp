@@ -4,6 +4,7 @@ import { MixedAssetRow } from "./MixedAssetRow";
 import { AddMixedAsset } from "./AddMixedAsset";
 import { MixedAsset } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
+import { API_BASE_URL } from "../../config";
 
 export function MixedAssetTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
@@ -12,7 +13,7 @@ export function MixedAssetTable() {
   const load = useCallback(async () => {
     if (!portfolioId) return;
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/mixed-assets/${portfolioId}`, {
+    const res = await fetch(`${API_BASE_URL}/mixed-assets/${portfolioId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) setAssets(await res.json());
@@ -22,7 +23,7 @@ export function MixedAssetTable() {
 
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/mixed-assets/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/mixed-assets/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

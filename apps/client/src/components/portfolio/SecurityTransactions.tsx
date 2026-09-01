@@ -6,6 +6,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { TRANSACTION_COLORS } from "./transactionColors";
 import { formatQuantity } from "../../utils/formatQuantity";
+import { API_BASE_URL } from "../../config";
 
 type EditState = {
   date: string;
@@ -44,7 +45,7 @@ export function SecurityTransactions({
   const saveEdit = async (id: string) => {
     if (!editState) return;
     try {
-      const res = await fetch(`/api/transactions`, {
+      const res = await fetch(`${API_BASE_URL}/transactions`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +68,7 @@ export function SecurityTransactions({
 
   const onDeleteTransaction = async (id: string) => {
     try {
-      const res = await fetch(`/api/transactions`, {
+      const res = await fetch(`${API_BASE_URL}/transactions`, {
         method: "DELETE",
         headers: {
           "Content-type": "application/json",

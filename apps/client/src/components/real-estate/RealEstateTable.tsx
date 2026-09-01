@@ -4,6 +4,7 @@ import { RealEstateRow } from "./RealEstateRow";
 import { RealEstateTransactions } from "./RealEstateTransactions";
 import { AddRealEstate } from "./AddRealEstate";
 import { RealEstate } from "./types";
+import { API_BASE_URL } from "../../config";
 
 export function RealEstateTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
@@ -13,7 +14,7 @@ export function RealEstateTable() {
   const load = useCallback(async () => {
     if (!portfolioId) return;
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/real-estate/${portfolioId}`, {
+    const res = await fetch(`${API_BASE_URL}/real-estate/${portfolioId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) setProperties(await res.json());
@@ -25,7 +26,7 @@ export function RealEstateTable() {
 
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`/api/real-estate/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/real-estate/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

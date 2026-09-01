@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config";
 
 export function LocationPicker() {
   const [countries, setCountries] = useState<string[]>([]);
@@ -16,7 +17,7 @@ export function LocationPicker() {
           .sort() as string[],
       );
 
-    const ipP = fetch("/api/geo/location")
+    const ipP = fetch(`${API_BASE_URL}/geo/location`)
       .then((r) => r.json())
       .catch(() => null);
 

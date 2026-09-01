@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../AuthContext";
 import "./NetWorthAllocation.css";
+import { API_BASE_URL } from "../../config";
 
 type NetWorth = {
   total: number;
@@ -22,7 +23,7 @@ export function NetWorthAllocation() {
   useEffect(() => {
     if (!userId) return;
     const token = localStorage.getItem("accessToken");
-    fetch(`/api/portfolios/user/${userId}/net-worth`, {
+    fetch(`${API_BASE_URL}/portfolios/user/${userId}/net-worth`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
