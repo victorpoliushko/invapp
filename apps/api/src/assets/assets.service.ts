@@ -36,18 +36,16 @@ export class AssetsService {
     }
 
     try {
-      const apikey = this.configService.get<string>('API_KEY');
-      const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apikey}`;
+      const apikey = this.configService.get<string>('FINNHUB_API_KEY');
+      const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apikey}`;
 
       const response = await lastValueFrom(this.httpService.get(quoteUrl));
-      const globalQuote = response.data['Global Quote'];
+      const price = response.data?.c;
 
-      if (!globalQuote || Object.keys(globalQuote).length === 0 || !globalQuote['05. price']) {
+      if (!price) {
         console.error('Full API Response:', JSON.stringify(response.data));
         return existing?.currentPrice ?? 0;
       }
-
-      const price = parseFloat(globalQuote['05. price']);
 
       await this.prismaService.asset.update({
         where: { ticker: symbol },
@@ -124,31 +122,24 @@ return response.data;
 
   async fetchAndStoreAssets() {
     try {
-      const func = 'LISTING_STATUS';
-      const apikey = this.configService.get<string>('API_KEY');
-      const url = `https://www.alphavantage.co/query?function=${func}&apikey=${apikey}`;
+      const apikey = this.configService.get<string>('FINNHUB_API_KEY');
+      const url = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${apikey}`;
       const response = await lastValueFrom(this.httpService.get(url));
 
-      const data = response.data.split('\n').slice(1);
-      const alphavantageData = data.map((line) => {
-        const [asset, name, exchange, type] = line.split(',');
-        return {
-          asset,
-          name,
-          exchange,
-          type,
-          dataSource: DataSource.ALPHA_VANTAGE,
-        };
-      });
-
-      alphavantageData.pop();
+      const finnhubData = (response.data || []).map((entry) => ({
+        asset: entry.symbol,
+        name: entry.description,
+        exchange: entry.mic,
+        type: entry.type,
+        dataSource: DataSource.FINNHUB,
+      }));
 
       await this.prismaService.asset.createMany({
-        data: alphavantageData,
+        data: finnhubData,
         skipDuplicates: true,
       });
 
-      console.log(`Fetched and stored ${alphavantageData.length} assets.`);
+      console.log(`Fetched and stored ${finnhubData.length} assets.`);
     } catch (error) {
       console.error('Error fetching assets', error);
     } finally {
@@ -170,17 +161,15 @@ return response.data;
 
   async findAssetInAPI(asset: string): Promise<Asset> {
     try {
-      const apikey = this.configService.get<string>('API_KEY');
-      const matchingUrl = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${asset.trim().toUpperCase()}&apikey=${apikey}`;
+      const apikey = this.configService.get<string>('FINNHUB_API_KEY');
+      const matchingUrl = `https://finnhub.io/api/v1/search?q=${encodeURIComponent(asset.trim())}&token=${apikey}`;
 
       const response = await lastValueFrom(this.httpService.get(matchingUrl));
-      const matches = response.data?.bestMatches || [];
+      const matches = response.data?.result || [];
 
       return matches.map((m) => ({
-        assetSymbol: m['1. symbol'],
-        name: m['2. name'],
-        region: m['4. region'],
-        currency: m['8. currency'],
+        assetSymbol: m.symbol,
+        name: m.description,
       }));
     } catch (error) {
       console.error('Error in find assets:', error.response?.data);

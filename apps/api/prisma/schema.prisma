@@ -55,6 +55,7 @@ enum AssetType {
 enum DataSource {
   ALPHA_VANTAGE
   COINGECKO
+  FINNHUB
 }
 
 model Asset {

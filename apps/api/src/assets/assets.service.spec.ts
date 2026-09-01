@@ -55,9 +55,9 @@ describe('AssetsService', () => {
       expect(httpService.get).toHaveBeenCalledWith(expect.stringContaining('bitcoin'));
     });
 
-    it('fetches and stores a fresh price from Alpha Vantage when the cache is stale', async () => {
+    it('fetches and stores a fresh price from Finnhub when the cache is stale', async () => {
       prisma.asset.findUnique.mockResolvedValue(null);
-      httpService.get.mockReturnValue(of({ data: { 'Global Quote': { '05. price': '187.50' } } }));
+      httpService.get.mockReturnValue(of({ data: { c: 187.5 } }));
 
       const result = await service.getSharePrice('aapl');
 
@@ -71,7 +71,7 @@ describe('AssetsService', () => {
     it('falls back to the existing cached price when the API response has no quote', async () => {
       jest.spyOn(console, 'error').mockImplementation(() => {});
       prisma.asset.findUnique.mockResolvedValue({ currentPrice: 120, priceUpdatedAt: null });
-      httpService.get.mockReturnValue(of({ data: { 'Global Quote': {} } }));
+      httpService.get.mockReturnValue(of({ data: { c: 0 } }));
 
       const result = await service.getSharePrice('aapl');
 
@@ -233,12 +233,12 @@ describe('AssetsService', () => {
   });
 
   describe('findAssetInAPI', () => {
-    it('maps Alpha Vantage best matches to the expected shape', async () => {
+    it('maps Finnhub search results to the expected shape', async () => {
       httpService.get.mockReturnValue(
         of({
           data: {
-            bestMatches: [
-              { '1. symbol': 'AAPL', '2. name': 'Apple Inc', '4. region': 'United States', '8. currency': 'USD' },
+            result: [
+              { symbol: 'AAPL', description: 'Apple Inc', displaySymbol: 'AAPL', type: 'Common Stock' },
             ],
           },
         }),
@@ -246,9 +246,7 @@ describe('AssetsService', () => {
 
       const result = await service.findAssetInAPI('apple');
 
-      expect(result).toEqual([
-        { assetSymbol: 'AAPL', name: 'Apple Inc', region: 'United States', currency: 'USD' },
-      ]);
+      expect(result).toEqual([{ assetSymbol: 'AAPL', name: 'Apple Inc' }]);
     });
 
     it('throws an InternalServerError HttpException when the API call fails', async () => {
