@@ -52,7 +52,10 @@ describe('AssetsService', () => {
       const result = await service.getSharePrice('btc');
 
       expect(result).toBe(50000);
-      expect(httpService.get).toHaveBeenCalledWith(expect.stringContaining('bitcoin'));
+      expect(httpService.get).toHaveBeenCalledWith(
+        expect.stringContaining('bitcoin'),
+        expect.anything(),
+      );
     });
 
     it('fetches and stores a fresh price from Finnhub when the cache is stale', async () => {

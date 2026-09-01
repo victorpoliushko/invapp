@@ -61,8 +61,11 @@ export class AssetsService {
 
   async getCryptoPrice(coingeckoId: string, ticker: string): Promise<number> {
     try {
+      const coingeckoApiKey = this.configService.get<string>('COINGECKO_API_KEY');
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoId}&vs_currencies=usd`;
-      const response = await lastValueFrom(this.httpService.get(url));
+      const response = await lastValueFrom(
+        this.httpService.get(url, { headers: { 'x-cg-demo-api-key': coingeckoApiKey } }),
+      );
       const price: number = response.data?.[coingeckoId]?.usd;
 
       if (!price) return 0;
@@ -148,8 +151,11 @@ return response.data;
   }
 
   async searchCrypto(query: string): Promise<{ id: string; symbol: string; name: string; thumb: string }[]> {
+    const coingeckoApiKey = this.configService.get<string>('COINGECKO_API_KEY');
     const url = `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`;
-    const response = await lastValueFrom(this.httpService.get(url));
+    const response = await lastValueFrom(
+      this.httpService.get(url, { headers: { 'x-cg-demo-api-key': coingeckoApiKey } }),
+    );
     const coins: any[] = response.data?.coins ?? [];
     return coins.slice(0, 10).map((c) => ({
       id: c.id,
