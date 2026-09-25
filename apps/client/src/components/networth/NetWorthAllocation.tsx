@@ -64,10 +64,10 @@ export function NetWorthAllocation() {
             <div key={s.key} className="net-worth-allocation-legend-item">
               <span className="net-worth-allocation-swatch" style={{ backgroundColor: s.color }} />
               <span className="net-worth-allocation-legend-label">{s.label}</span>
-              <span className="net-worth-allocation-legend-pct">{s.pct.toFixed(1)}%</span>
               <span className="net-worth-allocation-legend-value">
                 ${Math.round(s.value).toLocaleString()}
               </span>
+              <span className="net-worth-allocation-legend-pct">{s.pct.toFixed(1)}%</span>
             </div>
           ))}
         </div>

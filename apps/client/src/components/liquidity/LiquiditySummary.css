@@ -32,24 +32,36 @@
 
 .liquidity-summary-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas:
+    "label label label"
+    "range amount pct";
   row-gap: 0.15rem;
   column-gap: 0.5rem;
   font-size: var(--font-s);
 }
 
 .liquidity-summary-row-label {
+  grid-area: label;
   color: var(--color-text);
 }
 
+.liquidity-summary-row-range {
+  grid-area: range;
+  color: var(--color-text-muted);
+}
+
 .liquidity-summary-row-amount {
+  grid-area: amount;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
-.liquidity-summary-row-range {
-  grid-column: 1 / -1;
+.liquidity-summary-row-pct {
+  grid-area: pct;
   color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .liquidity-summary-row-range-alt {
@@ -58,13 +70,17 @@
 
 @media (min-width: 481px) {
   .liquidity-summary-row {
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
+    grid-template-areas: "label range amount pct";
     align-items: baseline;
   }
 
   .liquidity-summary-row-range {
-    grid-column: auto;
     text-align: right;
     min-width: 9rem;
+  }
+
+  .liquidity-summary-row-pct {
+    min-width: 3.5rem;
   }
 }

@@ -42,17 +42,16 @@
 }
 
 .net-worth-allocation-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.net-worth-allocation-legend-item {
   display: grid;
   grid-template-columns: 10px 1fr auto auto;
   align-items: center;
-  gap: 8px;
+  row-gap: 0.5rem;
+  column-gap: 8px;
   font-size: var(--font-s);
+}
+
+.net-worth-allocation-legend-item {
+  display: contents;
 }
 
 .net-worth-allocation-swatch {
@@ -68,6 +67,8 @@
 .net-worth-allocation-legend-pct {
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  min-width: 3.5rem;
 }
 
 .net-worth-allocation-legend-value {

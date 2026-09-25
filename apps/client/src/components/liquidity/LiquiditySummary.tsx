@@ -41,6 +41,7 @@ const ROWS: { key: "stocks" | "bonds" | "crypto"; label: string }[] = [
 export function LiquiditySummary() {
   const { userId } = useAuth();
   const [liquidity, setLiquidity] = useState<LiquiditySummary | null>(null);
+  const [netWorthTotal, setNetWorthTotal] = useState<number | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -51,6 +52,13 @@ export function LiquiditySummary() {
       .then((res) => (res.ok ? res.json() : null))
       .then(setLiquidity)
       .catch(() => setLiquidity(null));
+
+    fetch(`${API_BASE_URL}/portfolios/user/${userId}/net-worth`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setNetWorthTotal(data?.total ?? null))
+      .catch(() => setNetWorthTotal(null));
   }, [userId]);
 
   if (!liquidity) return null;
@@ -79,7 +87,6 @@ export function LiquiditySummary() {
           {rows.map((r) => (
             <div key={r.key} className="liquidity-summary-row">
               <span className="liquidity-summary-row-label">{r.label}</span>
-              <span className="liquidity-summary-row-amount">${Math.round(r.line.amount).toLocaleString()}</span>
               <span className="liquidity-summary-row-range">
                 {formatRange(r.line.minDays, r.line.maxDays)}
                 {r.isRealEstate && (
@@ -89,6 +96,12 @@ export function LiquiditySummary() {
                   </span>
                 )}
               </span>
+              <span className="liquidity-summary-row-amount">${Math.round(r.line.amount).toLocaleString()}</span>
+              {netWorthTotal != null && netWorthTotal > 0 && (
+                <span className="liquidity-summary-row-pct">
+                  {((r.line.amount / netWorthTotal) * 100).toFixed(1)}%
+                </span>
+              )}
             </div>
           ))}
         </div>
