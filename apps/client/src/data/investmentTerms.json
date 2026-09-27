@@ -1,0 +1,286 @@
+[
+  {
+    "term": "ETF",
+    "explanation": "A fund that trades on an exchange like a stock, holding a basket of assets (e.g. all the companies in an index). Lets you buy diversified exposure in a single trade."
+  },
+  {
+    "term": "P/E Ratio",
+    "explanation": "Price-to-Earnings ratio: a stock's share price divided by its earnings per share. A quick gauge of how expensive a stock is relative to the profit it generates."
+  },
+  {
+    "term": "FED",
+    "explanation": "The Federal Reserve, the US central bank. It sets interest rates and controls the money supply, which ripples through nearly every asset class worldwide."
+  },
+  {
+    "term": "Market Cap",
+    "explanation": "A company's total value on the stock market: share price multiplied by the number of shares outstanding. Used to compare company size."
+  },
+  {
+    "term": "Dividend",
+    "explanation": "A portion of a company's profit paid out to shareholders, usually quarterly. Not all companies pay one — many reinvest profits into growth instead."
+  },
+  {
+    "term": "Bond",
+    "explanation": "A loan you make to a government or company. They pay you regular interest (the coupon) and return your principal when the bond matures."
+  },
+  {
+    "term": "Coupon Rate",
+    "explanation": "The fixed interest rate a bond pays its holder, expressed as a percentage of the bond's face value, usually paid annually or semi-annually."
+  },
+  {
+    "term": "Yield",
+    "explanation": "The income return on an investment, usually expressed as a percentage of its price. A bond's yield moves opposite to its price."
+  },
+  {
+    "term": "Diversification",
+    "explanation": "Spreading investments across different assets so a loss in one doesn't sink the whole portfolio. The classic 'don't put all your eggs in one basket.'"
+  },
+  {
+    "term": "Volatility",
+    "explanation": "How much and how fast an asset's price swings up and down. Higher volatility means bigger potential gains and losses."
+  },
+  {
+    "term": "Bull Market",
+    "explanation": "A sustained period of rising prices, typically 20%+ off a low, paired with investor optimism."
+  },
+  {
+    "term": "Bear Market",
+    "explanation": "A sustained period of falling prices, typically a 20%+ drop from a recent high, paired with pessimism."
+  },
+  {
+    "term": "Liquidity",
+    "explanation": "How quickly and easily an asset can be converted to cash without significantly affecting its price. Stocks are highly liquid; real estate is not."
+  },
+  {
+    "term": "Asset Allocation",
+    "explanation": "How you split your money across asset classes — stocks, bonds, cash, real estate, etc. — based on your goals and risk tolerance."
+  },
+  {
+    "term": "Index Fund",
+    "explanation": "A fund designed to track a market index (like the S&P 500) rather than trying to beat it. Low-cost and hands-off by design."
+  },
+  {
+    "term": "Blue Chip",
+    "explanation": "Shares of large, well-established, financially sound companies with a long track record of reliable performance."
+  },
+  {
+    "term": "IPO",
+    "explanation": "Initial Public Offering: the first time a private company sells shares to the public, becoming a publicly traded company."
+  },
+  {
+    "term": "Market Order",
+    "explanation": "An order to buy or sell a security immediately at the best available current price."
+  },
+  {
+    "term": "Limit Order",
+    "explanation": "An order to buy or sell a security only at a specific price or better. Gives you price control but no guarantee it'll execute."
+  },
+  {
+    "term": "Portfolio Rebalancing",
+    "explanation": "Periodically buying or selling assets to bring your portfolio back to its target allocation as markets drift it out of line."
+  },
+  {
+    "term": "Capital Gain",
+    "explanation": "The profit made when you sell an asset for more than you paid for it. Taxed differently depending on how long you held it."
+  },
+  {
+    "term": "Inflation",
+    "explanation": "The rate at which prices rise over time, eroding the purchasing power of cash. A key reason people invest rather than just save."
+  },
+  {
+    "term": "Interest Rate",
+    "explanation": "The cost of borrowing money, or the return on lending it, expressed as a percentage. Central bank rate changes move nearly every market."
+  },
+  {
+    "term": "Compound Interest",
+    "explanation": "Interest earned on both your original investment and on the interest it's already accumulated. The engine behind long-term wealth growth."
+  },
+  {
+    "term": "Expense Ratio",
+    "explanation": "The annual fee a fund charges investors, expressed as a percentage of assets invested. Lower is generally better for long-term returns."
+  },
+  {
+    "term": "Market Correction",
+    "explanation": "A short-term drop of 10% or more in a market index from its recent peak — smaller and usually less severe than a bear market."
+  },
+  {
+    "term": "Recession",
+    "explanation": "A significant decline in economic activity lasting more than a few months, commonly defined as two consecutive quarters of falling GDP."
+  },
+  {
+    "term": "GDP",
+    "explanation": "Gross Domestic Product: the total value of all goods and services produced in a country. The headline measure of economic health."
+  },
+  {
+    "term": "Stock Split",
+    "explanation": "A company increases its share count (e.g. 2-for-1) while proportionally lowering the price per share. Total value held is unchanged."
+  },
+  {
+    "term": "Market Maker",
+    "explanation": "A firm that continuously quotes buy and sell prices for a security, providing liquidity so trades can happen quickly."
+  },
+  {
+    "term": "Short Selling",
+    "explanation": "Borrowing shares to sell now, betting the price falls so you can buy them back cheaper later and pocket the difference. High risk — losses are theoretically unlimited."
+  },
+  {
+    "term": "Margin Trading",
+    "explanation": "Borrowing money from a broker to buy more securities than your cash alone would allow. Amplifies both gains and losses."
+  },
+  {
+    "term": "Dollar-Cost Averaging",
+    "explanation": "Investing a fixed amount at regular intervals regardless of price, which smooths out the impact of volatility over time."
+  },
+  {
+    "term": "Asset Class",
+    "explanation": "A broad category of investments with similar characteristics — stocks, bonds, cash, real estate, commodities, crypto."
+  },
+  {
+    "term": "Yield Curve",
+    "explanation": "A line plotting interest rates across different bond maturities. When it 'inverts' (short-term rates exceed long-term), it's historically flagged as a recession warning."
+  },
+  {
+    "term": "Market Sentiment",
+    "explanation": "The overall attitude of investors toward a market or asset — optimistic (bullish) or pessimistic (bearish) — which can move prices independent of fundamentals."
+  },
+  {
+    "term": "Blue-Sky Laws",
+    "explanation": "State-level regulations in the US requiring securities offerings to be registered, protecting investors from fraud."
+  },
+  {
+    "term": "Stablecoin",
+    "explanation": "A cryptocurrency designed to hold a steady value, usually pegged 1:1 to a currency like the US dollar."
+  },
+  {
+    "term": "Market Cycle",
+    "explanation": "The recurring pattern of expansion and contraction markets move through over time — growth, peak, decline, trough, repeat."
+  },
+  {
+    "term": "Real Estate Appreciation",
+    "explanation": "The increase in a property's value over time, driven by factors like location, demand, and improvements."
+  },
+  {
+    "term": "Cap Rate",
+    "explanation": "Capitalization rate: a property's annual net income divided by its purchase price, used to estimate a real estate investment's potential return."
+  },
+  {
+    "term": "REIT",
+    "explanation": "Real Estate Investment Trust: a company that owns income-producing real estate, letting investors gain property exposure without buying physical buildings."
+  },
+  {
+    "term": "Net Worth",
+    "explanation": "The total value of everything you own (assets) minus everything you owe (liabilities). The single-number snapshot of financial position."
+  },
+  {
+    "term": "Cost Basis",
+    "explanation": "The original purchase price of an investment, used to calculate capital gains or losses when you sell it."
+  },
+  {
+    "term": "Total Return",
+    "explanation": "An investment's full gain or loss, combining price appreciation with any income received (dividends, interest, rent)."
+  },
+  {
+    "term": "Risk Tolerance",
+    "explanation": "How much investment loss you're personally willing and able to withstand, which should shape your asset allocation."
+  },
+  {
+    "term": "Blue-Chip Bond",
+    "explanation": "A bond issued by a highly creditworthy, financially stable government or corporation — considered low default risk."
+  },
+  {
+    "term": "Credit Rating",
+    "explanation": "A grade (like AAA or BB) assigned to a bond issuer reflecting its ability to repay debt. Lower ratings mean higher risk and typically higher yields."
+  },
+  {
+    "term": "Maturity Date",
+    "explanation": "The date a bond's principal is due to be repaid in full to the bondholder."
+  },
+  {
+    "term": "Market Volatility Index (VIX)",
+    "explanation": "Often called the 'fear index' — it measures expected stock market volatility over the next 30 days based on S&P 500 options pricing."
+  },
+  {
+    "term": "Passive Investing",
+    "explanation": "A strategy of buying and holding broad, low-cost investments (like index funds) rather than actively picking stocks or timing the market."
+  },
+  {
+    "term": "Active Investing",
+    "explanation": "A strategy where a manager or investor actively picks securities, aiming to outperform the broader market — usually at higher cost and risk."
+  },
+  {
+    "term": "Blockchain",
+    "explanation": "A decentralized, tamper-resistant digital ledger that records transactions across many computers — the underlying technology behind cryptocurrencies."
+  },
+  {
+    "term": "Market Liquidity Risk",
+    "explanation": "The risk that you won't be able to sell an asset quickly without accepting a lower price, because there aren't enough buyers at the moment."
+  },
+  {
+    "term": "Standard Deviation",
+    "explanation": "A statistical measure of how much an investment's returns swing away from their average. Higher standard deviation means more volatile, less predictable returns."
+  },
+  {
+    "term": "Variance",
+    "explanation": "The average of squared deviations from the mean return — the math behind standard deviation (which is just its square root), used to quantify how spread out returns are."
+  },
+  {
+    "term": "Beta",
+    "explanation": "A measure of how much an asset moves relative to the overall market. A beta of 1 tracks the market; above 1 amplifies market swings, below 1 dampens them."
+  },
+  {
+    "term": "Alpha",
+    "explanation": "The excess return an investment generates above what its risk (beta) would predict. Positive alpha means it beat expectations; it's the number active managers chase."
+  },
+  {
+    "term": "Sharpe Ratio",
+    "explanation": "Return earned per unit of risk taken: (return minus risk-free rate) divided by standard deviation. Lets you compare investments with different volatility on equal footing."
+  },
+  {
+    "term": "Sortino Ratio",
+    "explanation": "Like the Sharpe ratio, but only penalizes downside volatility — since investors don't actually mind upside swings, just downside risk."
+  },
+  {
+    "term": "Correlation",
+    "explanation": "A measure from -1 to +1 of how closely two assets move together. Near 0 or negative correlation is what makes diversification actually reduce risk."
+  },
+  {
+    "term": "R-Squared",
+    "explanation": "A statistic from 0 to 100% showing how much of a fund's movement is explained by its benchmark index. High R-squared means it closely tracks the index; low means it doesn't."
+  },
+  {
+    "term": "CAGR",
+    "explanation": "Compound Annual Growth Rate: the smoothed annual return an investment would need to grow from its starting to ending value, ignoring the bumpy path in between."
+  },
+  {
+    "term": "Moving Average",
+    "explanation": "The average price of an asset over a set recent period (e.g. 50 or 200 days), recalculated daily. Smooths out day-to-day noise to reveal the underlying trend."
+  },
+  {
+    "term": "Regression Analysis",
+    "explanation": "A statistical method for measuring the relationship between a security's returns and one or more factors (like the market), used to estimate beta and alpha."
+  },
+  {
+    "term": "Value at Risk (VaR)",
+    "explanation": "An estimate of the maximum expected loss on a portfolio over a set time period, at a given confidence level (e.g. 95%) — a common way to size downside risk."
+  },
+  {
+    "term": "Maximum Drawdown",
+    "explanation": "The largest peak-to-trough decline an investment has experienced, expressed as a percentage. A key measure of how bad the worst-case ride has actually been."
+  },
+  {
+    "term": "Skewness",
+    "explanation": "A measure of how lopsided a return distribution is. Positive skew means occasional large gains; negative skew means occasional large losses — both hide behind the same average return."
+  },
+  {
+    "term": "Kurtosis",
+    "explanation": "A measure of how likely extreme outcomes are compared to a normal distribution. High kurtosis ('fat tails') means bigger surprises — good and bad — happen more often than a simple average would suggest."
+  },
+  {
+    "term": "Monte Carlo Simulation",
+    "explanation": "A modeling technique that runs thousands of randomized scenarios to estimate the range of possible outcomes for a portfolio, rather than relying on a single projected average."
+  },
+  {
+    "term": "Efficient Frontier",
+    "explanation": "The set of portfolios that offer the highest expected return for each level of risk. Portfolios below the frontier are considered suboptimal — you could get more return for the same risk."
+  }
+]
