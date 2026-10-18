@@ -27,7 +27,9 @@
 
 .add-rule-form > input {
   border-radius: 6px;
-  border: 1px solid #cdcdcd;
+  border: 1px solid var(--border-container);
+  background-color: var(--background-subtle);
+  color: var(--text-body);
   padding: 9px 13px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   flex-grow: 1;
@@ -36,11 +38,11 @@
 }
 
 .add-rule-form > button {
-  font-family: Inter, sans-serif;
+  font-family: var(--font-family);
   border-radius: 6px;
   border: none;
-  background-color: #141413;
-  color: #FAFAF8;
+  background-color: var(--action-primary);
+  color: var(--text-body);
   padding: 9px 16px;
   cursor: pointer;
 }

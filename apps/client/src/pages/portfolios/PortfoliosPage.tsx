@@ -151,8 +151,8 @@ export default function PortfoliosPage() {
                     </select>
                   </div>
                   <p>Goal: {p.goal != null ? `${p.goal}%` : "—"}</p>
-                  <p>%: {(() => { const r = portfolioReturns[p.id]?.pctReturn; if (r == null) return "—"; return <span style={{ color: r >= 0 ? "#4caf50" : "#e57373" }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}%</span>; })()}</p>
-                  <p>$: {(() => { const d = portfolioReturns[p.id]?.dollarReturn; if (d == null) return "—"; return <span style={{ color: d >= 0 ? "#4caf50" : "#e57373" }}>{d >= 0 ? "+" : ""}{Math.round(d).toLocaleString()}$</span>; })()}</p>
+                  <p>%: {(() => { const r = portfolioReturns[p.id]?.pctReturn; if (r == null) return "—"; return <span style={{ color: r >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}%</span>; })()}</p>
+                  <p>$: {(() => { const d = portfolioReturns[p.id]?.dollarReturn; if (d == null) return "—"; return <span style={{ color: d >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>{d >= 0 ? "+" : ""}{Math.round(d).toLocaleString()}$</span>; })()}</p>
                 </div>
                 <div className="portfolio-min-col">
                   <h4>Top performers</h4>
@@ -160,10 +160,10 @@ export default function PortfoliosPage() {
                     <div key={a.label} className="portfolio-performer-row">
                       <span className="portfolio-performer-type">{assetTypeLabel(a.type)}</span>
                       <span className="portfolio-performer-name">{a.label}</span>
-                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "#4caf50" : "#e57373" }}>
+                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
                         {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
                       </span>
-                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "#4caf50" : "#e57373" }}>
+                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
                         {a.dollarReturn >= 0 ? "+" : ""}{Math.round(a.dollarReturn).toLocaleString()}$
                       </span>
                     </div>
@@ -178,10 +178,10 @@ export default function PortfoliosPage() {
                     <div key={a.label} className="portfolio-performer-row">
                       <span className="portfolio-performer-type">{assetTypeLabel(a.type)}</span>
                       <span className="portfolio-performer-name">{a.label}</span>
-                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "#4caf50" : "#e57373" }}>
+                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
                         {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
                       </span>
-                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "#4caf50" : "#e57373" }}>
+                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
                         {a.dollarReturn >= 0 ? "+" : ""}{Math.round(a.dollarReturn).toLocaleString()}$
                       </span>
                     </div>

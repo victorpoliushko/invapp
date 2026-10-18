@@ -9,11 +9,11 @@ type NetWorth = {
 };
 
 const ASSET_CLASSES: { key: keyof NetWorth["byType"]; label: string; color: string }[] = [
-  { key: "stocks", label: "Stocks", color: "#4caf50" },
-  { key: "crypto", label: "Crypto", color: "#f7931a" },
-  { key: "bonds", label: "Bonds", color: "#42a5f5" },
-  { key: "realEstate", label: "Real estate", color: "#ab47bc" },
-  { key: "mixedAssets", label: "Other", color: "#78909c" },
+  { key: "stocks", label: "Stocks", color: "var(--decorative-green)" },
+  { key: "crypto", label: "Crypto", color: "var(--decorative-orange)" },
+  { key: "bonds", label: "Bonds", color: "var(--decorative-blue)" },
+  { key: "realEstate", label: "Real estate", color: "var(--decorative-purple)" },
+  { key: "mixedAssets", label: "Other", color: "var(--decorative-grey)" },
 ];
 
 export function NetWorthAllocation() {

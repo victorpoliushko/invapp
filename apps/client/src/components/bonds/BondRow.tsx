@@ -79,7 +79,7 @@ export function BondRow({ bond, onDelete, onUpdated }: Props) {
       <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
       <td
         data-label="Capital gain"
-        style={{ color: capitalGain == null ? undefined : capitalGain >= 0 ? "#4caf50" : "#e57373" }}
+        style={{ color: capitalGain == null ? undefined : capitalGain >= 0 ? "var(--text-success)" : "var(--text-danger)" }}
       >
         {capitalGain == null ? "—" : `${capitalGain >= 0 ? "+" : ""}${Math.round(capitalGain).toLocaleString()}`}
       </td>

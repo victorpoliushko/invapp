@@ -47,11 +47,11 @@ export const SecurityRow = ({
       <td data-label="Current price">
         {loadingPrices[position.assetId] ? "..." : (currentPrice ?? "—")}
       </td>
-      <td data-label="% change" style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "#4caf50" : "#e57373" }}>
+      <td data-label="% change" style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
         {pctChange == null ? "—" : `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(2)}%`}
       </td>
       <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
-      <td data-label="Total return" style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "#4caf50" : "#e57373" }}>
+      <td data-label="Total return" style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
         {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn).toLocaleString()}`}
       </td>
       <td className="actions">

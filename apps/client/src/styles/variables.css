@@ -1,26 +1,61 @@
 :root {
-  /* Colors — surfaces (dark theme) */
-  --color-bg: #282b2e;
-  --color-surface: #383838;
-  --color-surface-alt: #2b2b2b;
-  --color-surface-raised: #424242;
-  --color-surface-card: #2e2e2e;
-  --color-surface-input: #1e1e1e;
+  /*
+   * Design tokens from the Invapp Figma file (file hRInWET1P26oboJuP3k36v).
+   * Names mirror the Figma variables so design and code stay in sync.
+   */
 
-  /* Colors — borders */
-  --color-border: #444;
-  --color-border-strong: #555;
-  --color-border-muted: #616161;
+  /* Backgrounds */
+  --background-screen: #0d0f14;
+  --background-subtle: #1a1d24;
+  --background-tab: #222630;
+  --background-elevated: #2a2f3d;
+  --background-disabled: #3a4657;
+  --background-danger: #3a1c20;
+  --backdrop: rgb(0 0 0 / 0.6);
 
-  /* Colors — text */
-  --color-text: #ffffff;
-  --color-text-muted: #aaa;
-  --color-text-faint: #777;
+  /* Borders */
+  --border-container: #2a2f3d;
+  --border-strong: #3a4657;
+  --border-danger: #611212;
 
-  /* Colors — brand / status */
-  --color-primary: #4caf50;
-  --color-primary-hover: #45a049;
-  --color-danger: #e57373;
+  /* Text */
+  --text-body: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-secondary-disabled: #94a3b880;
+  --text-tertiary: #64748b;
+  --text-success: #4caf50;
+  --text-danger: #e57373;
+
+  /* Actions */
+  --action-primary: #4caf50;
+  --action-primary-hover: #419644;
+
+  /* Asset-class colors (charts, allocation bars, legends) */
+  --decorative-green: #4caf50;
+  --decorative-orange: #f7931a;
+  --decorative-blue: #42a5f5;
+  --decorative-purple: #ab47bc;
+  --decorative-grey: #858585;
+
+  /* Typography */
+  --font-family: "Inter", sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semi-bold: 600;
+  --weight-bold: 700;
+
+  --font-size-micro: 0.625rem;        /* 10px — compact badges */
+  --font-size-caption: 0.6875rem;     /* 11px — nav, metadata */
+  --font-size-label: 0.75rem;         /* 12px — form labels */
+  --font-size-copy: 0.8125rem;        /* 13px — secondary values */
+  --font-size-body: 0.875rem;         /* 14px — default UI text */
+  --font-size-title-small: 0.9375rem; /* 15px — asset names */
+  --font-size-title: 1rem;            /* 16px — item titles */
+  --font-size-heading-small: 1.125rem;/* 18px — modal headings */
+  --font-size-heading: 1.25rem;       /* 20px — screen headings */
+  --font-size-metric: 1.5rem;         /* 24px — card totals */
+  --font-size-heading-large: 1.75rem; /* 28px — large headings */
+  --font-size-metric-large: 2rem;     /* 32px — net worth */
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -29,21 +64,17 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
 
-  /* Typography */
-  --font-family: "Inter", sans-serif;
-  --font-xs: 0.75rem;
-  --font-s: 0.875rem;
-  --font-m: 1rem;
-  --font-l: 1.25rem;
-  --font-xl: 1.5rem;
-
   /* Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 20px;
+  --radius-sm: 8px;   /* inputs, bars */
+  --radius-md: 10px;  /* buttons */
+  --radius-lg: 16px;  /* cards, modals */
+  --radius-pill: 100px;
+
+  /* Sizing */
+  --control-height: 44px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.3);
 
   /* Transitions */
   --transition-fast: 0.15s ease;
@@ -52,6 +83,35 @@
   /* Layout */
   --section-max-width: 1440px;
   --section-padding: 1.5rem;
+
+  /*
+   * Legacy aliases — existing stylesheets use these names. They now resolve
+   * to the Figma tokens above; prefer the Figma names in new code.
+   */
+  --color-bg: var(--background-screen);
+  --color-surface: var(--background-subtle);
+  --color-surface-alt: var(--background-tab);
+  --color-surface-raised: var(--background-subtle);
+  --color-surface-card: var(--background-tab);
+  --color-surface-input: var(--background-subtle);
+
+  --color-border: var(--border-container);
+  --color-border-strong: var(--border-strong);
+  --color-border-muted: var(--border-strong);
+
+  --color-text: var(--text-body);
+  --color-text-muted: var(--text-secondary);
+  --color-text-faint: var(--text-tertiary);
+
+  --color-primary: var(--action-primary);
+  --color-primary-hover: var(--action-primary-hover);
+  --color-danger: var(--text-danger);
+
+  --font-xs: var(--font-size-label);
+  --font-s: var(--font-size-body);
+  --font-m: var(--font-size-title);
+  --font-l: var(--font-size-heading);
+  --font-xl: var(--font-size-metric);
 
   /*
    * Breakpoint reference (media queries can't read custom properties,

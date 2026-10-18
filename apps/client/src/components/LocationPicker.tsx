@@ -47,10 +47,10 @@ export function LocationPicker() {
 
   const selectStyle: React.CSSProperties = {
     padding: "6px 8px",
-    border: "1px solid #444",
-    borderRadius: 4,
-    backgroundColor: "#2b2b2b",
-    color: "white",
+    border: "1px solid var(--border-container)",
+    borderRadius: "var(--radius-sm)",
+    backgroundColor: "var(--background-subtle)",
+    color: "var(--text-body)",
   };
 
   return (

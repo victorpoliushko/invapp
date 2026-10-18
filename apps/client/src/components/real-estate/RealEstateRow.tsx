@@ -50,7 +50,7 @@ function toDateInputValue(iso: string): string {
 
 export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpdated }: Props) {
   const { occupancyPct, annualNet, annualNetPct, totalReturn } = calcStats(property);
-  const gain = (v: number) => ({ color: v >= 0 ? "#4caf50" : "#e57373" });
+  const gain = (v: number) => ({ color: v >= 0 ? "var(--text-success)" : "var(--text-danger)" });
 
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({

@@ -5,6 +5,7 @@
 .liquidity-summary {
   margin: 1.5rem auto 0;
   background-color: var(--color-surface-raised);
+  border: 1px solid var(--border-container);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   display: flex;

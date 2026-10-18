@@ -1,5 +1,6 @@
 header {
-  background-color: #2a323e;
+  background-color: var(--background-subtle);
+  border-bottom: 1px solid var(--border-container);
 }
 
 .navbar-logo {
@@ -61,8 +62,10 @@ nav > span {
 .input-group input {
   width: 60%;
   padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-container);
+  background-color: var(--background-subtle);
+  color: var(--text-body);
+  border-radius: var(--radius-sm);
 }
 
 .buttons {
