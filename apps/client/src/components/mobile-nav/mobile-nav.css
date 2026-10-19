@@ -6,18 +6,6 @@
   display: none;
 }
 
-.mobile-nav-icon {
-  display: block;
-  flex-shrink: 0;
-  background-color: currentColor;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
-}
-
 @media (max-width: 600px) {
   .mobile-top-bar {
     display: flex;

@@ -1,0 +1,226 @@
+/*
+ * Shared UI pieces from the Figma component sheets (Primary-buttons, inputs,
+ * period-tabs, new-portfolio-modal). Use these classes instead of restyling
+ * buttons/inputs per page.
+ */
+
+/* Icon drawn as a CSS mask so it takes the surrounding text color. */
+.mask-icon {
+  display: block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* Buttons — full-width 44px actions */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-semi-bold);
+  cursor: pointer;
+  transition: background-color var(--transition-base);
+}
+
+.btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background-color: var(--action-primary);
+  color: var(--text-body);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--action-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--background-screen);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  color: var(--text-body);
+}
+
+/* Small pill action, e.g. "+ New" in a page header */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--action-primary);
+  color: var(--text-body);
+  font-family: var(--font-family);
+  font-size: var(--font-size-label);
+  font-weight: var(--weight-semi-bold);
+  cursor: pointer;
+  transition: background-color var(--transition-base);
+}
+
+.btn-pill:hover {
+  background-color: var(--action-primary-hover);
+}
+
+/* Form field: label above a 44px input */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-label);
+  font-weight: var(--weight-semi-bold);
+  text-transform: uppercase;
+}
+
+.input {
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 12px;
+  border: 1px solid var(--border-container);
+  border-radius: var(--radius-sm);
+  background-color: var(--background-subtle);
+  color: var(--text-body);
+  caret-color: var(--text-success);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.input:focus {
+  border-color: var(--border-strong);
+}
+
+.input:disabled {
+  background-color: var(--background-disabled);
+  color: var(--text-secondary-disabled);
+}
+
+.input[aria-invalid="true"] {
+  background-color: var(--background-danger);
+  border-color: var(--border-danger);
+  color: var(--text-danger);
+}
+
+/* Segmented control (period tabs) */
+.segmented {
+  display: flex;
+  height: 28px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background-color: var(--background-screen);
+}
+
+.segmented-tab {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-secondary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-caption);
+  font-weight: var(--weight-semi-bold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.segmented-tab[aria-pressed="true"] {
+  background-color: var(--border-container);
+  color: var(--text-body);
+}
+
+/* Modal dialog */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgb(0 0 0 / 0.65);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  border: 1px solid var(--border-container);
+  border-radius: 20px;
+  background-color: var(--background-subtle);
+  box-shadow: 0 12px 12px rgb(0 0 0 / 0.4);
+}
+
+.modal-title {
+  margin: 0;
+  color: var(--text-body);
+  font-size: var(--font-size-heading-small);
+  font-weight: var(--weight-bold);
+}
+
+.modal-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Page title bar — "Portfolios" + action. 56px tall on phones (Figma top-bar). */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page-title {
+  margin: 0;
+  color: var(--text-body);
+  font-size: var(--font-size-heading-large);
+  font-weight: var(--weight-bold);
+}
+
+@media (max-width: 600px) {
+  .page-header {
+    height: 56px;
+    margin-bottom: 0;
+  }
+
+  .page-title {
+    font-size: var(--font-size-heading);
+  }
+}

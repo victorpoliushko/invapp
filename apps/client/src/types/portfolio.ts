@@ -101,6 +101,7 @@ export type MixedAsset = {
 export type PortfolioDto = {
   id: string;
   name: string;
+  goal?: number | null;
   user: UserDto;
   stockPositions: PositionDto[];
   cryptoPositions: PositionDto[];

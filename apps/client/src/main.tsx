@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/variables.css";
 import "./styles/base.css";
+import "./styles/components.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import PortfoliosPage from "./pages/portfolios/PortfoliosPage.tsx";

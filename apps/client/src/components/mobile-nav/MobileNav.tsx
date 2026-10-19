@@ -4,29 +4,19 @@ import homeIcon from "../../assets/icons/home.svg";
 import pieChartIcon from "../../assets/icons/pie-chart.svg";
 import settingsIcon from "../../assets/icons/settings.svg";
 import userIcon from "../../assets/icons/user.svg";
+import { MaskIcon } from "../MaskIcon";
 import "./mobile-nav.css";
 
-// Icons are drawn as CSS masks so they take the tab's text color
-// (white when active, slate otherwise) instead of the color baked into the SVG.
-function NavIcon({ src, size }: { src: string; size: number }) {
-  return (
-    <span
-      className="mobile-nav-icon"
-      // Quoted: Vite inlines small SVGs as unencoded data URIs, which contain
-      // spaces and break an unquoted url().
-      style={{ width: size, height: size, maskImage: `url("${src}")`, WebkitMaskImage: `url("${src}")` }}
-      aria-hidden="true"
-    />
-  );
-}
-
-/** Phone-only top bar (≤600px), shown to signed-in users in place of the desktop header. */
+/**
+ * Phone-only top bar (≤600px) for the Main screen. Other screens render their
+ * own title bar (e.g. "Portfolios" + New), as in the Figma screens.
+ */
 export function MobileTopBar() {
   return (
     <div className="mobile-top-bar">
       <Link to="/main" className="mobile-top-bar-title">Invapp</Link>
       <Link to="/settings" className="mobile-top-bar-profile" aria-label="Profile and settings">
-        <NavIcon src={userIcon} size={18} />
+        <MaskIcon src={userIcon} size={18} />
       </Link>
     </div>
   );
@@ -43,18 +33,18 @@ export function MobileTabBar() {
   return (
     <nav className="mobile-tab-bar" aria-label="Main navigation">
       <NavLink to="/main" className="mobile-tab">
-        <NavIcon src={homeIcon} size={20} />
+        <MaskIcon src={homeIcon} size={20} />
         <span>Main</span>
       </NavLink>
       <NavLink
         to={`/portfolios/user/${userId}`}
         className={() => `mobile-tab${portfoliosActive ? " active" : ""}`}
       >
-        <NavIcon src={pieChartIcon} size={20} />
+        <MaskIcon src={pieChartIcon} size={20} />
         <span>Portfolios</span>
       </NavLink>
       <NavLink to="/settings" className="mobile-tab">
-        <NavIcon src={settingsIcon} size={20} />
+        <MaskIcon src={settingsIcon} size={20} />
         <span>Settings</span>
       </NavLink>
     </nav>

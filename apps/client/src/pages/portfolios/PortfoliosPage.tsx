@@ -3,7 +3,10 @@ import "./PortfoliosPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
+import plusIcon from "../../assets/icons/plus.svg";
 import { API_BASE_URL } from "../../config";
+import { MaskIcon } from "../../components/MaskIcon";
+import { NewPortfolioModal } from "./NewPortfolioModal";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -30,6 +33,22 @@ const RETURN_PERIOD_OPTIONS: { value: ReturnPeriod; label: string }[] = [
   { value: "year", label: "Last year" },
   { value: "month", label: "This month" },
 ];
+
+function formatMoney(value: number): string {
+  return `$${Math.abs(Math.round(value)).toLocaleString()}`;
+}
+
+function signedPct(value: number): string {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function signedMoney(value: number): string {
+  return `${value >= 0 ? "+" : "-"}${formatMoney(value)}`;
+}
+
+function gainColor(value: number): string {
+  return value >= 0 ? "var(--text-success)" : "var(--text-danger)";
+}
 
 type PortfolioReturns = { pctReturn: number | null; dollarReturn: number | null };
 type Mover = { label: string; type: string; pct: number; dollarReturn: number };
@@ -68,21 +87,14 @@ export default function PortfoliosPage() {
   const navigate = useNavigate();
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
     usePortfolio();
-  const [portfolioName, setPortfolioName] = useState<string>("");
-  const [portfolioGoal, setPortfolioGoal] = useState<string>("");
   const [isCreating, setIsCreating] = useState(false);
   const [returnPeriods, setReturnPeriods] = useState<Record<string, ReturnPeriod>>({});
   const [portfolioReturns, setPortfolioReturns] = useState<Record<string, PortfolioReturns>>({});
   const [portfolioMovers, setPortfolioMovers] = useState<Record<string, PortfolioMovers>>({});
   const [portfolioNetWorth, setPortfolioNetWorth] = useState<Record<string, PortfolioNetWorth>>({});
 
-  const handleCreate = () => {
-    if (portfolioName.trim()) {
-      const goal = portfolioGoal !== "" ? parseFloat(portfolioGoal) : undefined;
-      createPortolio(portfolioName, userId ?? "", goal);
-      setPortfolioName("");
-      setPortfolioGoal("");
-    }
+  const handleCreate = (name: string, goal: number | undefined) => {
+    createPortolio(name, userId ?? "", goal);
     setIsCreating(false);
   };
 
@@ -92,7 +104,7 @@ export default function PortfoliosPage() {
 
   useEffect(() => {
     if (!portfolios) return;
-    portfolios.forEach((p: any) => {
+    portfolios.forEach((p) => {
       const period = returnPeriods[p.id] ?? "all";
       fetchPortfolioReturns(p.id, period).then((data) => {
         if (data) setPortfolioReturns((prev) => ({ ...prev, [p.id]: data }));
@@ -105,7 +117,7 @@ export default function PortfoliosPage() {
 
   useEffect(() => {
     if (!portfolios) return;
-    portfolios.forEach((p: any) => {
+    portfolios.forEach((p) => {
       fetchPortfolioNetWorth(p.id).then((data) => {
         if (data) setPortfolioNetWorth((prev) => ({ ...prev, [p.id]: data }));
       });
@@ -114,135 +126,115 @@ export default function PortfoliosPage() {
 
   return (
     <section className="portfolios-section section-container">
-      {portfolios && portfolios.length > 0 &&
-        portfolios.map((p: any) => {
-          const period = returnPeriods[p.id] ?? "all";
-          const movers = portfolioMovers[p.id];
-          const performers = movers?.topPerformers ?? [];
-          const losers = movers?.topLosers ?? [];
-          const netWorth = portfolioNetWorth[p.id]?.total;
-          return (
-          <div
-            className="portfolio-min portfolio-min--clickable"
-            key={p.id}
-            onClick={() => navigate(`/portfolios/${p.id}`)}
-          >
-            <div className="portfolio-min-header">
-              <h2>{p.name}</h2>
-              <span className="portfolio-min-networth">
-                {netWorth != null ? `$${Math.round(netWorth).toLocaleString()}` : "—"}
-              </span>
-            </div>
-            <div className="portfolio-min-cols">
-                <div className="portfolio-min-col">
-                  <div className="portfolio-returns-header">
-                    <h4>Returns</h4>
-                    <select
-                      value={period}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => {
-                        const value = e.target.value as ReturnPeriod;
-                        setReturnPeriods((prev) => ({ ...prev, [p.id]: value }));
-                      }}
-                    >
-                      {RETURN_PERIOD_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <p>Goal: {p.goal != null ? `${p.goal}%` : "—"}</p>
-                  <p>%: {(() => { const r = portfolioReturns[p.id]?.pctReturn; if (r == null) return "—"; return <span style={{ color: r >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>{r >= 0 ? "+" : ""}{r.toFixed(2)}%</span>; })()}</p>
-                  <p>$: {(() => { const d = portfolioReturns[p.id]?.dollarReturn; if (d == null) return "—"; return <span style={{ color: d >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>{d >= 0 ? "+" : ""}{Math.round(d).toLocaleString()}$</span>; })()}</p>
-                </div>
-                <div className="portfolio-min-col">
-                  <h4>Top performers</h4>
-                  {performers.map((a) => (
-                    <div key={a.label} className="portfolio-performer-row">
-                      <span className="portfolio-performer-type">{assetTypeLabel(a.type)}</span>
-                      <span className="portfolio-performer-name">{a.label}</span>
-                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
-                        {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
-                      </span>
-                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
-                        {a.dollarReturn >= 0 ? "+" : ""}{Math.round(a.dollarReturn).toLocaleString()}$
-                      </span>
-                    </div>
-                  ))}
-                  {performers.length === 0 && (
-                    <p className="portfolio-performer-empty">No price data yet</p>
-                  )}
-                </div>
-                <div className="portfolio-min-col">
-                  <h4>Losers</h4>
-                  {losers.map((a) => (
-                    <div key={a.label} className="portfolio-performer-row">
-                      <span className="portfolio-performer-type">{assetTypeLabel(a.type)}</span>
-                      <span className="portfolio-performer-name">{a.label}</span>
-                      <span className="portfolio-performer-pct" style={{ color: a.pct >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
-                        {a.pct >= 0 ? "+" : ""}{a.pct.toFixed(2)}%
-                      </span>
-                      <span className="portfolio-performer-dollar" style={{ color: a.dollarReturn >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
-                        {a.dollarReturn >= 0 ? "+" : ""}{Math.round(a.dollarReturn).toLocaleString()}$
-                      </span>
-                    </div>
-                  ))}
-                  {losers.length === 0 && (
-                    <p className="portfolio-performer-empty">No price data yet</p>
-                  )}
-                </div>
-                <button
-                  className="portfolio-delete-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    deletePortfolio(p.id);
-                  }}
-                >
-                  <img src={deleteIcon} height={24} width={24} alt="delete" />
-                </button>
-              </div>
-            </div>
-          );
-        })
-      }
-
-      {isCreating ? (
-        <div className="portfolio-min portfolio-min--creating">
-          <input
-            type="text"
-            className="portfolio-create-input"
-            placeholder="Portfolio name"
-            value={portfolioName}
-            onChange={(e) => setPortfolioName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleCreate();
-              if (e.key === "Escape") setIsCreating(false);
-            }}
-            autoFocus
-          />
-          <input
-            type="number"
-            className="portfolio-create-input"
-            placeholder="Goal % (optional)"
-            value={portfolioGoal}
-            onChange={(e) => setPortfolioGoal(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleCreate();
-              if (e.key === "Escape") setIsCreating(false);
-            }}
-            min={0}
-          />
-          <div className="portfolio-create-actions">
-            <button className="portfolio-create-confirm" onClick={handleCreate}>Create</button>
-            <button className="portfolio-create-cancel" onClick={() => setIsCreating(false)}>Cancel</button>
-          </div>
-        </div>
-      ) : (
-        <button className="portfolio-min portfolio-min--add" onClick={() => setIsCreating(true)}>
-          <span>New portfolio</span>
-          <span className="portfolio-min--add-icon">+</span>
+      <div className="page-header">
+        <h1 className="page-title">Portfolios</h1>
+        <button className="btn-pill" onClick={() => setIsCreating(true)}>
+          <MaskIcon src={plusIcon} size={14} />
+          New
         </button>
+      </div>
+
+      <div className="portfolio-list">
+        {portfolios && portfolios.length > 0 &&
+          portfolios.map((p) => {
+            const period = returnPeriods[p.id] ?? "all";
+            const returns = portfolioReturns[p.id];
+            const movers = portfolioMovers[p.id];
+            const performers = movers?.topPerformers ?? [];
+            const losers = movers?.topLosers ?? [];
+            const netWorth = portfolioNetWorth[p.id]?.total;
+            return (
+              <article
+                className="portfolio-card"
+                key={p.id}
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(`/portfolios/${p.id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/portfolios/${p.id}`);
+                }}
+              >
+                <div className="portfolio-card-top">
+                  <h2 className="portfolio-card-name">
+                    {p.name}
+                    {p.goal != null && <span className="portfolio-card-goal">Goal {p.goal}%</span>}
+                  </h2>
+                  <button
+                    className="portfolio-card-delete"
+                    aria-label={`Delete ${p.name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deletePortfolio(p.id);
+                    }}
+                  >
+                    <MaskIcon src={deleteIcon} size={20} />
+                  </button>
+                </div>
+
+                <div className="portfolio-card-header-row">
+                  <span className="portfolio-card-total">
+                    {netWorth != null ? formatMoney(netWorth) : "—"}
+                  </span>
+                  {returns?.pctReturn != null && (
+                    <span className="portfolio-card-returns">
+                      <span className="portfolio-card-returns-pct" style={{ color: gainColor(returns.pctReturn) }}>
+                        {signedPct(returns.pctReturn)}
+                      </span>
+                      {returns.dollarReturn != null && (
+                        <span className="portfolio-card-returns-dollar">
+                          ({returns.dollarReturn < 0 ? "-" : ""}{formatMoney(returns.dollarReturn)})
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </div>
+
+                <div className="segmented" role="group" aria-label="Return period" onClick={(e) => e.stopPropagation()}>
+                  {RETURN_PERIOD_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      className="segmented-tab"
+                      aria-pressed={period === opt.value}
+                      onClick={() => setReturnPeriods((prev) => ({ ...prev, [p.id]: opt.value }))}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="portfolio-card-movers">
+                  <MoverGroup title="Top performers" movers={performers} />
+                  <MoverGroup title="Losers" movers={losers} />
+                </div>
+              </article>
+            );
+          })}
+      </div>
+
+      {isCreating && (
+        <NewPortfolioModal onSave={handleCreate} onClose={() => setIsCreating(false)} />
       )}
     </section>
+  );
+}
+
+function MoverGroup({ title, movers }: { title: string; movers: Mover[] }) {
+  return (
+    <div className="portfolio-card-movers-group">
+      <p className="portfolio-card-movers-title">{title}</p>
+      {movers.map((a) => (
+        <div key={a.label} className="portfolio-mover">
+          <span className="portfolio-mover-meta">
+            <span className="portfolio-mover-name">{a.label}</span>
+            <span className="portfolio-mover-type">{assetTypeLabel(a.type)}</span>
+          </span>
+          <span className="portfolio-mover-value">
+            <span className="portfolio-mover-pct" style={{ color: gainColor(a.pct) }}>{signedPct(a.pct)}</span>
+            <span className="portfolio-mover-dollar">{signedMoney(a.dollarReturn)}</span>
+          </span>
+        </div>
+      ))}
+      {movers.length === 0 && <p className="portfolio-mover-empty">No price data yet</p>}
+    </div>
   );
 }
