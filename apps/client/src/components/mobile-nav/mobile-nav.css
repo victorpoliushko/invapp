@@ -1,0 +1,82 @@
+/* Phone-only navigation (Figma: main-home top-bar + bottom-nav).
+   Hidden by default; Layout's ≤600px rules switch it on for signed-in users. */
+
+.mobile-top-bar,
+.mobile-tab-bar {
+  display: none;
+}
+
+.mobile-nav-icon {
+  display: block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+@media (max-width: 600px) {
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 16px;
+  }
+
+  .mobile-top-bar-title {
+    font-size: var(--font-size-heading);
+    font-weight: var(--weight-bold);
+    color: var(--text-body);
+  }
+
+  .mobile-top-bar-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--background-subtle);
+    color: var(--text-secondary);
+  }
+
+  .mobile-tab-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    height: calc(60px + env(safe-area-inset-bottom));
+    padding: 0 32px env(safe-area-inset-bottom);
+    background-color: var(--background-subtle);
+    border-top: 1px solid var(--border-container);
+  }
+
+  .mobile-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 64px;
+    font-size: var(--font-size-caption);
+    font-weight: var(--weight-medium);
+    color: var(--text-tertiary);
+  }
+
+  .mobile-tab span {
+    color: var(--text-secondary);
+  }
+
+  .mobile-tab.active,
+  .mobile-tab.active span {
+    color: var(--text-body);
+    font-weight: var(--weight-semi-bold);
+  }
+}

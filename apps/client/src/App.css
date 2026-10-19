@@ -441,3 +441,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Phone layout (Figma mobile screens are 375px wide). Signed-in users get
+   the mobile top bar + bottom tab bar instead of the desktop header/footer. */
+@media (max-width: 600px) {
+  .app-shell--signed-in > .header,
+  .app-shell--signed-in > .footer {
+    display: none;
+  }
+
+  .page-content {
+    padding: 0 16px 24px;
+  }
+
+  /* Leave room for the fixed bottom tab bar. */
+  .app-shell--signed-in .page-content {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom) + 24px);
+  }
+
+  /* page-content already supplies the 16px gutter; don't add a second one. */
+  .page-content .section-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .news-section,
+  .stocks-section,
+  .realestate-section {
+    margin: 16px 0 0;
+    padding: 16px;
+  }
+
+  .news-section h1,
+  .stocks-section h1,
+  .realestate-section h1 {
+    margin: 0 0 12px;
+    font-size: var(--font-size-heading);
+  }
+}

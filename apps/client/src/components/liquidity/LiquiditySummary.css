@@ -3,11 +3,11 @@
    for the layout itself — only the totals row gets a small width bump. */
 
 .liquidity-summary {
-  margin: 1.5rem auto 0;
+  margin: 16px auto 0;
   background-color: var(--color-surface-raised);
   border: 1px solid var(--border-container);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -19,41 +19,45 @@
 }
 
 .liquidity-summary-label {
-  color: var(--color-text-muted);
-  font-size: var(--font-s);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-semi-bold);
 }
 
 .liquidity-summary-rows {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
 .liquidity-summary-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   grid-template-areas:
-    "label label label"
-    "range amount pct";
-  row-gap: 0.15rem;
+    "label amount"
+    "range pct";
+  row-gap: 2px;
   column-gap: 0.5rem;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-container);
   font-size: var(--font-s);
 }
 
 .liquidity-summary-row-label {
   grid-area: label;
   color: var(--color-text);
+  font-weight: var(--weight-semi-bold);
 }
 
 .liquidity-summary-row-range {
   grid-area: range;
   color: var(--color-text-muted);
+  font-size: var(--font-size-label);
 }
 
 .liquidity-summary-row-amount {
   grid-area: amount;
+  font-weight: var(--weight-semi-bold);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -61,6 +65,7 @@
 .liquidity-summary-row-pct {
   grid-area: pct;
   color: var(--color-text-muted);
+  font-size: var(--font-size-label);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -74,6 +79,13 @@
     grid-template-columns: 1fr auto auto auto;
     grid-template-areas: "label range amount pct";
     align-items: baseline;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .liquidity-summary-row-range,
+  .liquidity-summary-row-pct {
+    font-size: var(--font-s);
   }
 
   .liquidity-summary-row-range {

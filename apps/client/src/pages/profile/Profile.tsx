@@ -13,7 +13,7 @@ interface UserProfile {
 }
 
 export default function Profile() {
-  const { userId, accessToken } = useAuth();
+  const { userId, accessToken, logout } = useAuth();
   const fetchWithRedirect = useFetchWithRedirect();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -136,6 +136,11 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      {/* Phone only — on desktop, logout lives in the header. */}
+      <button className="profile-logout-btn" onClick={logout}>
+        Log out
+      </button>
     </section>
   );
 }

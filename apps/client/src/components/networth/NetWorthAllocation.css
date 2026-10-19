@@ -16,15 +16,14 @@
 }
 
 .net-worth-allocation-label {
-  color: var(--color-text-muted);
-  font-size: var(--font-s);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-semi-bold);
 }
 
 .net-worth-allocation-total {
   font-size: var(--font-xl);
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
 
@@ -63,25 +62,48 @@
 
 .net-worth-allocation-legend-label {
   color: var(--color-text);
+  font-weight: var(--weight-medium);
 }
 
 .net-worth-allocation-legend-pct {
   color: var(--color-text-muted);
+  font-size: var(--font-size-label);
   font-variant-numeric: tabular-nums;
   text-align: right;
   min-width: 3.5rem;
 }
 
 .net-worth-allocation-legend-value {
+  font-weight: var(--weight-semi-bold);
   font-variant-numeric: tabular-nums;
   text-align: right;
   min-width: 5.5rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .net-worth-allocation {
-    margin-top: 1.5rem;
-    padding: 1.25rem;
+    margin-top: 16px;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .net-worth-allocation-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .net-worth-allocation-total {
+    font-size: var(--font-size-metric-large);
+    line-height: 1.2;
+  }
+
+  .net-worth-allocation-bar {
+    height: 16px;
+  }
+
+  .net-worth-allocation-legend {
+    row-gap: 10px;
   }
 
   .net-worth-allocation-legend-value {

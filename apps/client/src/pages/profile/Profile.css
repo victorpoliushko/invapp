@@ -122,3 +122,24 @@
     flex: 1;
   }
 }
+
+.profile-logout-btn {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .profile-logout-btn {
+    display: block;
+    width: 100%;
+    height: var(--control-height);
+    margin-top: 16px;
+    border: 1px solid var(--border-danger);
+    border-radius: var(--radius-md);
+    background-color: var(--background-danger);
+    color: var(--text-danger);
+    font-family: var(--font-family);
+    font-size: var(--font-size-body);
+    font-weight: var(--weight-semi-bold);
+    cursor: pointer;
+  }
+}
