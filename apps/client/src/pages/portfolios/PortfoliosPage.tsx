@@ -7,6 +7,7 @@ import plusIcon from "../../assets/icons/plus.svg";
 import { API_BASE_URL } from "../../config";
 import { MaskIcon } from "../../components/MaskIcon";
 import { NewPortfolioModal } from "./NewPortfolioModal";
+import { formatMoney, gainColor, signedMoney, signedPct } from "../../utils/money";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -33,22 +34,6 @@ const RETURN_PERIOD_OPTIONS: { value: ReturnPeriod; label: string }[] = [
   { value: "year", label: "Last year" },
   { value: "month", label: "This month" },
 ];
-
-function formatMoney(value: number): string {
-  return `$${Math.abs(Math.round(value)).toLocaleString()}`;
-}
-
-function signedPct(value: number): string {
-  return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
-}
-
-function signedMoney(value: number): string {
-  return `${value >= 0 ? "+" : "-"}${formatMoney(value)}`;
-}
-
-function gainColor(value: number): string {
-  return value >= 0 ? "var(--text-success)" : "var(--text-danger)";
-}
 
 type PortfolioReturns = { pctReturn: number | null; dollarReturn: number | null };
 type Mover = { label: string; type: string; pct: number; dollarReturn: number };
@@ -182,7 +167,7 @@ export default function PortfoliosPage() {
                       </span>
                       {returns.dollarReturn != null && (
                         <span className="portfolio-card-returns-dollar">
-                          ({returns.dollarReturn < 0 ? "-" : ""}{formatMoney(returns.dollarReturn)})
+                          ({formatMoney(returns.dollarReturn)})
                         </span>
                       )}
                     </span>

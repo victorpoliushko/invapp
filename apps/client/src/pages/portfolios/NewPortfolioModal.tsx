@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Modal } from "../../components/Modal";
 
 type Props = {
   onSave: (name: string, goal: number | undefined) => void;
@@ -10,14 +11,6 @@ export function NewPortfolioModal({ onSave, onClose }: Props) {
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -25,15 +18,8 @@ export function NewPortfolioModal({ onSave, onClose }: Props) {
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form
-        className="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="new-portfolio-title"
-        onClick={(e) => e.stopPropagation()}
-        onSubmit={handleSubmit}
-      >
+    <Modal labelledBy="new-portfolio-title" onClose={onClose}>
+      <form className="modal-body" onSubmit={handleSubmit}>
         <h2 id="new-portfolio-title" className="modal-title">New Portfolio</h2>
 
         <div className="modal-fields">
@@ -70,6 +56,6 @@ export function NewPortfolioModal({ onSave, onClose }: Props) {
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

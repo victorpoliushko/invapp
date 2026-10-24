@@ -4,7 +4,7 @@ import "../../pages/portfolio/PortfolioPage.css";
 import { PositionDto } from "../../types/portfolio";
 import { formatQuantity } from "../../utils/formatQuantity";
 
-export const SecurityRow = ({
+export const PositionRow = ({
   position,
   assetType,
   onExpand,

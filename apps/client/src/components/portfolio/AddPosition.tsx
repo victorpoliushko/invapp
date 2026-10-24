@@ -1,34 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useParams } from "react-router-dom";
-import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
-import { usePortfolio } from "../../context/PortfolioContext";
 import { TRANSACTION_COLORS } from "./transactionColors";
 import { alertMissingFields } from "../../utils/formValidation";
-import { API_BASE_URL } from "../../config";
+import { isCryptoSuggestion as isCrypto, useAssetSearch } from "../../hooks/useAssetSearch";
+import { useAddPositionTransaction } from "./useAddPositionTransaction";
 
-type StockSuggestion = { assetSymbol: string; name: string };
-type CryptoSuggestion = { id: string; symbol: string; name: string };
-type Suggestion = StockSuggestion | CryptoSuggestion;
-
-function isCrypto(s: Suggestion): s is CryptoSuggestion {
-  return "id" in s;
-}
-
-export function AddSecurity({
+export function AddPosition({
   assetType = "stock",
   totalPositionSum,
 }: {
   assetType?: "stock" | "crypto";
   totalPositionSum: number;
 }) {
-  const { id: portfolioId } = useParams<{ id: string }>();
-  const { refreshPortfolio } = usePortfolio();
-  const fetchWithRedirect = useFetchWithRedirect();
+  const addTransaction = useAddPositionTransaction();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
+  const { suggestions, clearSuggestions } = useAssetSearch(searchTerm, assetType, autocompleteEnabled);
   const [selectedCoingeckoId, setSelectedCoingeckoId] = useState<string | null>(null);
   const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number } | null>(null);
   const autocompleteRef = useRef<HTMLDivElement>(null);
@@ -40,33 +28,6 @@ export function AddSecurity({
     quantityChange: "",
     pricePerUnit: "",
   });
-
-  useEffect(() => {
-    if (!autocompleteEnabled || !searchTerm.trim()) {
-      setSuggestions([]);
-      return;
-    }
-
-    const token = localStorage.getItem("accessToken");
-    const endpoint =
-      assetType === "crypto"
-        ? `${API_BASE_URL}/assets/search-crypto?q=${searchTerm}`
-        : `${API_BASE_URL}/assets/search?q=${searchTerm}`;
-
-    const timer = setTimeout(async () => {
-      try {
-        const response = await fetchWithRedirect(endpoint, {
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) throw new Error("Failed to fetch suggestions");
-        setSuggestions(await response.json());
-      } catch (err) {
-        console.error("Autocomplete error:", err);
-      }
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, assetType]);
 
   useEffect(() => {
     if (suggestions.length === 0) {
@@ -91,7 +52,6 @@ export function AddSecurity({
   }, [suggestions]);
 
   const handleAddAsset = async () => {
-    if (!portfolioId) return;
     const { assetName, dueDate, quantityChange, pricePerUnit } = newAsset;
     if (alertMissingFields({
       Asset: assetName,
@@ -100,37 +60,21 @@ export function AddSecurity({
       Price: pricePerUnit,
     })) return;
 
-    const token = localStorage.getItem("accessToken");
-
     try {
-      const body: Record<string, unknown> = {
+      await addTransaction({
         assetName,
-        date: new Date(dueDate).toISOString(),
+        date: dueDate,
         quantityChange: Number(quantityChange),
         pricePerUnit: Number(pricePerUnit),
         type: transactionType,
-      };
-      if (assetType === "crypto" && selectedCoingeckoId) {
-        body.coingeckoId = selectedCoingeckoId;
-      }
-
-      const res = await fetchWithRedirect(
-        `${API_BASE_URL}/portfolios/${portfolioId}/assets`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify(body),
-        },
-      );
-
-      if (!res.ok) throw new Error("Failed to add asset");
+        coingeckoId: assetType === "crypto" ? selectedCoingeckoId : null,
+      });
 
       setNewAsset({ assetName: "", dueDate: "", quantityChange: "", pricePerUnit: "" });
       setSearchTerm("");
-      setSuggestions([]);
+      clearSuggestions();
       setSelectedCoingeckoId(null);
       setAutocompleteEnabled(true);
-      await refreshPortfolio();
     } catch (err) {
       console.error("Add asset error:", err);
       alert("Failed to add asset");
@@ -189,7 +133,7 @@ export function AddSecurity({
                       setSearchTerm(s.symbol);
                       setNewAsset({ ...newAsset, assetName: s.symbol });
                       setSelectedCoingeckoId(s.id);
-                      setSuggestions([]);
+                      clearSuggestions();
                       setAutocompleteEnabled(false);
                     }}
                   >
@@ -202,7 +146,7 @@ export function AddSecurity({
                     onClick={() => {
                       setSearchTerm(s.assetSymbol);
                       setNewAsset({ ...newAsset, assetName: s.assetSymbol });
-                      setSuggestions([]);
+                      clearSuggestions();
                       setAutocompleteEnabled(false);
                     }}
                   >

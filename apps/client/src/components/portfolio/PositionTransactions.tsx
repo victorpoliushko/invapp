@@ -14,7 +14,7 @@ type EditState = {
   pricePerUnit: string;
 };
 
-export function SecurityTransactions({
+export function PositionTransactions({
   assetTicker,
   assetType,
   transactions,

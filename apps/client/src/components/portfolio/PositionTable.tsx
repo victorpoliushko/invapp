@@ -1,39 +1,20 @@
 import { Fragment, useState } from "react";
-import { SecurityRow } from "./SecurityRow";
-import { SecurityTransactions } from "./SecurityTransactions";
+import { PositionRow } from "./PositionRow";
+import { PositionTransactions } from "./PositionTransactions";
 import "../../pages/portfolio/PortfolioPage.css";
 import { PortfolioDto } from "../../types/portfolio";
-import { AddSecurity } from "./AddSecurity";
+import { AddPosition } from "./AddPosition";
 import { usePortfolio } from "../../context/PortfolioContext";
+import { pctChange, totalPosition, totalReturn } from "./positionMetrics";
 
 type SortCol = "pctChange" | "totalPosition" | "totalReturn";
 type SortDir = "asc" | "desc";
 
 type Position = PortfolioDto["stockPositions"][number];
 
-function totalPosition(pa: Position): number {
-  return pa.transactions
-    .filter((t) => t.type === "BUY")
-    .reduce((sum, t) => sum + t.quantityChange * t.pricePerUnit, 0);
-}
+const orLowest = (v: number | null) => v ?? -Infinity;
 
-function pctChange(pa: Position, prices: Record<string, number>): number {
-  const cur = prices[pa.assetId];
-  const avg = pa.price;
-  return cur != null && avg != null && avg !== 0
-    ? ((cur - avg) / avg) * 100
-    : -Infinity;
-}
-
-function totalReturn(pa: Position, prices: Record<string, number>): number {
-  const cur = prices[pa.assetId];
-  const avg = pa.price;
-  return cur != null && avg != null
-    ? (cur - avg) * pa.quantity
-    : -Infinity;
-}
-
-export const SecurityTable = ({
+export const PositionTable = ({
   portfolio,
   assetType = "stock",
 }: {
@@ -51,8 +32,8 @@ export const SecurityTable = ({
   };
 
   const sortValue = (pa: Position) => {
-    if (sortCol === "pctChange") return pctChange(pa, currentPrices);
-    if (sortCol === "totalReturn") return totalReturn(pa, currentPrices);
+    if (sortCol === "pctChange") return orLowest(pctChange(pa, currentPrices[pa.assetId]));
+    if (sortCol === "totalReturn") return orLowest(totalReturn(pa, currentPrices[pa.assetId]));
     return totalPosition(pa);
   };
 
@@ -94,7 +75,7 @@ export const SecurityTable = ({
       <tbody>
         {positions.map((position) => (
           <Fragment key={position.assetId}>
-            <SecurityRow
+            <PositionRow
               position={position}
               assetType={assetType}
               isExpanded={expandedIds.has(position.assetId)}
@@ -107,7 +88,7 @@ export const SecurityTable = ({
               }
             />
             {expandedIds.has(position.assetId) && (
-              <SecurityTransactions
+              <PositionTransactions
                 assetTicker={position.asset.ticker}
                 assetType={assetType}
                 transactions={position.transactions}
@@ -115,7 +96,7 @@ export const SecurityTable = ({
             )}
           </Fragment>
         ))}
-        <AddSecurity assetType={assetType} totalPositionSum={totalPositionSum} />
+        <AddPosition assetType={assetType} totalPositionSum={totalPositionSum} />
       </tbody>
     </table>
     </div>
