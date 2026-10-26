@@ -68,6 +68,7 @@ export function BondRow({ bond, onDelete, onUpdated }: Props) {
       <td data-label="Face value">{bond.faceValue.toLocaleString()}</td>
       <td data-label="Coupon %">{bond.couponRate}%</td>
       <td data-label="Frequency">{FREQUENCY_LABEL[bond.couponFrequency]}</td>
+      <td data-label="Currency">{bond.currency}</td>
       <td data-label="Annual income">{annualIncome > 0 ? Math.round(annualIncome).toLocaleString() : "—"}</td>
       <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
       <td

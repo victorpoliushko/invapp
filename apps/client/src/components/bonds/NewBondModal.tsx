@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal } from "../Modal";
-import { CouponFrequency, FREQUENCY_LABEL } from "./types";
+import { BOND_CURRENCIES, CouponFrequency, FREQUENCY_LABEL } from "./types";
 import { useBondActions } from "./useBonds";
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -15,6 +15,7 @@ const EMPTY = {
   quantity: "",
   couponRate: "",
   couponFrequency: "" as CouponFrequency | "",
+  currency: "USD",
 };
 
 export function NewBondModal({ onClose }: { onClose: () => void }) {
@@ -51,6 +52,7 @@ export function NewBondModal({ onClose }: { onClose: () => void }) {
         faceValue: parseFloat(form.faceValue),
         couponRate: parseFloat(form.couponRate),
         couponFrequency: form.couponFrequency,
+        currency: form.currency,
         quantity: parseFloat(form.quantity),
         purchaseDate: form.purchaseDate,
         maturityDate: form.maturityDate,
@@ -91,6 +93,14 @@ export function NewBondModal({ onClose }: { onClose: () => void }) {
           <label className="field">
             <span className="field-label">Name</span>
             <input className="input" type="text" placeholder="e.g. US Treasury 2027" value={form.name} onChange={set("name")} />
+          </label>
+          <label className="field">
+            <span className="field-label">Currency</span>
+            <select className="input" value={form.currency} onChange={set("currency")}>
+              {BOND_CURRENCIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </label>
           {number("purchasePrice", "Purchase price")}
           {number("faceValue", "Face value")}

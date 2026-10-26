@@ -30,6 +30,7 @@ export function BondTable({ bonds, onChanged }: { bonds: Bond[]; onChanged: () =
           <th scope="col">Face value</th>
           <th scope="col">Coupon %</th>
           <th scope="col">Frequency</th>
+          <th scope="col">Currency</th>
           <th scope="col">Annual income</th>
           <th scope="col">Total position</th>
           <th scope="col">Capital gain</th>

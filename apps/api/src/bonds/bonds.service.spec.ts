@@ -168,6 +168,43 @@ describe('BondsService', () => {
     });
   });
 
+  describe('currency', () => {
+    const base = {
+      portfolioId: 'p1',
+      isin: 'US123',
+      name: 'Treasury',
+      faceValue: 1000,
+      couponRate: 5,
+      couponFrequency: 'ANNUAL' as any,
+      quantity: 0,
+      purchasePrice: 980,
+      purchaseDate: '2026-01-01',
+    };
+
+    it('normalizes the currency code on create', async () => {
+      await service.create({ ...base, currency: ' eur ' }, OWNER_ID);
+
+      expect(prisma.bond.create.mock.calls[0][0].data.currency).toBe('EUR');
+    });
+
+    it('leaves currency to the database default when omitted', async () => {
+      await service.create(base, OWNER_ID);
+
+      expect(prisma.bond.create.mock.calls[0][0].data.currency).toBeUndefined();
+    });
+
+    it('rejects an invalid currency code', async () => {
+      await expect(service.create({ ...base, currency: 'EURO' }, OWNER_ID)).rejects.toThrow(BadRequestException);
+      expect(prisma.bond.create).not.toHaveBeenCalled();
+    });
+
+    it('updates the currency', async () => {
+      await service.update('bond-1', { currency: 'gbp' }, OWNER_ID);
+
+      expect(prisma.bond.update).toHaveBeenCalledWith({ where: { id: 'bond-1' }, data: { currency: 'GBP' } });
+    });
+  });
+
   describe('update', () => {
     it('ignores quantity and purchasePrice, which are derived from trades', async () => {
       await service.update('bond-1', { quantity: 20, purchasePrice: 900, couponRate: 6 } as any, OWNER_ID);
@@ -295,7 +332,7 @@ describe('BondsService', () => {
           delete: jest.fn(),
           findMany: jest.fn(),
         },
-        bond: { update: jest.fn() },
+        bond: { update: jest.fn().mockImplementation(({ data }) => data), delete: jest.fn() },
       };
       prisma.$transaction = jest.fn((fn: (t: any) => unknown) => fn(tx));
       prisma.bondTransaction = {
@@ -335,6 +372,29 @@ describe('BondsService', () => {
         purchasePrice: 100,
         purchaseDate: new Date('2026-01-01'),
       });
+    });
+
+    it('deletes the bond when a SELL closes the whole holding', async () => {
+      tx.bondTransaction.findMany.mockResolvedValue([
+        trade('BUY', 5, 100, '2026-01-01'),
+        trade('SELL', 5, 110, '2026-02-01'),
+      ]);
+
+      const result = await service.addTransaction('bond-1', { type: 'SELL', quantity: 5, pricePerUnit: 110, date: '2026-02-01' } as any, OWNER_ID);
+
+      expect(tx.bond.delete).toHaveBeenCalledWith({ where: { id: 'bond-1' } });
+      expect(result).toBeNull();
+    });
+
+    it('keeps the bond after a partial SELL', async () => {
+      tx.bondTransaction.findMany.mockResolvedValue([
+        trade('BUY', 5, 100, '2026-01-01'),
+        trade('SELL', 2, 110, '2026-02-01'),
+      ]);
+
+      await service.addTransaction('bond-1', { type: 'SELL', quantity: 2, pricePerUnit: 110, date: '2026-02-01' } as any, OWNER_ID);
+
+      expect(tx.bond.delete).not.toHaveBeenCalled();
     });
 
     it('rejects a SELL larger than the holding', async () => {

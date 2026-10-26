@@ -4,6 +4,14 @@ import { CouponFrequency, Prisma, TransactionType } from '@prisma/client';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 import { BondTransactionInputDto, BondTransactionUpdateDto } from './dto/BondTransaction.dto';
 
+function parseCurrency(value: string): string {
+  const code = String(value).trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(code)) throw new BadRequestException('currency must be a 3-letter ISO code');
+  return code;
+}
+
+const SOLD_OUT_EPSILON = 1e-9;
+
 const WITH_TRANSACTIONS = {
   transactions: { orderBy: { date: 'desc' as const } },
 };
@@ -38,6 +46,7 @@ export class BondsService {
       faceValue: number;
       couponRate: number;
       couponFrequency: CouponFrequency;
+      currency?: string;
       quantity: number;
       purchasePrice: number;
       currentValue?: number;
@@ -61,6 +70,7 @@ export class BondsService {
         faceValue: Number(data.faceValue),
         couponRate: Number(data.couponRate),
         couponFrequency: data.couponFrequency,
+        currency: data.currency ? parseCurrency(data.currency) : undefined,
         quantity,
         purchasePrice,
         currentValue: data.currentValue != null ? Number(data.currentValue) : undefined,
@@ -83,6 +93,7 @@ export class BondsService {
       faceValue: number;
       couponRate: number;
       couponFrequency: CouponFrequency;
+      currency: string;
       currentValue: number;
       maturityDate: string;
     }>,
@@ -99,6 +110,7 @@ export class BondsService {
         ...(data.faceValue != null && { faceValue: Number(data.faceValue) }),
         ...(data.couponRate != null && { couponRate: Number(data.couponRate) }),
         ...(data.couponFrequency && { couponFrequency: data.couponFrequency }),
+        ...(data.currency && { currency: parseCurrency(data.currency) }),
         ...(data.currentValue != null && { currentValue: Number(data.currentValue) }),
         ...(data.maturityDate && { maturityDate: new Date(data.maturityDate) }),
       },
@@ -126,7 +138,13 @@ export class BondsService {
           date: new Date(input.date),
         },
       });
-      return this.recalculate(tx, bondId);
+      const bond = await this.recalculate(tx, bondId);
+
+      if (input.type === TransactionType.SELL && bond.quantity <= SOLD_OUT_EPSILON) {
+        await tx.bond.delete({ where: { id: bondId } });
+        return null;
+      }
+      return bond;
     });
   }
 

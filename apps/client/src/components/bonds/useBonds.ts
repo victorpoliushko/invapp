@@ -12,6 +12,7 @@ export type NewBondInput = {
   faceValue: number;
   couponRate: number;
   couponFrequency: CouponFrequency;
+  currency: string;
   quantity: number;
   purchaseDate: string;
   maturityDate: string;

@@ -3,6 +3,15 @@ export function formatMoney(value: number, digits = 0): string {
   return `${value < 0 ? "-" : ""}$${abs}`;
 }
 
+export function formatCurrency(value: number, currency: string, digits = 0): string {
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: digits,
+  }).format(value);
+}
+
 export function signedMoney(value: number, digits = 0): string {
   return `${value >= 0 ? "+" : ""}${formatMoney(value, digits)}`;
 }

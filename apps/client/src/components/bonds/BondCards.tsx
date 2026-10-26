@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MaskIcon } from "../MaskIcon";
 import searchIcon from "../../assets/icons/search.svg";
 import eyeIcon from "../../assets/icons/eye.svg";
-import { formatMoney } from "../../utils/money";
+import { formatCurrency } from "../../utils/money";
 import { Bond, FREQUENCY_LABEL } from "./types";
 import { BondDetailsModal } from "./BondDetailsModal";
 import { BondTradeModal } from "./BondTradeModal";
@@ -84,7 +84,7 @@ function BondCard({
       <dl className="position-card-metrics bond-card-metrics">
         <div>
           <dt>Total position</dt>
-          <dd>{totalPosition > 0 ? formatMoney(totalPosition) : "—"}</dd>
+          <dd>{totalPosition > 0 ? formatCurrency(totalPosition, bond.currency) : "—"}</dd>
         </div>
         <div className="position-card-metric-end">
           <dt>Coupon</dt>
@@ -96,7 +96,7 @@ function BondCard({
         </div>
         <div className="position-card-metric-end">
           <dt>Annual income</dt>
-          <dd className="text-success">{annualIncome > 0 ? formatMoney(annualIncome) : "—"}</dd>
+          <dd className="text-success">{annualIncome > 0 ? formatCurrency(annualIncome, bond.currency) : "—"}</dd>
         </div>
       </dl>
 

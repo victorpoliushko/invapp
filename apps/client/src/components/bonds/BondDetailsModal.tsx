@@ -1,7 +1,7 @@
 import { Modal } from "../Modal";
 import { MaskIcon } from "../MaskIcon";
 import xIcon from "../../assets/icons/x.svg";
-import { formatMoney } from "../../utils/money";
+import { formatCurrency } from "../../utils/money";
 import { TRANSACTION_COLORS } from "../portfolio/transactionColors";
 import { Bond } from "./types";
 import { useBondActions } from "./useBonds";
@@ -28,8 +28,8 @@ export function BondDetailsModal({ bond, onClose }: { bond: Bond; onClose: () =>
         <div className="position-details-summary">
           <h2 id="bond-details-title" className="position-details-title">{bond.isin} Details</h2>
           <p><span>Total q-ty</span><strong>{bond.quantity}</strong></p>
-          <p><span>Face value</span><strong>{formatMoney(bond.faceValue, 2)}</strong></p>
-          <p><span>Purchase price</span><strong>{formatMoney(bond.purchasePrice, 2)}</strong></p>
+          <p><span>Face value</span><strong>{formatCurrency(bond.faceValue, bond.currency, 2)}</strong></p>
+          <p><span>Purchase price</span><strong>{formatCurrency(bond.purchasePrice, bond.currency, 2)}</strong></p>
         </div>
         <button className="icon-button" aria-label="Close" onClick={onClose}>
           <MaskIcon src={xIcon} size={20} />
@@ -52,7 +52,7 @@ export function BondDetailsModal({ bond, onClose }: { bond: Bond; onClose: () =>
                 <td style={{ color: TRANSACTION_COLORS[t.type] }}>{t.type}</td>
                 <td>{new Date(t.date).toLocaleDateString(undefined, SHORT_DATE)}</td>
                 <td>{t.quantity}</td>
-                <td>{formatMoney(t.pricePerUnit, 2)}</td>
+                <td>{formatCurrency(t.pricePerUnit, bond.currency, 2)}</td>
               </tr>
             ))}
           </tbody>

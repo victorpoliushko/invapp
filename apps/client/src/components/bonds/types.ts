@@ -7,6 +7,8 @@ export const FREQUENCY_LABEL: Record<CouponFrequency, string> = {
   MONTHLY: 'Monthly',
 };
 
+export const BOND_CURRENCIES = ['USD', 'EUR', 'GBP', 'UAH'];
+
 export type BondTransaction = {
   id: string;
   bondId: string;
@@ -23,6 +25,7 @@ export type Bond = {
   faceValue: number;
   couponRate: number;
   couponFrequency: CouponFrequency;
+  currency: string;
   quantity: number;
   purchasePrice: number;
   currentValue: number | null;

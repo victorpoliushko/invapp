@@ -68,7 +68,7 @@ export function BondTradeModal({
             )}
           </label>
           <label className="field">
-            <span className="field-label">Price</span>
+            <span className="field-label">Price ({bond.currency})</span>
             <input
               className="input"
               type="number"

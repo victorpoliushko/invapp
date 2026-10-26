@@ -217,6 +217,7 @@ model Bond {
   faceValue       Float
   couponRate      Float
   couponFrequency CouponFrequency
+  currency        String          @default("USD")
   quantity        Float           @default(0)
   purchasePrice   Float           @default(0)
   currentValue    Float?
