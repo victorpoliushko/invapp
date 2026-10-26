@@ -4,6 +4,7 @@ import { PassportJwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
 import { UseGuards } from '@nestjs/common';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
+import { BondTransactionInputDto, BondTransactionUpdateDto } from './dto/BondTransaction.dto';
 
 @UseGuards(PassportJwtAuthGuard)
 @Controller('bonds')
@@ -28,5 +29,20 @@ export class BondsController {
   @Delete(':id')
   delete(@Param('id') id: string, @GetUser() user: User) {
     return this.bondsService.delete(id, user.id);
+  }
+
+  @Post(':id/transactions')
+  addTransaction(@Param('id') id: string, @Body() body: BondTransactionInputDto, @GetUser() user: User) {
+    return this.bondsService.addTransaction(id, body, user.id);
+  }
+
+  @Patch('transaction/:id')
+  updateTransaction(@Param('id') id: string, @Body() body: BondTransactionUpdateDto, @GetUser() user: User) {
+    return this.bondsService.updateTransaction(id, body, user.id);
+  }
+
+  @Delete('transaction/:id')
+  deleteTransaction(@Param('id') id: string, @GetUser() user: User) {
+    return this.bondsService.deleteTransaction(id, user.id);
   }
 }

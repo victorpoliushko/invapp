@@ -8,7 +8,8 @@ import { CryptoPositions } from "../crypto/CryptoPositions";
 import { NewCryptoModal } from "../crypto/NewCryptoModal";
 import { AssetTab, NewAssetMenu } from "./NewAssetMenu";
 import { RealEstateTable } from "../real-estate/RealEstateTable";
-import { BondTable } from "../bonds/BondTable";
+import { BondPositions } from "../bonds/BondPositions";
+import { NewBondModal } from "../bonds/NewBondModal";
 import { MixedAssetTable } from "../mixed-assets/MixedAssetTable";
 import { MaskIcon } from "../MaskIcon";
 import chevronIcon from "../../assets/icons/chevron-right.svg";
@@ -32,7 +33,7 @@ export function PortfolioContent() {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedTab, setSelectedTab] = useState<AssetTab>("stocks");
-  const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | null>(null);
+  const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | null>(null);
   const [netWorth, setNetWorth] = useState<number | null>(null);
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export function PortfolioContent() {
     setSelectedTab(tab);
     if (tab === "stocks") setNewAssetModal("stock");
     if (tab === "crypto") setNewAssetModal("crypto");
+    if (tab === "bonds") setNewAssetModal("bond");
   };
 
   const renderTab = () => {
@@ -70,7 +72,7 @@ export function PortfolioContent() {
       case "crypto":
         return <CryptoPositions portfolio={portfolio} />;
       case "bonds":
-        return <BondTable />;
+        return <BondPositions />;
       case "realestate":
         return <RealEstateTable />;
       case "other":
@@ -150,6 +152,7 @@ export function PortfolioContent() {
 
       {newAssetModal === "stock" && <NewStockModal onClose={() => setNewAssetModal(null)} />}
       {newAssetModal === "crypto" && <NewCryptoModal onClose={() => setNewAssetModal(null)} />}
+      {newAssetModal === "bond" && <NewBondModal onClose={() => setNewAssetModal(null)} />}
     </section>
   );
 }

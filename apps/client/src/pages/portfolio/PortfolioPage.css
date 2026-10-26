@@ -427,6 +427,24 @@ table th {
   white-space: nowrap;
 }
 
+.bond-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.bond-card-metrics {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 12px;
+}
+
+.position-card-metrics dd.text-success {
+  color: var(--text-success);
+}
+
 .position-card-actions {
   display: flex;
   gap: 12px;

@@ -2,15 +2,8 @@ import { useState } from "react";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
 import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
-import { Bond } from "./types";
+import { Bond, FREQUENCY_LABEL } from "./types";
 import { API_BASE_URL } from "../../config";
-
-const FREQUENCY_LABEL: Record<string, string> = {
-  ANNUAL: "Annual",
-  SEMI_ANNUAL: "Semi-annual",
-  QUARTERLY: "Quarterly",
-  MONTHLY: "Monthly",
-};
 
 type Props = { bond: Bond; onDelete: (id: string) => void; onUpdated: () => void };
 

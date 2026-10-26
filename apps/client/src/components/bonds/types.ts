@@ -1,5 +1,12 @@
 export type CouponFrequency = 'ANNUAL' | 'SEMI_ANNUAL' | 'QUARTERLY' | 'MONTHLY';
 
+export const FREQUENCY_LABEL: Record<CouponFrequency, string> = {
+  ANNUAL: 'Annual',
+  SEMI_ANNUAL: 'Semi-annual',
+  QUARTERLY: 'Quarterly',
+  MONTHLY: 'Monthly',
+};
+
 export type BondTransaction = {
   id: string;
   bondId: string;
@@ -21,4 +28,5 @@ export type Bond = {
   currentValue: number | null;
   purchaseDate: string;
   maturityDate: string | null;
+  transactions?: BondTransaction[];
 };

@@ -59,16 +59,16 @@ enum DataSource {
 }
 
 model Asset {
-  id              String      @id @default(uuid())
-  ticker          String      @unique
-  name            String?
-  type            AssetType?
-  exchange        String?
-  dataSource      DataSource?
-  coingeckoId     String?
-  updatedAt       DateTime?   @updatedAt
-  currentPrice    Float?
-  priceUpdatedAt  DateTime?
+  id             String      @id @default(uuid())
+  ticker         String      @unique
+  name           String?
+  type           AssetType?
+  exchange       String?
+  dataSource     DataSource?
+  coingeckoId    String?
+  updatedAt      DateTime?   @updatedAt
+  currentPrice   Float?
+  priceUpdatedAt DateTime?
 
   stockPositions  StockPosition[]
   cryptoPositions CryptoPosition[]
@@ -106,16 +106,16 @@ model RealEstate {
   rooms         Int?
   totalArea     Float?
 
-  portfolio     Portfolio              @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
-  portfolioId   String
-  transactions  RealEstateTransaction[]
+  portfolio    Portfolio               @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId  String
+  transactions RealEstateTransaction[]
 }
 
 model RealEstateTransaction {
-  id           String     @id @default(uuid())
-  startDate    DateTime
-  endDate      DateTime
-  monthlyRent  Float
+  id          String   @id @default(uuid())
+  startDate   DateTime
+  endDate     DateTime
+  monthlyRent Float
 
   realEstate   RealEstate @relation(fields: [realEstateId], references: [id], onDelete: Cascade)
   realEstateId String
@@ -159,11 +159,11 @@ model InvestStrategy {
 }
 
 model MixedAsset {
-  id            String    @id @default(uuid())
+  id            String   @id @default(uuid())
   name          String
-  quantity      Float     @default(1)
+  quantity      Float    @default(1)
   purchasePrice Float
-  purchaseDate  DateTime  @default(now())
+  purchaseDate  DateTime @default(now())
   currentValue  Float?
 
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
@@ -223,8 +223,22 @@ model Bond {
   purchaseDate    DateTime        @default(now())
   maturityDate    DateTime?
 
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
-  portfolioId String
+  portfolio    Portfolio         @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId  String
+  transactions BondTransaction[]
+}
+
+model BondTransaction {
+  id           String          @id @default(uuid())
+  bondId       String
+  type         TransactionType
+  quantity     Float
+  pricePerUnit Float
+  date         DateTime
+
+  bond Bond @relation(fields: [bondId], references: [id], onDelete: Cascade)
+
+  @@index([bondId])
 }
 
 // TODO

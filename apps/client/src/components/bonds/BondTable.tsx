@@ -1,33 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
 import { BondRow } from "./BondRow";
 import { AddBondTransaction } from "./AddBondTransaction";
 import { Bond } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
 import { API_BASE_URL } from "../../config";
 
-export function BondTable() {
-  const { id: portfolioId } = useParams<{ id: string }>();
-  const [bonds, setBonds] = useState<Bond[]>([]);
-
-  const load = useCallback(async () => {
-    if (!portfolioId) return;
-    const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/bonds/${portfolioId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) setBonds(await res.json());
-  }, [portfolioId]);
-
-  useEffect(() => { load(); }, [load]);
-
+export function BondTable({ bonds, onChanged }: { bonds: Bond[]; onChanged: () => void }) {
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
     const res = await fetch(`${API_BASE_URL}/bonds/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (res.ok) load();
+    if (res.ok) onChanged();
     else alert("Failed to delete bond");
   };
 
@@ -54,9 +38,9 @@ export function BondTable() {
       </thead>
       <tbody>
         {bonds.map((bond) => (
-          <BondRow key={bond.id} bond={bond} onDelete={handleDelete} onUpdated={load} />
+          <BondRow key={bond.id} bond={bond} onDelete={handleDelete} onUpdated={onChanged} />
         ))}
-        <AddBondTransaction onAdded={load} />
+        <AddBondTransaction onAdded={onChanged} />
       </tbody>
     </table>
     </div>
