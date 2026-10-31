@@ -17,7 +17,7 @@ describe('UsersController', () => {
 
   describe('getUser', () => {
     it('delegates to the service with the user id', () => {
-      controller.getUser('u1');
+      controller.getUser('u1', { id: 'u1', role: 'USER' } as any);
 
       expect(service.getUser).toHaveBeenCalledWith('u1');
     });
@@ -37,7 +37,7 @@ describe('UsersController', () => {
     it('delegates to the service with the user id and update dto', () => {
       const dto = { username: 'new-name' };
 
-      controller.updateUser('u1', dto as any);
+      controller.updateUser('u1', dto as any, { id: 'u1', role: 'USER' } as any);
 
       expect(service.update).toHaveBeenCalledWith('u1', dto);
     });

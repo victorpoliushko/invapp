@@ -6,7 +6,7 @@ import { API_BASE_URL } from "../../config";
 
 export type CashEntry = {
   id: string;
-  name: string;
+  name: string | null;
   currency: string;
   amount: number;
 };

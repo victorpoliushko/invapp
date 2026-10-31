@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, SetMetadata, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, SetMetadata, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/CreateUser.dto";
 import { UpdateUserDto } from "./dto/UpdateUser.dto";
-import { Role } from "@prisma/client";
+import { Role, User } from "@prisma/client";
+import { GetUser } from "src/auth/decorators/GetUser.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { RolesGuard } from "src/auth/guards/roles/roles.guard";
 
@@ -13,7 +14,8 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
-  getUser(@Param('id') id: string) {
+  getUser(@Param('id') id: string, @GetUser() user: User) {
+    assertSelfOrAdmin(id, user);
     return this.usersService.getUser(id);
   }
 
@@ -25,6 +27,7 @@ export class UsersController {
   }
 
   @Post()
+  @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -33,7 +36,11 @@ export class UsersController {
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @GetUser() user: User) {
+    assertSelfOrAdmin(id, user);
+    if (updateUserDto.role !== undefined && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can change roles');
+    }
     return this.usersService.update(id, updateUserDto);
   }
 
@@ -46,4 +53,10 @@ export class UsersController {
     this.usersService.delete(id);
   }
 
+}
+
+function assertSelfOrAdmin(targetId: string, user: User) {
+  if (user.id !== targetId && user.role !== Role.ADMIN) {
+    throw new ForbiddenException("You can only access your own account");
+  }
 }

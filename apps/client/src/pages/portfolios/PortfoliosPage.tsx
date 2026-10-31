@@ -8,7 +8,8 @@ import { API_BASE_URL } from "../../config";
 import { MaskIcon } from "../../components/MaskIcon";
 import { NewPortfolioModal } from "./NewPortfolioModal";
 import { formatCurrency, gainColor, signedCurrency, signedPct } from "../../utils/money";
-import { useCurrency } from "../../context/CurrencyContext";
+import { Currency, useCurrency } from "../../context/CurrencyContext";
+import { CurrencySelect } from "../../components/CurrencySelect";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -85,6 +86,20 @@ export default function PortfoliosPage() {
     setIsCreating(false);
   };
 
+  const handleCurrencyChange = async (portfolioId: string, currency: Currency) => {
+    const token = localStorage.getItem("accessToken");
+    const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: portfolioId, displayCurrency: currency }),
+    });
+    if (!res.ok) {
+      alert("Failed to save currency");
+      return;
+    }
+    await refreshUserPortfolios();
+  };
+
   useEffect(() => {
     refreshUserPortfolios();
   }, [userId, refreshUserPortfolios]);
@@ -148,16 +163,16 @@ export default function PortfoliosPage() {
                     {p.name}
                     {p.goal != null && <span className="portfolio-card-goal">Goal {p.goal}%</span>}
                   </h2>
-                  <button
-                    className="portfolio-card-delete"
-                    aria-label={`Delete ${p.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deletePortfolio(p.id);
-                    }}
-                  >
-                    <MaskIcon src={deleteIcon} size={20} />
-                  </button>
+                  <div className="portfolio-card-actions" onClick={(e) => e.stopPropagation()}>
+                    <CurrencySelect value={currency} onChange={(c) => handleCurrencyChange(p.id, c)} />
+                    <button
+                      className="portfolio-card-delete"
+                      aria-label={`Delete ${p.name}`}
+                      onClick={() => deletePortfolio(p.id)}
+                    >
+                      <MaskIcon src={deleteIcon} size={20} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="portfolio-card-header-row">

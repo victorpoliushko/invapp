@@ -18,7 +18,7 @@ export function TradeModal({
   assetType: "stock" | "crypto";
   onClose: () => void;
 }) {
-  const { currentPrices } = usePortfolio();
+  const { currentPrices, deleteAsset } = usePortfolio();
   const addTransaction = useAddPositionTransaction();
   const ticker = position.asset.ticker;
   const currentPrice = currentPrices[position.assetId];
@@ -32,6 +32,19 @@ export function TradeModal({
   const qty = parseFloat(quantity);
   const oversell = type === "SELL" && qty > position.quantity;
   const canSubmit = qty > 0 && parseFloat(price) > 0 && date !== "" && !oversell && !submitting;
+
+  const handleSellAll = async () => {
+    if (!window.confirm(`Sell all ${ticker}? The position and its trade history will be removed.`)) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await deleteAsset(position.assetId);
+      onClose();
+    } catch {
+      setError("Couldn't sell. Please try again.");
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +118,11 @@ export function TradeModal({
           <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
             {submitting ? "Saving…" : "Submit"}
           </button>
+          {type === "SELL" && (
+            <button type="button" className="btn btn-danger" onClick={handleSellAll} disabled={submitting}>
+              Sell all
+            </button>
+          )}
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>

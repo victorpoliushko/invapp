@@ -18,7 +18,7 @@ export class UserDto {
   @IsEmail()
   email: string;
 
-  @IsString()
+  @Exclude()
   hashedRefreshToken?: string;
 
   @Exclude()

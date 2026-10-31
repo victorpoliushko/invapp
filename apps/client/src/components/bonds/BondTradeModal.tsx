@@ -14,7 +14,7 @@ export function BondTradeModal({
   type: "BUY" | "SELL";
   onClose: () => void;
 }) {
-  const { addTrade } = useBondActions();
+  const { addTrade, deleteBond } = useBondActions();
 
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
@@ -25,6 +25,19 @@ export function BondTradeModal({
   const qty = parseFloat(quantity);
   const oversell = type === "SELL" && qty > bond.quantity;
   const canSubmit = qty > 0 && parseFloat(price) > 0 && date !== "" && !oversell && !submitting;
+
+  const handleSellAll = async () => {
+    if (!window.confirm(`Sell all ${bond.isin}? The bond and its trade history will be removed.`)) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await deleteBond(bond.id);
+      onClose();
+    } catch {
+      setError("Couldn't sell. Please try again.");
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +105,11 @@ export function BondTradeModal({
           <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
             {submitting ? "Saving…" : "Submit"}
           </button>
+          {type === "SELL" && (
+            <button type="button" className="btn btn-danger" onClick={handleSellAll} disabled={submitting}>
+              Sell all
+            </button>
+          )}
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>

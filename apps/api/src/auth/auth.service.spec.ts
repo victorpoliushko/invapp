@@ -115,7 +115,7 @@ describe('AuthService', () => {
 
   describe('validateRefreshToken', () => {
     it('returns the user id and username when the refresh token matches', async () => {
-      userService.getUser.mockResolvedValue({ username: 'vic', hashedRefreshToken: 'hashed' });
+      userService.findOne.mockResolvedValue({ username: 'vic', hashedRefreshToken: 'hashed' });
       (argon2.verify as jest.Mock).mockResolvedValue(true);
 
       const result = await service.validateRefreshToken('u1', 'raw-token');
@@ -125,19 +125,19 @@ describe('AuthService', () => {
     });
 
     it('throws Unauthorized when the user has no stored refresh token', async () => {
-      userService.getUser.mockResolvedValue({ username: 'vic', hashedRefreshToken: null });
+      userService.findOne.mockResolvedValue({ username: 'vic', hashedRefreshToken: null });
 
       await expect(service.validateRefreshToken('u1', 'raw-token')).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws Unauthorized when the user does not exist', async () => {
-      userService.getUser.mockResolvedValue(null);
+      userService.findOne.mockResolvedValue(null);
 
       await expect(service.validateRefreshToken('u1', 'raw-token')).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws Unauthorized when the token does not match', async () => {
-      userService.getUser.mockResolvedValue({ username: 'vic', hashedRefreshToken: 'hashed' });
+      userService.findOne.mockResolvedValue({ username: 'vic', hashedRefreshToken: 'hashed' });
       (argon2.verify as jest.Mock).mockResolvedValue(false);
 
       await expect(service.validateRefreshToken('u1', 'wrong-token')).rejects.toThrow(UnauthorizedException);

@@ -26,10 +26,10 @@ export function CashPositions({ displayCurrency }: { displayCurrency: string }) 
         <article key={e.id} className="position-card cash-card">
           <div className="position-card-header">
             <div>
-              <h3 className="position-card-ticker">{e.name}</h3>
-              <p className="position-card-subtitle">{e.currency}</p>
+              <h3 className="position-card-ticker">{e.name ?? e.currency}</h3>
+              {e.name && <p className="position-card-subtitle">{e.currency}</p>}
             </div>
-            <button className="icon-button" aria-label={`Edit ${e.name}`} onClick={() => setEditing(e)}>
+            <button className="icon-button" aria-label={`Edit ${e.name ?? `${e.currency} cash`}`} onClick={() => setEditing(e)}>
               <MaskIcon src={editIcon} size={20} />
             </button>
           </div>

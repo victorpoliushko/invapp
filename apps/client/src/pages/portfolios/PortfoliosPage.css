@@ -49,6 +49,12 @@
   font-weight: var(--weight-regular);
 }
 
+.portfolio-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .portfolio-card-delete {
   display: flex;
   padding: 0;

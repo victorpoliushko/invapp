@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 import { isSupportedCurrency, SUPPORTED_CURRENCIES } from '../fx/currencies';
 
-type CashInput = { name: string; currency: string; amount: number };
+type CashInput = { name?: string | null; currency: string; amount: number };
 
 @Injectable()
 export class CashService {
@@ -44,7 +44,7 @@ export class CashService {
     return this.prisma.cash.update({
       where: { id },
       data: {
-        ...(data.name != null && { name: parseName(data.name) }),
+        ...(data.name !== undefined && { name: parseName(data.name) }),
         ...(data.currency != null && { currency: parseCurrency(data.currency) }),
         ...(data.amount != null && { amount: parseAmount(data.amount) }),
       },
@@ -59,10 +59,9 @@ export class CashService {
   }
 }
 
-function parseName(value: unknown): string {
+function parseName(value: unknown): string | null {
   const name = String(value ?? '').trim();
-  if (!name) throw new BadRequestException('name is required');
-  return name;
+  return name || null;
 }
 
 function parseCurrency(value: unknown): string {

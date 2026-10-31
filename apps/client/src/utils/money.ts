@@ -3,13 +3,18 @@ export function formatMoney(value: number, digits = 0): string {
   return `${value < 0 ? "-" : ""}$${abs}`;
 }
 
+const COMPACT_FROM = 10_000;
+
 export function formatCurrency(value: number, currency: string, digits = 0): string {
+  const compact = Math.abs(value) >= COMPACT_FROM;
   return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency,
+    currencyDisplay: "narrowSymbol",
     minimumFractionDigits: 0,
-    maximumFractionDigits: digits,
-  }).format(value);
+    maximumFractionDigits: compact ? 1 : digits,
+    ...(compact && { notation: "compact", roundingMode: "trunc" }),
+  } as Intl.NumberFormatOptions).format(value);
 }
 
 export function signedMoney(value: number, digits = 0): string {

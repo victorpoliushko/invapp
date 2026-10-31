@@ -174,8 +174,8 @@ model MixedAsset {
 }
 
 model Cash {
-  id       String @id @default(uuid())
-  name     String
+  id       String  @id @default(uuid())
+  name     String?
   currency String
   amount   Float
 

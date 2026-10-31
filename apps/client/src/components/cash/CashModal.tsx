@@ -11,7 +11,7 @@ export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () =
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = name.trim() !== "" && amount !== "" && parseFloat(amount) >= 0 && !submitting;
+  const canSubmit = amount !== "" && parseFloat(amount) >= 0 && !submitting;
 
   const run = async (action: () => Promise<void>, failure: string) => {
     setSubmitting(true);
@@ -28,7 +28,7 @@ export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
-    const input = { name: name.trim(), currency, amount: parseFloat(amount) };
+    const input = { name: name.trim() || null, currency, amount: parseFloat(amount) };
     run(
       () => (entry ? updateCash(entry.id, input) : createCash(input)),
       "Couldn't save. Please try again.",
@@ -36,7 +36,7 @@ export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () =
   };
 
   const handleDelete = () => {
-    if (!entry || !window.confirm(`Delete ${entry.name}?`)) return;
+    if (!entry || !window.confirm(`Delete ${entry.name ?? `${entry.currency} cash`}?`)) return;
     run(() => deleteCash(entry.id), "Couldn't delete. Please try again.");
   };
 
@@ -47,7 +47,7 @@ export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () =
 
         <div className="modal-fields">
           <label className="field">
-            <span className="field-label">Name</span>
+            <span className="field-label">Name (optional)</span>
             <input
               className="input"
               type="text"
