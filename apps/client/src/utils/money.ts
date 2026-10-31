@@ -16,6 +16,10 @@ export function signedMoney(value: number, digits = 0): string {
   return `${value >= 0 ? "+" : ""}${formatMoney(value, digits)}`;
 }
 
+export function signedCurrency(value: number, currency: string, digits = 0): string {
+  return `${value >= 0 ? "+" : ""}${formatCurrency(value, currency, digits)}`;
+}
+
 export function signedPct(value: number, digits = 1): string {
   return `${value >= 0 ? "+" : ""}${value.toFixed(digits)}%`;
 }

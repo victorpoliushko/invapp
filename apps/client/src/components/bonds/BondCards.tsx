@@ -2,10 +2,10 @@ import { useState } from "react";
 import { MaskIcon } from "../MaskIcon";
 import searchIcon from "../../assets/icons/search.svg";
 import eyeIcon from "../../assets/icons/eye.svg";
-import { formatCurrency } from "../../utils/money";
 import { Bond, FREQUENCY_LABEL } from "./types";
 import { BondDetailsModal } from "./BondDetailsModal";
 import { BondTradeModal } from "./BondTradeModal";
+import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric", year: "2-digit" };
 
@@ -66,6 +66,7 @@ function BondCard({
   onDetails: () => void;
   onTrade: (type: "BUY" | "SELL") => void;
 }) {
+  const { money } = useDisplayMoney();
   const totalPosition = bond.purchasePrice * bond.quantity;
   const annualIncome = bond.faceValue * (bond.couponRate / 100) * bond.quantity;
 
@@ -84,7 +85,7 @@ function BondCard({
       <dl className="position-card-metrics bond-card-metrics">
         <div>
           <dt>Total position</dt>
-          <dd>{totalPosition > 0 ? formatCurrency(totalPosition, bond.currency) : "—"}</dd>
+          <dd>{totalPosition > 0 ? money(totalPosition, bond.currency) : "—"}</dd>
         </div>
         <div className="position-card-metric-end">
           <dt>Coupon</dt>
@@ -96,7 +97,7 @@ function BondCard({
         </div>
         <div className="position-card-metric-end">
           <dt>Annual income</dt>
-          <dd className="text-success">{annualIncome > 0 ? formatCurrency(annualIncome, bond.currency) : "—"}</dd>
+          <dd className="text-success">{annualIncome > 0 ? money(annualIncome, bond.currency) : "—"}</dd>
         </div>
       </dl>
 

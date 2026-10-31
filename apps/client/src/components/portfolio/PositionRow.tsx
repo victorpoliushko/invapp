@@ -3,6 +3,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { PositionDto } from "../../types/portfolio";
 import { formatQuantity } from "../../utils/formatQuantity";
+import { useDisplayMoney } from "./DisplayCurrency";
 
 export const PositionRow = ({
   position,
@@ -15,6 +16,7 @@ export const PositionRow = ({
   onExpand: any;
   isExpanded: boolean;
 }) => {
+  const { money, signedMoney } = useDisplayMoney();
   const { deleteAsset, loadingPrices, currentPrices } = usePortfolio();
 
   const currentPrice = currentPrices[position.assetId];
@@ -43,16 +45,16 @@ export const PositionRow = ({
           : "—"}
       </td>
       <td data-label="Quantity">{formatQuantity(position.quantity, assetType)}</td>
-      <td className="col-avg-price" data-label="Avg price">{position.price ?? "—"}</td>
+      <td className="col-avg-price" data-label="Avg price">{position.price != null ? money(position.price, "USD", 2) : "—"}</td>
       <td data-label="Current price">
-        {loadingPrices[position.assetId] ? "..." : (currentPrice ?? "—")}
+        {loadingPrices[position.assetId] ? "..." : currentPrice != null ? money(currentPrice, "USD", 2) : "—"}
       </td>
       <td data-label="% change" style={{ color: pctChange == null ? undefined : pctChange >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
         {pctChange == null ? "—" : `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(2)}%`}
       </td>
-      <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
+      <td data-label="Total position">{totalPosition > 0 ? money(totalPosition) : "—"}</td>
       <td data-label="Total return" style={{ color: totalReturn == null ? undefined : totalReturn >= 0 ? "var(--text-success)" : "var(--text-danger)" }}>
-        {totalReturn == null ? "—" : `${totalReturn >= 0 ? "+" : ""}${Math.round(totalReturn).toLocaleString()}`}
+        {totalReturn == null ? "—" : signedMoney(totalReturn)}
       </td>
       <td className="actions">
         <button className="icon-btn" onClick={() => deleteAsset(position.assetId)}>

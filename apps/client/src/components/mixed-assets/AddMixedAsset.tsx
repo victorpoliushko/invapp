@@ -46,7 +46,7 @@ export function AddMixedAsset({ onAdded }: Props) {
       <td><input type="text" value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Name" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="date" value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} /></td>
       <td><input type="number" value={form.quantity} onChange={(e) => set("quantity", e.target.value)} placeholder="Qty" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
-      <td><input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
+      <td><input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price (USD)" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td><input type="number" value={form.currentValue} onChange={(e) => set("currentValue", e.target.value)} placeholder="Current value" onKeyDown={(e) => e.key === "Enter" && handleAdd()} /></td>
       <td></td>
       <td></td>

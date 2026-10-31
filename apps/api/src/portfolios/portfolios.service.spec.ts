@@ -186,6 +186,7 @@ describe('PortfoliosService', () => {
 
   let prisma: any;
   let assetsService: any;
+  let fxService: any;
   let service: PortfoliosService;
 
   beforeEach(() => {
@@ -234,7 +235,8 @@ describe('PortfoliosService', () => {
       getSharePrice: jest.fn(),
     };
 
-    service = new PortfoliosService(prisma, assetsService);
+    fxService = { toUsdConverter: jest.fn().mockResolvedValue((amount: number) => amount) };
+    service = new PortfoliosService(prisma, assetsService, fxService);
   });
 
   describe('assertOwnership', () => {
@@ -1263,7 +1265,7 @@ describe('PortfoliosService', () => {
 
       expect(result).toEqual({
         total: 0,
-        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0 },
+        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0, cash: 0 },
       });
     });
 
@@ -1283,7 +1285,7 @@ describe('PortfoliosService', () => {
 
       // stocks: 150*10 = 1500 | crypto: 50000*0.5 = 25000
       // bonds: 950*10 = 9500 | real estate: 200000 | mixed assets: 6000*1 = 6000
-      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000, mixedAssets: 6000 });
+      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000, mixedAssets: 6000, cash: 0 });
       expect(result.total).toBe(1500 + 25000 + 9500 + 200000 + 6000);
     });
 
@@ -1393,6 +1395,7 @@ describe('PortfoliosService', () => {
           bonds: true,
           realEstateAssets: true,
           mixedAssets: true,
+          cash: true,
         },
       });
     });
@@ -1424,8 +1427,32 @@ describe('PortfoliosService', () => {
 
       const result = await service.getPortfolioNetWorth('p1', OWNER_ID);
 
-      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000, mixedAssets: 6000 });
+      expect(result.byType).toEqual({ stocks: 1500, crypto: 25000, bonds: 9500, realEstate: 200000, mixedAssets: 6000, cash: 0 });
       expect(result.total).toBe(1500 + 25000 + 9500 + 200000 + 6000);
+    });
+
+    it('converts bonds and cash in other currencies to USD', async () => {
+      const usdPerUnit: Record<string, number> = { USD: 1, EUR: 1.1, UAH: 0.025 };
+      fxService.toUsdConverter.mockResolvedValue((amount: number, currency: string) => amount * usdPerUnit[currency]);
+      prisma.portfolio.findUnique.mockResolvedValue({
+        id: 'p1',
+        userId: OWNER_ID,
+        stockPositions: [],
+        cryptoPositions: [],
+        bonds: [{ purchasePrice: 100, currentValue: null, quantity: 10, currency: 'EUR' }],
+        realEstateAssets: [],
+        mixedAssets: [],
+        cash: [
+          { amount: 4000, currency: 'UAH' },
+          { amount: 50, currency: 'USD' },
+        ],
+      });
+
+      const result = await service.getPortfolioNetWorth('p1', OWNER_ID);
+
+      expect(result.byType.bonds).toBeCloseTo(1100);
+      expect(result.byType.cash).toBeCloseTo(150);
+      expect(result.total).toBeCloseTo(1250);
     });
 
     it('does not include other portfolios owned by the same user', async () => {
@@ -1462,7 +1489,7 @@ describe('PortfoliosService', () => {
 
       expect(result).toEqual({
         total: 0,
-        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0 },
+        byType: { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0, cash: 0 },
       });
     });
 
@@ -1502,6 +1529,7 @@ describe('PortfoliosService', () => {
           bonds: true,
           realEstateAssets: true,
           mixedAssets: true,
+          cash: true,
         },
       });
     });

@@ -81,7 +81,7 @@ export function TradeModal({
             )}
           </label>
           <label className="field">
-            <span className="field-label">Price</span>
+            <span className="field-label">Price (USD)</span>
             <input
               className="input"
               type="number"

@@ -111,7 +111,7 @@ export function NewPositionModal({
             />
           </label>
           <label className="field">
-            <span className="field-label">Price/unit</span>
+            <span className="field-label">Price/unit (USD)</span>
             <input
               className="input"
               type="number"

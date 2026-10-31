@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { CashModule } from './cash/cash.module';
+import { FxModule } from './fx/fx.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AssetsService } from './assets/assets.service';
@@ -38,6 +40,8 @@ import { LiquidityModule } from './liquidity/liquidity.module';
     RealEstateModule,
     BondsModule,
     LiquidityModule,
+    CashModule,
+    FxModule,
     PrometheusModule.register(),
     UploadModule
   ],

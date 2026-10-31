@@ -71,7 +71,8 @@ export class UsersService {
       data: {
         username: input.username,
         phoneNumber: input.phoneNumber,
-        role: input.role
+        role: input.role,
+        defaultCurrency: input.defaultCurrency,
       },
     });
 

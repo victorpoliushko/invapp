@@ -3,6 +3,8 @@ import { useAuth } from "../../AuthContext";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import "./Profile.css";
 import { API_BASE_URL } from "../../config";
+import { CurrencySelect } from "../../components/CurrencySelect";
+import { useCurrency } from "../../context/CurrencyContext";
 
 interface UserProfile {
   id: string;
@@ -15,6 +17,7 @@ interface UserProfile {
 export default function Profile() {
   const { userId, accessToken, logout } = useAuth();
   const fetchWithRedirect = useFetchWithRedirect();
+  const { defaultCurrency, setDefaultCurrency } = useCurrency();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -115,6 +118,15 @@ export default function Profile() {
         <div className="profile-field">
           <span className="profile-label">Role</span>
           <span className="profile-value">{user.role}</span>
+        </div>
+        <div className="profile-field">
+          <span className="profile-label">Default currency</span>
+          <CurrencySelect
+            value={defaultCurrency}
+            label="Default currency"
+            align="start"
+            onChange={(c) => setDefaultCurrency(c).catch(() => alert("Failed to save currency"))}
+          />
         </div>
 
         {saveError && <p className="profile-error">{saveError}</p>}

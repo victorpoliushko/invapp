@@ -2,13 +2,16 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../AuthContext";
 import "./NetWorthAllocation.css";
 import { API_BASE_URL } from "../../config";
+import { useCurrency } from "../../context/CurrencyContext";
+import { formatCurrency } from "../../utils/money";
 
 type NetWorth = {
   total: number;
-  byType: { stocks: number; crypto: number; bonds: number; realEstate: number; mixedAssets: number };
+  byType: { stocks: number; crypto: number; bonds: number; realEstate: number; mixedAssets: number; cash?: number };
 };
 
 const ASSET_CLASSES: { key: keyof NetWorth["byType"]; label: string; color: string }[] = [
+  { key: "cash", label: "Cash", color: "var(--decorative-cash)" },
   { key: "stocks", label: "Stocks", color: "var(--decorative-green)" },
   { key: "crypto", label: "Crypto", color: "var(--decorative-orange)" },
   { key: "bonds", label: "Bonds", color: "var(--decorative-blue)" },
@@ -18,6 +21,7 @@ const ASSET_CLASSES: { key: keyof NetWorth["byType"]; label: string; color: stri
 
 export function NetWorthAllocation() {
   const { userId } = useAuth();
+  const { defaultCurrency, fromUsd } = useCurrency();
   const [netWorth, setNetWorth] = useState<NetWorth | null>(null);
 
   useEffect(() => {
@@ -44,7 +48,7 @@ export function NetWorthAllocation() {
         <div className="net-worth-allocation-header">
           <span className="net-worth-allocation-label">Net worth</span>
           <span className="net-worth-allocation-total">
-            ${Math.round(netWorth.total).toLocaleString()}
+            {formatCurrency(fromUsd(netWorth.total, defaultCurrency), defaultCurrency)}
           </span>
         </div>
 
@@ -65,7 +69,7 @@ export function NetWorthAllocation() {
               <span className="net-worth-allocation-swatch" style={{ backgroundColor: s.color }} />
               <span className="net-worth-allocation-legend-label">{s.label}</span>
               <span className="net-worth-allocation-legend-value">
-                ${Math.round(s.value).toLocaleString()}
+                {formatCurrency(fromUsd(s.value, defaultCurrency), defaultCurrency)}
               </span>
               <span className="net-worth-allocation-legend-pct">{s.pct.toFixed(1)}%</span>
             </div>

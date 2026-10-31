@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { SUPPORTED_CURRENCIES } from "../../fx/currencies";
 
 export class UpdateUserDto {
   @IsOptional()
@@ -18,4 +19,8 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsEnum(Role)
   role?: Role;
+
+  @IsOptional()
+  @IsIn(SUPPORTED_CURRENCIES)
+  defaultCurrency?: string;
 }

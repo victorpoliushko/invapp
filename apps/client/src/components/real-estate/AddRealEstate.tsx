@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { alertMissingFields } from "../../utils/formValidation";
 import { API_BASE_URL } from "../../config";
+import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 type Props = { onAdded: () => void; totalPurchasePrice: number };
 
 export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
+  const { money } = useDisplayMoney();
   const { id: portfolioId } = useParams<{ id: string }>();
   const [form, setForm] = useState({
     code: "",
@@ -84,7 +86,7 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
         <input type="date" value={form.purchaseDate} onChange={(e) => set("purchaseDate", e.target.value)} />
       </td>
       <td>
-        <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price" />
+        <input type="number" value={form.purchasePrice} onChange={(e) => set("purchasePrice", e.target.value)} placeholder="Price (USD)" />
       </td>
       <td></td>
       <td>
@@ -109,7 +111,7 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
       </td>
       <td colSpan={3}></td>
       <td data-label="Total position" style={{ fontWeight: 600, textAlign: "right" }}>
-        {totalPurchasePrice.toLocaleString()}
+        {money(totalPurchasePrice)}
       </td>
       <td>
         <button onClick={handleAdd}>Add</button>

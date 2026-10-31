@@ -3,13 +3,14 @@ import { MaskIcon } from "../MaskIcon";
 import chevronDownIcon from "../../assets/icons/chevron-down.svg";
 import checkIcon from "../../assets/icons/check.svg";
 
-export type AssetTab = "stocks" | "bonds" | "realestate" | "crypto" | "other";
+export type AssetTab = "stocks" | "bonds" | "realestate" | "crypto" | "cash" | "other";
 
 const OPTIONS: { tab: AssetTab; label: string }[] = [
   { tab: "stocks", label: "Stock" },
   { tab: "bonds", label: "Bonds" },
   { tab: "realestate", label: "Real Estate" },
   { tab: "crypto", label: "Crypto" },
+  { tab: "cash", label: "Cash" },
   { tab: "other", label: "Other" },
 ];
 

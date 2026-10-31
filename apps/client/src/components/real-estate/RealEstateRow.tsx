@@ -4,6 +4,7 @@ import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstate } from "./types";
 import { API_BASE_URL } from "../../config";
+import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 type Props = {
   property: RealEstate;
@@ -49,6 +50,7 @@ function toDateInputValue(iso: string): string {
 }
 
 export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpdated }: Props) {
+  const { money, signedMoney } = useDisplayMoney();
   const { occupancyPct, annualNet, annualNetPct, totalReturn } = calcStats(property);
   const gain = (v: number) => ({ color: v >= 0 ? "var(--text-success)" : "var(--text-danger)" });
 
@@ -155,16 +157,15 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
       <td data-label="Name">{property.name}</td>
       <td data-label="Type">{TYPE_LABELS[property.type] ?? property.type}</td>
       <td data-label="Purchase date">{new Date(property.purchaseDate).toLocaleDateString()}</td>
-      <td data-label="Purchase price">{property.purchasePrice.toLocaleString()}</td>
-      <td data-label="Current value">{property.currentValue != null ? property.currentValue.toLocaleString() : "—"}</td>
+      <td data-label="Purchase price">{money(property.purchasePrice)}</td>
+      <td data-label="Current value">{property.currentValue != null ? money(property.currentValue) : "—"}</td>
       <td data-label="Rooms">{property.rooms ?? "—"}</td>
       <td data-label="Total area, m²">{property.totalArea != null ? property.totalArea.toLocaleString() : "—"}</td>
       <td data-label="Occupancy %">{occupancyPct.toFixed(1)}%</td>
-      <td data-label="Annual net income" style={gain(annualNet)}>{Math.round(annualNet).toLocaleString()}</td>
+      <td data-label="Annual net income" style={gain(annualNet)}>{money(annualNet)}</td>
       <td data-label="Annual net income %" style={gain(annualNetPct)}>{annualNetPct.toFixed(2)}%</td>
       <td data-label="Total return" style={gain(totalReturn)}>
-        {totalReturn >= 0 ? "+" : ""}
-        {Math.round(totalReturn).toLocaleString()}
+        {signedMoney(totalReturn)}
       </td>
       <td className="actions">
         <button className="icon-btn" onClick={startEditing}>

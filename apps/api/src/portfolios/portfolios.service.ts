@@ -1,4 +1,5 @@
 import { plainToInstance } from 'class-transformer';
+import { FxService, ToUsd } from '../fx/fx.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { PortfolioDto } from './dto/Portfolio.dto';
@@ -203,6 +204,7 @@ export interface NetWorthByType {
   bonds: number;
   realEstate: number;
   mixedAssets: number;
+  cash: number;
 }
 
 // Net worth for a single portfolio. Stocks/crypto use the live currentPrice
@@ -214,15 +216,17 @@ export interface NetWorthByType {
 function computeNetWorthByType(portfolio: {
   stockPositions: { asset: { currentPrice: number | null }; price: number | null; quantity: number }[];
   cryptoPositions: { asset: { currentPrice: number | null }; price: number | null; quantity: number }[];
-  bonds: { currentValue: number | null; purchasePrice: number; quantity: number }[];
+  bonds: { currentValue: number | null; purchasePrice: number; quantity: number; currency: string }[];
   realEstateAssets: { currentValue: number | null; purchasePrice: number }[];
   mixedAssets?: { currentValue: number | null; purchasePrice: number; quantity: number }[];
-}): NetWorthByType {
+  cash?: { amount: number; currency: string }[];
+}, toUsd: ToUsd): NetWorthByType {
   let stocks = 0;
   let crypto = 0;
   let bonds = 0;
   let realEstate = 0;
   let mixedAssets = 0;
+  let cash = 0;
 
   for (const pa of portfolio.stockPositions) {
     stocks += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
@@ -231,7 +235,7 @@ function computeNetWorthByType(portfolio: {
     crypto += (pa.asset.currentPrice ?? pa.price ?? 0) * pa.quantity;
   }
   for (const bond of portfolio.bonds) {
-    bonds += (bond.currentValue ?? bond.purchasePrice) * bond.quantity;
+    bonds += toUsd((bond.currentValue ?? bond.purchasePrice) * bond.quantity, bond.currency);
   }
   for (const property of portfolio.realEstateAssets) {
     realEstate += property.currentValue ?? property.purchasePrice;
@@ -239,8 +243,11 @@ function computeNetWorthByType(portfolio: {
   for (const asset of portfolio.mixedAssets ?? []) {
     mixedAssets += (asset.currentValue ?? asset.purchasePrice) * asset.quantity;
   }
+  for (const entry of portfolio.cash ?? []) {
+    cash += toUsd(entry.amount, entry.currency);
+  }
 
-  return { stocks, crypto, bonds, realEstate, mixedAssets };
+  return { stocks, crypto, bonds, realEstate, mixedAssets, cash };
 }
 
 const NET_WORTH_INCLUDE = {
@@ -249,13 +256,19 @@ const NET_WORTH_INCLUDE = {
   bonds: true,
   realEstateAssets: true,
   mixedAssets: true,
+  cash: true,
 } as const;
+
+function sumNetWorth(byType: NetWorthByType): number {
+  return byType.stocks + byType.crypto + byType.bonds + byType.realEstate + byType.mixedAssets + byType.cash;
+}
 
 @Injectable()
 export class PortfoliosService {
   constructor(
     private prismaService: PrismaService,
     private assetsService: AssetsService,
+    private fxService: FxService,
   ) {}
 
   // Verifies that `userId` owns the portfolio identified by `portfolioId`,
@@ -318,6 +331,7 @@ export class PortfoliosService {
       where: { id: input.id },
       data: {
         name: input.name,
+        ...(input.displayCurrency !== undefined && { displayCurrency: input.displayCurrency }),
       },
       include: {
         stockPositions: { include: { asset: true } },
@@ -658,19 +672,20 @@ export class PortfoliosService {
       include: NET_WORTH_INCLUDE,
     });
 
-    const byType: NetWorthByType = { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0 };
+    const toUsd = await this.fxService.toUsdConverter();
+    const byType: NetWorthByType = { stocks: 0, crypto: 0, bonds: 0, realEstate: 0, mixedAssets: 0, cash: 0 };
 
     for (const portfolio of portfolios) {
-      const portfolioByType = computeNetWorthByType(portfolio);
+      const portfolioByType = computeNetWorthByType(portfolio, toUsd);
       byType.stocks += portfolioByType.stocks;
       byType.crypto += portfolioByType.crypto;
       byType.bonds += portfolioByType.bonds;
       byType.realEstate += portfolioByType.realEstate;
       byType.mixedAssets += portfolioByType.mixedAssets;
+      byType.cash += portfolioByType.cash;
     }
 
-    const total = byType.stocks + byType.crypto + byType.bonds + byType.realEstate + byType.mixedAssets;
-    return { total, byType };
+    return { total: sumNetWorth(byType), byType };
   }
 
   // Net worth for a single portfolio — same valuation rules as getNetWorth,
@@ -685,8 +700,7 @@ export class PortfoliosService {
 
     if (!portfolio) throw new NotFoundException('Portfolio not found');
 
-    const byType = computeNetWorthByType(portfolio);
-    const total = byType.stocks + byType.crypto + byType.bonds + byType.realEstate + byType.mixedAssets;
-    return { total, byType };
+    const byType = computeNetWorthByType(portfolio, await this.fxService.toUsdConverter());
+    return { total: sumNetWorth(byType), byType };
   }
 }

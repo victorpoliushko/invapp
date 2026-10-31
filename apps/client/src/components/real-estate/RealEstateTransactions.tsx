@@ -4,6 +4,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstateTransaction } from "./types";
 import { API_BASE_URL } from "../../config";
+import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 type Props = {
   realEstateId: string;
@@ -18,6 +19,7 @@ function toInputDate(iso: string) {
 }
 
 export function RealEstateTransactions({ realEstateId, transactions, onChanged }: Props) {
+  const { money } = useDisplayMoney();
   const token = () => localStorage.getItem("accessToken");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editState, setEditState] = useState<EditState | null>(null);
@@ -131,7 +133,7 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
                   <tr key={t.id}>
                     <td>{new Date(t.startDate).toLocaleDateString()}</td>
                     <td>{new Date(t.endDate).toLocaleDateString()}</td>
-                    <td>{t.monthlyRent.toLocaleString()}</td>
+                    <td>{money(t.monthlyRent)}</td>
                     <td className="actions">
                       <button className="icon-btn" onClick={() => startEdit(t)}>
                         <img src={editIcon} height={20} width={20} alt="edit" />

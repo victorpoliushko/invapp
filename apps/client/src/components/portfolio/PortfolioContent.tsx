@@ -11,10 +11,15 @@ import { RealEstateTable } from "../real-estate/RealEstateTable";
 import { BondPositions } from "../bonds/BondPositions";
 import { NewBondModal } from "../bonds/NewBondModal";
 import { MixedAssetTable } from "../mixed-assets/MixedAssetTable";
+import { CashPositions } from "../cash/CashPositions";
+import { CashModal } from "../cash/CashModal";
+import { CurrencySelect } from "../CurrencySelect";
+import { DisplayCurrencyProvider } from "./DisplayCurrency";
+import { Currency, useCurrency } from "../../context/CurrencyContext";
 import { MaskIcon } from "../MaskIcon";
 import chevronIcon from "../../assets/icons/chevron-right.svg";
 import editIcon from "../../assets/icons/edit.svg";
-import { formatMoney } from "../../utils/money";
+import { formatCurrency } from "../../utils/money";
 import { API_BASE_URL } from "../../config";
 import "../../pages/portfolio/PortfolioPage.css";
 
@@ -23,17 +28,19 @@ const TABS: { id: AssetTab; label: string }[] = [
   { id: "bonds", label: "Bonds" },
   { id: "realestate", label: "Real estate" },
   { id: "crypto", label: "Crypto" },
+  { id: "cash", label: "Cash" },
   { id: "other", label: "Other" },
 ];
 
 export function PortfolioContent() {
-  const { portfolio, updatePortfolioName } = usePortfolio();
+  const { portfolio, updatePortfolioName, refreshPortfolio } = usePortfolio();
+  const { defaultCurrency, fromUsd } = useCurrency();
   const { userId } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedTab, setSelectedTab] = useState<AssetTab>("stocks");
-  const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | null>(null);
+  const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | "cash" | null>(null);
   const [netWorth, setNetWorth] = useState<number | null>(null);
 
   useEffect(() => {
@@ -53,6 +60,22 @@ export function PortfolioContent() {
 
   if (!portfolio) return <p className="portfolio-detail-status">Loading...</p>;
 
+  const displayCurrency = portfolio.displayCurrency ?? defaultCurrency;
+
+  const handleCurrencyChange = async (currency: Currency) => {
+    const token = localStorage.getItem("accessToken");
+    const res = await fetch(`${API_BASE_URL}/portfolios/${portfolio.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: portfolio.id, displayCurrency: currency }),
+    });
+    if (!res.ok) {
+      alert("Failed to save currency");
+      return;
+    }
+    await refreshPortfolio();
+  };
+
   const handleSave = async () => {
     await updatePortfolioName(newName);
     setIsEditing(false);
@@ -63,6 +86,7 @@ export function PortfolioContent() {
     if (tab === "stocks") setNewAssetModal("stock");
     if (tab === "crypto") setNewAssetModal("crypto");
     if (tab === "bonds") setNewAssetModal("bond");
+    if (tab === "cash") setNewAssetModal("cash");
   };
 
   const renderTab = () => {
@@ -75,12 +99,15 @@ export function PortfolioContent() {
         return <BondPositions />;
       case "realestate":
         return <RealEstateTable />;
+      case "cash":
+        return <CashPositions displayCurrency={displayCurrency} />;
       case "other":
         return <MixedAssetTable />;
     }
   };
 
   return (
+    <DisplayCurrencyProvider value={displayCurrency}>
     <section className="portfolio-detail section-container">
       <div className="detail-top-bar">
         <Link to={`/portfolios/user/${userId}`} className="detail-back" aria-label="Back to portfolios">
@@ -127,9 +154,14 @@ export function PortfolioContent() {
       <div className="detail-header">
         <div className="detail-networth">
           <span className="detail-networth-label">Net worth</span>
-          <span className="detail-networth-total">{netWorth != null ? formatMoney(netWorth) : "—"}</span>
+          <span className="detail-networth-total">
+            {netWorth != null ? formatCurrency(fromUsd(netWorth, displayCurrency), displayCurrency) : "—"}
+          </span>
         </div>
-        <NewAssetMenu current={selectedTab} onSelect={handleNewAsset} />
+        <div className="detail-header-actions">
+          <CurrencySelect value={displayCurrency} onChange={handleCurrencyChange} />
+          <NewAssetMenu current={selectedTab} onSelect={handleNewAsset} />
+        </div>
       </div>
 
       <div className="chip-tabs detail-tabs" role="tablist" aria-label="Asset type">
@@ -153,6 +185,8 @@ export function PortfolioContent() {
       {newAssetModal === "stock" && <NewStockModal onClose={() => setNewAssetModal(null)} />}
       {newAssetModal === "crypto" && <NewCryptoModal onClose={() => setNewAssetModal(null)} />}
       {newAssetModal === "bond" && <NewBondModal onClose={() => setNewAssetModal(null)} />}
+      {newAssetModal === "cash" && <CashModal onClose={() => setNewAssetModal(null)} />}
     </section>
+    </DisplayCurrencyProvider>
   );
 }

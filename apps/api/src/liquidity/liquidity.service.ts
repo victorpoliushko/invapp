@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { FxService, ToUsd } from '../fx/fx.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 import {
@@ -89,6 +90,7 @@ export interface RealEstateLiquidityLine extends LiquidityLine {
 }
 
 export interface LiquidityBreakdown {
+  cash: LiquidityLine;
   stocks: LiquidityLine;
   bonds: LiquidityLine;
   crypto: LiquidityLine;
@@ -97,7 +99,7 @@ export interface LiquidityBreakdown {
 
 export interface LiquiditySummary {
   byType: LiquidityBreakdown;
-  // Liquid = stocks + bonds + crypto; illiquid = real estate (full-value
+  // Liquid = cash + stocks + bonds + crypto; illiquid = real estate (full-value
   // range, the realistic worst case). Mixed assets are excluded from both,
   // per the reference file's scope.
   liquid: LiquidityLine;
@@ -145,7 +147,9 @@ export interface LiquidityPortfolioInput {
     currentValue: number | null;
     purchasePrice: number;
     quantity: number;
+    currency?: string;
   }[];
+  cash?: { amount: number; currency: string }[];
   realEstateAssets: {
     currentValue: number | null;
     purchasePrice: number;
@@ -158,9 +162,13 @@ export interface LiquidityPortfolioInput {
 // computeNetWorthByType in portfolios.service.ts (live price falling back to
 // cost basis for stocks/crypto, currentValue falling back to purchasePrice
 // for bonds/real estate) so the dollar amounts here always match net worth.
+const SAME_DAY: DayRange = { minDays: 0, maxDays: 0 };
+
 export function computeLiquidity(
   portfolio: LiquidityPortfolioInput,
+  toUsd: ToUsd = (amount) => amount,
 ): LiquiditySummary {
+  const cash = emptyLine();
   const stocks = emptyLine();
   const bonds = emptyLine();
   const crypto = emptyLine();
@@ -188,7 +196,7 @@ export function computeLiquidity(
   }
 
   for (const bond of portfolio.bonds) {
-    const amount = (bond.currentValue ?? bond.purchasePrice) * bond.quantity;
+    const amount = toUsd((bond.currentValue ?? bond.purchasePrice) * bond.quantity, bond.currency ?? 'USD');
     addToLine(bonds, amount, BOND_LIQUIDITY[DEFAULT_BOND_CLASS]);
   }
 
@@ -199,15 +207,20 @@ export function computeLiquidity(
     addToLine(realEstate.full, amount, full);
   }
 
-  const liquid = [stocks, bonds, crypto].reduce(mergeLines, emptyLine());
+  for (const entry of portfolio.cash ?? []) {
+    addToLine(cash, toUsd(entry.amount, entry.currency), SAME_DAY);
+  }
+
+  const liquid = [cash, stocks, bonds, crypto].reduce(mergeLines, emptyLine());
   const illiquid = mergeLines(emptyLine(), realEstate.full);
 
-  return { byType: { stocks, bonds, crypto, realEstate }, liquid, illiquid };
+  return { byType: { cash, stocks, bonds, crypto, realEstate }, liquid, illiquid };
 }
 
 export function mergeLiquiditySummaries(
   summaries: LiquiditySummary[],
 ): LiquiditySummary {
+  const cash = emptyLine();
   const stocks = emptyLine();
   const bonds = emptyLine();
   const crypto = emptyLine();
@@ -217,6 +230,7 @@ export function mergeLiquiditySummaries(
   };
 
   for (const summary of summaries) {
+    addToLine(cash, summary.byType.cash.amount, summary.byType.cash);
     addToLine(stocks, summary.byType.stocks.amount, summary.byType.stocks);
     addToLine(bonds, summary.byType.bonds.amount, summary.byType.bonds);
     addToLine(crypto, summary.byType.crypto.amount, summary.byType.crypto);
@@ -232,10 +246,10 @@ export function mergeLiquiditySummaries(
     );
   }
 
-  const liquid = [stocks, bonds, crypto].reduce(mergeLines, emptyLine());
+  const liquid = [cash, stocks, bonds, crypto].reduce(mergeLines, emptyLine());
   const illiquid = mergeLines(emptyLine(), realEstate.full);
 
-  return { byType: { stocks, bonds, crypto, realEstate }, liquid, illiquid };
+  return { byType: { cash, stocks, bonds, crypto, realEstate }, liquid, illiquid };
 }
 
 const LIQUIDITY_INCLUDE = {
@@ -243,6 +257,7 @@ const LIQUIDITY_INCLUDE = {
   cryptoPositions: { include: { asset: true } },
   bonds: true,
   realEstateAssets: true,
+  cash: true,
 } as const;
 
 @Injectable()
@@ -250,6 +265,7 @@ export class LiquidityService {
   constructor(
     private prismaService: PrismaService,
     private portfoliosService: PortfoliosService,
+    private fxService: FxService,
   ) {}
 
   // Liquidity for a single portfolio.
@@ -265,7 +281,7 @@ export class LiquidityService {
     });
     if (!portfolio) throw new NotFoundException('Portfolio not found');
 
-    return computeLiquidity(portfolio);
+    return computeLiquidity(portfolio, await this.fxService.toUsdConverter());
   }
 
   // Liquidity across every portfolio a user owns.
@@ -275,6 +291,7 @@ export class LiquidityService {
       include: LIQUIDITY_INCLUDE,
     });
 
-    return mergeLiquiditySummaries(portfolios.map(computeLiquidity));
+    const toUsd = await this.fxService.toUsdConverter();
+    return mergeLiquiditySummaries(portfolios.map((p) => computeLiquidity(p, toUsd)));
   }
 }

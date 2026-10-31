@@ -102,6 +102,7 @@ export type PortfolioDto = {
   id: string;
   name: string;
   goal?: number | null;
+  displayCurrency?: string | null;
   user: UserDto;
   stockPositions: PositionDto[];
   cryptoPositions: PositionDto[];

@@ -28,4 +28,7 @@ export class UserDto {
   @IsNotEmpty()
   @IsEnum(Role)
   role: Role;
+
+  @IsString()
+  defaultCurrency: string;
 }

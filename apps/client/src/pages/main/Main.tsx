@@ -5,6 +5,8 @@ import MarketNews from "../../components/marketNews";
 import { PropertyCard } from "../../components/PropertyCard";
 import { NetWorthAllocation } from "../../components/networth/NetWorthAllocation";
 import { LiquiditySummary } from "../../components/liquidity/LiquiditySummary";
+import { CurrencySelect } from "../../components/CurrencySelect";
+import { useCurrency } from "../../context/CurrencyContext";
 
 const SAMPLE_PROPERTIES = [
   {
@@ -57,8 +59,16 @@ const SAMPLE_PROPERTIES = [
 ];
 
 export const MainPage = () => {
+  const { defaultCurrency, setDefaultCurrency } = useCurrency();
+
   return (
     <>
+      <div className="page-toolbar section-container">
+        <CurrencySelect
+          value={defaultCurrency}
+          onChange={(c) => setDefaultCurrency(c).catch(() => alert("Failed to save currency"))}
+        />
+      </div>
       <NetWorthAllocation />
       <LiquiditySummary />
 

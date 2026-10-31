@@ -7,7 +7,8 @@ import plusIcon from "../../assets/icons/plus.svg";
 import { API_BASE_URL } from "../../config";
 import { MaskIcon } from "../../components/MaskIcon";
 import { NewPortfolioModal } from "./NewPortfolioModal";
-import { formatMoney, gainColor, signedMoney, signedPct } from "../../utils/money";
+import { formatCurrency, gainColor, signedCurrency, signedPct } from "../../utils/money";
+import { useCurrency } from "../../context/CurrencyContext";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -68,6 +69,7 @@ async function fetchPortfolioNetWorth(portfolioId: string): Promise<PortfolioNet
 }
 
 export default function PortfoliosPage() {
+  const { defaultCurrency, fromUsd } = useCurrency();
   const { userId } = useParams();
   const navigate = useNavigate();
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
@@ -128,6 +130,8 @@ export default function PortfoliosPage() {
             const performers = movers?.topPerformers ?? [];
             const losers = movers?.topLosers ?? [];
             const netWorth = portfolioNetWorth[p.id]?.total;
+            const currency = p.displayCurrency ?? defaultCurrency;
+            const money = (usd: number) => formatCurrency(fromUsd(usd, currency), currency);
             return (
               <article
                 className="portfolio-card"
@@ -158,7 +162,7 @@ export default function PortfoliosPage() {
 
                 <div className="portfolio-card-header-row">
                   <span className="portfolio-card-total">
-                    {netWorth != null ? formatMoney(netWorth) : "—"}
+                    {netWorth != null ? money(netWorth) : "—"}
                   </span>
                   {returns?.pctReturn != null && (
                     <span className="portfolio-card-returns">
@@ -167,7 +171,7 @@ export default function PortfoliosPage() {
                       </span>
                       {returns.dollarReturn != null && (
                         <span className="portfolio-card-returns-dollar">
-                          ({formatMoney(returns.dollarReturn)})
+                          ({money(returns.dollarReturn)})
                         </span>
                       )}
                     </span>
@@ -188,8 +192,8 @@ export default function PortfoliosPage() {
                 </div>
 
                 <div className="portfolio-card-movers">
-                  <MoverGroup title="Top performers" movers={performers} />
-                  <MoverGroup title="Losers" movers={losers} />
+                  <MoverGroup title="Top performers" movers={performers} currency={currency} />
+                  <MoverGroup title="Losers" movers={losers} currency={currency} />
                 </div>
               </article>
             );
@@ -203,7 +207,8 @@ export default function PortfoliosPage() {
   );
 }
 
-function MoverGroup({ title, movers }: { title: string; movers: Mover[] }) {
+function MoverGroup({ title, movers, currency }: { title: string; movers: Mover[]; currency: string }) {
+  const { fromUsd } = useCurrency();
   return (
     <div className="portfolio-card-movers-group">
       <p className="portfolio-card-movers-title">{title}</p>
@@ -215,7 +220,7 @@ function MoverGroup({ title, movers }: { title: string; movers: Mover[] }) {
           </span>
           <span className="portfolio-mover-value">
             <span className="portfolio-mover-pct" style={{ color: gainColor(a.pct) }}>{signedPct(a.pct)}</span>
-            <span className="portfolio-mover-dollar">{signedMoney(a.dollarReturn)}</span>
+            <span className="portfolio-mover-dollar">{signedCurrency(fromUsd(a.dollarReturn, currency), currency)}</span>
           </span>
         </div>
       ))}

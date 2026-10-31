@@ -4,10 +4,11 @@ import { PortfolioDto, PositionDto } from "../../types/portfolio";
 import { MaskIcon } from "../MaskIcon";
 import searchIcon from "../../assets/icons/search.svg";
 import eyeIcon from "../../assets/icons/eye.svg";
-import { formatMoney, gainColor, signedMoney, signedPct } from "../../utils/money";
+import { gainColor, signedPct } from "../../utils/money";
 import { lastTradeDate, pctChange, totalPosition, totalReturn } from "./positionMetrics";
 import { PositionDetailsModal } from "./PositionDetailsModal";
 import { TradeModal } from "./TradeModal";
+import { useDisplayMoney } from "./DisplayCurrency";
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric", year: "2-digit" };
 
@@ -93,6 +94,7 @@ function PositionCard({
   onDetails: () => void;
   onTrade: (type: "BUY" | "SELL") => void;
 }) {
+  const { money, signedMoney } = useDisplayMoney();
   const ticker = position.asset.ticker;
   const lastTrade = lastTradeDate(position);
   const change = pctChange(position, currentPrice);
@@ -116,11 +118,11 @@ function PositionCard({
       <dl className="position-card-metrics">
         <div>
           <dt>Avg price</dt>
-          <dd>{position.price != null ? formatMoney(position.price, 2) : "—"}</dd>
+          <dd>{position.price != null ? money(position.price, "USD", 2) : "—"}</dd>
         </div>
         <div>
           <dt>Total position</dt>
-          <dd>{total > 0 ? formatMoney(total) : "—"}</dd>
+          <dd>{total > 0 ? money(total) : "—"}</dd>
         </div>
         <div className="position-card-metric-end">
           <dt>Change</dt>

@@ -21,6 +21,24 @@ function emptyPortfolio(): LiquidityPortfolioInput {
 }
 
 describe('computeLiquidity', () => {
+  it('counts cash as same-day liquidity, converted to USD', () => {
+    const usdPerUnit: Record<string, number> = { USD: 1, EUR: 1.1, UAH: 0.025 };
+    const portfolio = emptyPortfolio();
+    portfolio.cash = [
+      { amount: 100, currency: 'EUR' },
+      { amount: 4000, currency: 'UAH' },
+    ];
+    portfolio.bonds = [{ currentValue: null, purchasePrice: 100, quantity: 10, currency: 'EUR' }];
+
+    const result = computeLiquidity(portfolio, (amount, currency) => amount * usdPerUnit[currency]);
+
+    expect(result.byType.cash.amount).toBeCloseTo(210);
+    expect(result.byType.cash.minDays).toBe(0);
+    expect(result.byType.cash.maxDays).toBe(0);
+    expect(result.byType.bonds.amount).toBeCloseTo(1100);
+    expect(result.liquid.amount).toBeCloseTo(1310);
+  });
+
   it('values a stock position at currentPrice * quantity with the US range by default', () => {
     const portfolio = emptyPortfolio();
     portfolio.stockPositions = [

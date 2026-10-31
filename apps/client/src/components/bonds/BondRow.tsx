@@ -4,10 +4,12 @@ import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { Bond, FREQUENCY_LABEL } from "./types";
 import { API_BASE_URL } from "../../config";
+import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 type Props = { bond: Bond; onDelete: (id: string) => void; onUpdated: () => void };
 
 export function BondRow({ bond, onDelete, onUpdated }: Props) {
+  const { money, signedMoney } = useDisplayMoney();
   const annualIncome = bond.faceValue * (bond.couponRate / 100) * bond.quantity;
   const totalPosition = bond.purchasePrice * bond.quantity;
   const capitalGain = bond.currentValue != null ? (bond.currentValue - bond.purchasePrice) * bond.quantity : null;
@@ -44,7 +46,7 @@ export function BondRow({ bond, onDelete, onUpdated }: Props) {
       <td data-label="Date bought">{new Date(bond.purchaseDate).toLocaleDateString()}</td>
       <td data-label="Maturity date">{bond.maturityDate ? new Date(bond.maturityDate).toLocaleDateString() : "—"}</td>
       <td data-label="Quantity">{bond.quantity}</td>
-      <td data-label="Purchase price">{bond.purchasePrice}</td>
+      <td data-label="Purchase price">{money(bond.purchasePrice, bond.currency, 2)}</td>
       <td data-label="Current value">
         {isEditingValue ? (
           <div style={{ display: "flex", gap: 4 }}>
@@ -53,7 +55,7 @@ export function BondRow({ bond, onDelete, onUpdated }: Props) {
               value={currentValueInput}
               onChange={(e) => setCurrentValueInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && saveCurrentValue()}
-              placeholder="Per unit"
+              placeholder={`Per unit (${bond.currency})`}
               autoFocus
             />
             <button onClick={saveCurrentValue}>Save</button>
@@ -61,21 +63,21 @@ export function BondRow({ bond, onDelete, onUpdated }: Props) {
           </div>
         ) : (
           <span onClick={startEditingValue} style={{ cursor: "pointer" }} title="Click to edit">
-            {bond.currentValue != null ? bond.currentValue.toLocaleString() : "—"}
+            {bond.currentValue != null ? money(bond.currentValue, bond.currency, 2) : "—"}
           </span>
         )}
       </td>
-      <td data-label="Face value">{bond.faceValue.toLocaleString()}</td>
+      <td data-label="Face value">{money(bond.faceValue, bond.currency, 2)}</td>
       <td data-label="Coupon %">{bond.couponRate}%</td>
       <td data-label="Frequency">{FREQUENCY_LABEL[bond.couponFrequency]}</td>
       <td data-label="Currency">{bond.currency}</td>
-      <td data-label="Annual income">{annualIncome > 0 ? Math.round(annualIncome).toLocaleString() : "—"}</td>
-      <td data-label="Total position">{totalPosition > 0 ? Math.round(totalPosition).toLocaleString() : "—"}</td>
+      <td data-label="Annual income">{annualIncome > 0 ? money(annualIncome, bond.currency) : "—"}</td>
+      <td data-label="Total position">{totalPosition > 0 ? money(totalPosition, bond.currency) : "—"}</td>
       <td
         data-label="Capital gain"
         style={{ color: capitalGain == null ? undefined : capitalGain >= 0 ? "var(--text-success)" : "var(--text-danger)" }}
       >
-        {capitalGain == null ? "—" : `${capitalGain >= 0 ? "+" : ""}${Math.round(capitalGain).toLocaleString()}`}
+        {capitalGain == null ? "—" : signedMoney(capitalGain, bond.currency)}
       </td>
       <td className="actions">
         <button className="icon-btn" onClick={startEditingValue}>

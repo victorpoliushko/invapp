@@ -4,6 +4,7 @@ import { TRANSACTION_COLORS } from "./transactionColors";
 import { alertMissingFields } from "../../utils/formValidation";
 import { isCryptoSuggestion as isCrypto, useAssetSearch } from "../../hooks/useAssetSearch";
 import { useAddPositionTransaction } from "./useAddPositionTransaction";
+import { useDisplayMoney } from "./DisplayCurrency";
 
 export function AddPosition({
   assetType = "stock",
@@ -12,6 +13,7 @@ export function AddPosition({
   assetType?: "stock" | "crypto";
   totalPositionSum: number;
 }) {
+  const { money } = useDisplayMoney();
   const addTransaction = useAddPositionTransaction();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -182,13 +184,13 @@ export function AddPosition({
           value={newAsset.pricePerUnit}
           onChange={(e) => setNewAsset({ ...newAsset, pricePerUnit: e.target.value })}
           onKeyDown={(e) => { if (e.key === "Enter") handleAddAsset(); }}
-          placeholder="Price"
+          placeholder="Price (USD)"
         />
       </td>
       <td></td>
       <td></td>
       <td data-label="Total position" style={{ fontWeight: 600, textAlign: "right" }}>
-        {totalPositionSum > 0 ? Math.round(totalPositionSum).toLocaleString() : "—"}
+        {totalPositionSum > 0 ? money(totalPositionSum) : "—"}
       </td>
       <td></td>
       <td>

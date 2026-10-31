@@ -311,6 +311,13 @@ table th {
   padding-bottom: 16px;
 }
 
+.detail-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .detail-networth {
   display: flex;
   flex-direction: column;
@@ -328,15 +335,6 @@ table th {
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
-}
-
-.menu-chevron {
-  display: flex;
-  transition: transform var(--transition-fast);
-}
-
-.menu-chevron-open {
-  transform: rotate(180deg);
 }
 
 .detail-tabs {
@@ -443,6 +441,40 @@ table th {
 
 .position-card-metrics dd.text-success {
   color: var(--text-success);
+}
+
+.cash-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 4px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body);
+}
+
+.cash-total strong {
+  color: var(--text-body);
+  font-size: var(--font-size-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.cash-card-amounts {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cash-card-amount {
+  color: var(--text-body);
+  font-size: var(--font-size-metric);
+  font-weight: var(--weight-bold);
+}
+
+.cash-card-converted {
+  color: var(--text-secondary);
+  font-size: var(--font-size-copy);
 }
 
 .position-card-actions {

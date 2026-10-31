@@ -317,6 +317,11 @@
   list-style: none;
 }
 
+.menu-start {
+  right: auto;
+  left: 0;
+}
+
 .menu-item {
   display: flex;
   align-items: center;
@@ -456,4 +461,30 @@ select.input option[value=""] {
 
 .text-success {
   color: var(--text-success);
+}
+
+.menu-chevron {
+  display: flex;
+  transition: transform var(--transition-fast);
+}
+
+.menu-chevron-open {
+  transform: rotate(180deg);
+}
+
+.btn-pill-secondary {
+  border: 1px solid var(--border-container);
+  background-color: var(--background-subtle);
+  color: var(--text-body);
+}
+
+.btn-pill-secondary:hover {
+  background-color: var(--background-tab);
+}
+
+.page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
 }

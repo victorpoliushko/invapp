@@ -7,6 +7,7 @@ import "../../pages/portfolio/PortfolioPage.css";
 import { TRANSACTION_COLORS } from "./transactionColors";
 import { formatQuantity } from "../../utils/formatQuantity";
 import { API_BASE_URL } from "../../config";
+import { useDisplayMoney } from "./DisplayCurrency";
 
 type EditState = {
   date: string;
@@ -23,6 +24,7 @@ export function PositionTransactions({
   assetType: "stock" | "crypto";
   transactions: TransactionsDto[];
 }) {
+  const { money } = useDisplayMoney();
   const { refreshPortfolio } = usePortfolio();
   const token = localStorage.getItem("accessToken");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -140,7 +142,7 @@ export function PositionTransactions({
                     <td>{assetTicker}</td>
                     <td>{new Date(transaction.date).toLocaleDateString()}</td>
                     <td>{formatQuantity(transaction.quantityChange, assetType)}</td>
-                    <td>{transaction.pricePerUnit}</td>
+                    <td>{money(transaction.pricePerUnit, "USD", 2)}</td>
                     <td className="actions">
                       <button className="icon-btn" title="Edit" onClick={() => startEdit(transaction)}>
                         <img src={editIcon} height={20} width={20} alt="edit" />
