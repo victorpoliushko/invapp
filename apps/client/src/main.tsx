@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage.tsx";
 import PortfoliosPage from "./pages/portfolios/PortfoliosPage.tsx";
 import { AiSuggestions } from "./pages/aiSuggestions/AiSuggestions.tsx";
 import LoginPage from "./pages/auth/LoginPage.tsx";
+import RegisterPage from "./pages/auth/RegisterPage.tsx";
 import { HomePage } from "./pages/HomePage.tsx";
 import { MainPage } from "./pages/main/Main.tsx";
 import { AuthProvider } from "./AuthContext.tsx";
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
       },
       {
         element: <PortfolioProviderWrapper />,

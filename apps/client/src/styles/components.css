@@ -488,3 +488,38 @@ select.input option[value=""] {
   align-items: center;
   gap: 8px;
 }
+
+.modal.confirm-dialog {
+  gap: 24px;
+}
+
+.confirm-message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.confirm-message p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.text-danger {
+  color: var(--text-danger);
+}
+
+.text-warning {
+  color: var(--decorative-orange);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}

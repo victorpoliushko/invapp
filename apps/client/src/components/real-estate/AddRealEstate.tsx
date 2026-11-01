@@ -25,7 +25,6 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
     if (!portfolioId) return;
     const { code, name, type, purchaseDate, purchasePrice, rooms, totalArea } = form;
     if (alertMissingFields({
-      Code: code,
       Name: name,
       "Purchase date": purchaseDate,
       "Purchase price": purchasePrice,
@@ -38,7 +37,7 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        code,
+        code: code || undefined,
         name,
         type,
         purchaseDate: new Date(purchaseDate).toISOString(),
@@ -80,6 +79,8 @@ export function AddRealEstate({ onAdded, totalPurchasePrice }: Props) {
           <option value="APARTMENT">Apartment</option>
           <option value="HOUSE">House</option>
           <option value="COMMERCIAL">Commercial</option>
+          <option value="PARKING_LOT">Parking lot</option>
+          <option value="OTHER">Other</option>
         </select>
       </td>
       <td>

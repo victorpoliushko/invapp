@@ -96,11 +96,13 @@ enum RealEstateType {
   APARTMENT
   HOUSE
   COMMERCIAL
+  PARKING_LOT
+  OTHER
 }
 
 model RealEstate {
   id            String         @id @default(uuid())
-  code          String
+  code          String?
   name          String
   type          RealEstateType
   purchaseDate  DateTime

@@ -124,9 +124,17 @@ export const REAL_ESTATE_LIQUIDITY: Record<
   },
 };
 
+const LIQUIDITY_CATEGORY: Record<string, RealEstateCategory> = {
+  APARTMENT: 'APARTMENT',
+  HOUSE: 'HOUSE',
+  COMMERCIAL: 'COMMERCIAL',
+  PARKING_LOT: 'COMMERCIAL',
+  OTHER: 'COMMERCIAL',
+};
+
 export function realEstateLiquidity(
-  type: RealEstateCategory,
+  type: string,
   price: number,
 ): RealEstateLiquidity {
-  return REAL_ESTATE_LIQUIDITY[type][realEstatePriceTier(price)];
+  return REAL_ESTATE_LIQUIDITY[LIQUIDITY_CATEGORY[type] ?? 'COMMERCIAL'][realEstatePriceTier(price)];
 }

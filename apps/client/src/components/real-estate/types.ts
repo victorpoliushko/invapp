@@ -5,9 +5,19 @@ export type RealEstateTransaction = {
   monthlyRent: number;
 };
 
+export const REAL_ESTATE_TYPES = ["APARTMENT", "HOUSE", "COMMERCIAL", "PARKING_LOT", "OTHER"] as const;
+
+export const TYPE_LABELS: Record<string, string> = {
+  APARTMENT: "Apartment",
+  HOUSE: "House",
+  COMMERCIAL: "Commercial",
+  PARKING_LOT: "Parking lot",
+  OTHER: "Other",
+};
+
 export type RealEstate = {
   id: string;
-  code: string;
+  code: string | null;
   name: string;
   type: string;
   purchaseDate: string;

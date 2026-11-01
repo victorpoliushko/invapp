@@ -5,9 +5,11 @@ import { RealEstateTransactions } from "./RealEstateTransactions";
 import { AddRealEstate } from "./AddRealEstate";
 import { RealEstate } from "./types";
 import { API_BASE_URL } from "../../config";
+import { usePortfolio } from "../../context/PortfolioContext";
 
 export function RealEstateTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
+  const { portfolio } = usePortfolio();
   const [properties, setProperties] = useState<RealEstate[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -20,7 +22,7 @@ export function RealEstateTable() {
     if (res.ok) setProperties(await res.json());
   }, [portfolioId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, portfolio]);
 
   const totalPurchasePrice = properties.reduce((sum, p) => sum + p.purchasePrice, 0);
 

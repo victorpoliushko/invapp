@@ -153,7 +153,7 @@ export interface LiquidityPortfolioInput {
   realEstateAssets: {
     currentValue: number | null;
     purchasePrice: number;
-    type: 'APARTMENT' | 'HOUSE' | 'COMMERCIAL';
+    type: string;
   }[];
 }
 

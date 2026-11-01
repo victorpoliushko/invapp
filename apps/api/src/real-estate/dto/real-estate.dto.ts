@@ -2,8 +2,9 @@ import { RealEstateType } from '@prisma/client';
 import { IsEnum, IsNumber, IsString, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateRealEstateDto {
+  @IsOptional()
   @IsString()
-  code: string;
+  code?: string;
 
   @IsString()
   name: string;

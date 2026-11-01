@@ -1,4 +1,5 @@
-import { Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { RegisterDto } from './dto/Register.dto';
 import { AuthService } from './auth.service';
 import { PassportLocalGuard } from './guards/passport-local.guard';
 import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
@@ -22,6 +23,13 @@ export class PassportAuthController {
     const { accessToken, refreshToken } = await this.authService.signIn(req.user);
 
     return { userId: req.user.userId, username: req.user.username, accessToken, refreshToken };
+  }
+
+  @Public()
+  @Post('register')
+  async register(@Body() body: RegisterDto) {
+    const { accessToken, refreshToken, userId, username } = await this.authService.register(body);
+    return { userId, username, accessToken, refreshToken };
   }
 
   @Public()

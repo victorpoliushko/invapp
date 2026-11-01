@@ -2,7 +2,8 @@ import { useState } from "react";
 import deleteIcon from "../../assets/crud-icons/delete.svg";
 import editIcon from "../../assets/crud-icons/update.svg";
 import "../../pages/portfolio/PortfolioPage.css";
-import { RealEstate } from "./types";
+import { RealEstate, TYPE_LABELS } from "./types";
+import { calcRealEstateStats as calcStats } from "./realEstateMetrics";
 import { API_BASE_URL } from "../../config";
 import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
@@ -13,37 +14,6 @@ type Props = {
   onDelete: (id: string) => void;
   onUpdated: () => void;
 };
-
-const TYPE_LABELS: Record<string, string> = {
-  APARTMENT: "Apartment",
-  HOUSE: "House",
-  COMMERCIAL: "Commercial",
-};
-
-function calcStats(property: RealEstate) {
-  const purchaseMs = new Date(property.purchaseDate).getTime();
-  const nowMs = Date.now();
-  const totalDays = (nowMs - purchaseMs) / (1000 * 60 * 60 * 24);
-
-  let occupiedDays = 0;
-  let totalRentEarned = 0;
-
-  for (const t of property.transactions) {
-    const start = new Date(t.startDate).getTime();
-    const end = new Date(t.endDate).getTime();
-    const days = (end - start) / (1000 * 60 * 60 * 24);
-    occupiedDays += days;
-    totalRentEarned += (days / 30.4375) * t.monthlyRent;
-  }
-
-  const occupancyPct = totalDays > 0 ? (occupiedDays / totalDays) * 100 : 0;
-  const yearsSincePurchase = totalDays / 365.25;
-  const annualNet = yearsSincePurchase > 0 ? totalRentEarned / yearsSincePurchase : 0;
-  const annualNetPct = property.purchasePrice > 0 ? (annualNet / property.purchasePrice) * 100 : 0;
-  const capitalGain = property.currentValue != null ? property.currentValue - property.purchasePrice : 0;
-
-  return { occupancyPct, annualNet, annualNetPct, totalReturn: totalRentEarned + capitalGain };
-}
 
 function toDateInputValue(iso: string): string {
   return new Date(iso).toISOString().slice(0, 10);
@@ -56,7 +26,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
 
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
-    code: property.code,
+    code: property.code ?? "",
     name: property.name,
     type: property.type,
     purchaseDate: toDateInputValue(property.purchaseDate),
@@ -70,7 +40,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
 
   const startEditing = () => {
     setForm({
-      code: property.code,
+      code: property.code ?? "",
       name: property.name,
       type: property.type,
       purchaseDate: toDateInputValue(property.purchaseDate),
@@ -122,6 +92,8 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
             <option value="APARTMENT">Apartment</option>
             <option value="HOUSE">House</option>
             <option value="COMMERCIAL">Commercial</option>
+            <option value="PARKING_LOT">Parking lot</option>
+            <option value="OTHER">Other</option>
           </select>
         </td>
         <td>

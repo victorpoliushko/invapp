@@ -1,4 +1,6 @@
-import { HttpException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, HttpException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { RegisterDto } from './dto/Register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -52,6 +54,21 @@ export class AuthService {
     }
 
     return { userId: user.id, username: user.username};
+  }
+
+  async register(input: RegisterDto): Promise<AuthResult> {
+    const email = input.email.trim().toLowerCase();
+    const username = input.username.trim();
+
+    if (await this.userService.getUserByEmail(email)) {
+      throw new ConflictException('An account with this email already exists');
+    }
+    if (await this.userService.getUserByName(username)) {
+      throw new ConflictException('This username is taken');
+    }
+
+    const user = await this.userService.create({ username, email, password: input.password, role: Role.USER });
+    return this.signIn({ userId: user.id, username: user.username });
   }
 
   async signIn(input: SignInData): Promise<AuthResult> {
