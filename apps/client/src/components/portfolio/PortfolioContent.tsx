@@ -11,7 +11,8 @@ import { RealEstatePositions } from "../real-estate/RealEstatePositions";
 import { NewRealEstateModal } from "../real-estate/NewRealEstateModal";
 import { BondPositions } from "../bonds/BondPositions";
 import { NewBondModal } from "../bonds/NewBondModal";
-import { MixedAssetTable } from "../mixed-assets/MixedAssetTable";
+import { MixedAssetPositions } from "../mixed-assets/MixedAssetPositions";
+import { NewMixedAssetModal } from "../mixed-assets/NewMixedAssetModal";
 import { CashPositions } from "../cash/CashPositions";
 import { CashModal } from "../cash/CashModal";
 import { CurrencySelect } from "../CurrencySelect";
@@ -41,7 +42,7 @@ export function PortfolioContent() {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedTab, setSelectedTab] = useState<AssetTab>("stocks");
-  const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | "cash" | "realestate" | null>(null);
+  const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | "cash" | "realestate" | "other" | null>(null);
   const [netWorth, setNetWorth] = useState<number | null>(null);
 
   useEffect(() => {
@@ -89,6 +90,7 @@ export function PortfolioContent() {
     if (tab === "bonds") setNewAssetModal("bond");
     if (tab === "cash") setNewAssetModal("cash");
     if (tab === "realestate") setNewAssetModal("realestate");
+    if (tab === "other") setNewAssetModal("other");
   };
 
   const renderTab = () => {
@@ -104,7 +106,7 @@ export function PortfolioContent() {
       case "cash":
         return <CashPositions displayCurrency={displayCurrency} />;
       case "other":
-        return <MixedAssetTable />;
+        return <MixedAssetPositions />;
     }
   };
 
@@ -189,6 +191,7 @@ export function PortfolioContent() {
       {newAssetModal === "bond" && <NewBondModal onClose={() => setNewAssetModal(null)} />}
       {newAssetModal === "cash" && <CashModal onClose={() => setNewAssetModal(null)} />}
       {newAssetModal === "realestate" && <NewRealEstateModal onClose={() => setNewAssetModal(null)} />}
+      {newAssetModal === "other" && <NewMixedAssetModal onClose={() => setNewAssetModal(null)} />}
     </section>
     </DisplayCurrencyProvider>
   );

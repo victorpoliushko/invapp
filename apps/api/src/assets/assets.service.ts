@@ -185,4 +185,64 @@ return response.data;
       );
     }
   }
+
+  private marketCache: { value: MarketQuote[]; fetchedAt: number } | null = null;
+
+  async getMarketSummary(): Promise<MarketQuote[]> {
+    if (this.marketCache && Date.now() - this.marketCache.fetchedAt < MARKET_CACHE_TTL_MS) {
+      return this.marketCache.value;
+    }
+
+    const finnhubKey = this.configService.get<string>('FINNHUB_API_KEY');
+    const coingeckoKey = this.configService.get<string>('COINGECKO_API_KEY');
+
+    const stockQuote = async (symbol: string, title: string): Promise<MarketQuote | null> => {
+      try {
+        const { data } = await lastValueFrom(
+          this.httpService.get(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`),
+        );
+        if (!data?.c) return null;
+        return { symbol, title, price: data.c, change: data.d ?? 0, changePct: data.dp ?? 0 };
+      } catch (error) {
+        console.error(`Market quote error for ${symbol}:`, error.message);
+        return null;
+      }
+    };
+
+    const bitcoin = async (): Promise<MarketQuote | null> => {
+      try {
+        const { data } = await lastValueFrom(
+          this.httpService.get(
+            'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
+            { headers: { 'x-cg-demo-api-key': coingeckoKey } },
+          ),
+        );
+        const price = data?.bitcoin?.usd;
+        const changePct = data?.bitcoin?.usd_24h_change ?? 0;
+        if (!price) return null;
+        const change = price - price / (1 + changePct / 100);
+        return { symbol: 'BTC', title: 'Bitcoin', price, change, changePct };
+      } catch (error) {
+        console.error('Market quote error for BTC:', error.message);
+        return null;
+      }
+    };
+
+    const quotes = (
+      await Promise.all([stockQuote('SPY', 'S&P 500'), stockQuote('DIA', 'Dow 30'), bitcoin()])
+    ).filter((q): q is MarketQuote => q !== null);
+
+    if (quotes.length > 0) this.marketCache = { value: quotes, fetchedAt: Date.now() };
+    return quotes.length > 0 ? quotes : (this.marketCache?.value ?? []);
+  }
 }
+
+export type MarketQuote = {
+  symbol: string;
+  title: string;
+  price: number;
+  change: number;
+  changePct: number;
+};
+
+const MARKET_CACHE_TTL_MS = 60 * 1000;

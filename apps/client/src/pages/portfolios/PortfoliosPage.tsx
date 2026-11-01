@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./PortfoliosPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
-import deleteIcon from "../../assets/crud-icons/delete.svg";
+import editIcon from "../../assets/icons/edit.svg";
 import plusIcon from "../../assets/icons/plus.svg";
 import { API_BASE_URL } from "../../config";
 import { MaskIcon } from "../../components/MaskIcon";
@@ -10,6 +10,7 @@ import { NewPortfolioModal } from "./NewPortfolioModal";
 import { formatCurrency, gainColor, signedCurrency, signedPct } from "../../utils/money";
 import { Currency, useCurrency } from "../../context/CurrencyContext";
 import { CurrencySelect } from "../../components/CurrencySelect";
+import { EditPortfolioModal } from "./EditPortfolioModal";
 
 const TYPE_LABEL: Record<string, string> = {
   CRYPTOCURRENCY: "Crypto",
@@ -76,6 +77,7 @@ export default function PortfoliosPage() {
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
     usePortfolio();
   const [isCreating, setIsCreating] = useState(false);
+  const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
   const [returnPeriods, setReturnPeriods] = useState<Record<string, ReturnPeriod>>({});
   const [portfolioReturns, setPortfolioReturns] = useState<Record<string, PortfolioReturns>>({});
   const [portfolioMovers, setPortfolioMovers] = useState<Record<string, PortfolioMovers>>({});
@@ -84,6 +86,17 @@ export default function PortfoliosPage() {
   const handleCreate = (name: string, goal: number | undefined) => {
     createPortolio(name, userId ?? "", goal);
     setIsCreating(false);
+  };
+
+  const renamePortfolio = async (portfolioId: string, name: string) => {
+    const token = localStorage.getItem("accessToken");
+    const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: portfolioId, name }),
+    });
+    if (!res.ok) throw new Error("Failed to rename portfolio");
+    await refreshUserPortfolios();
   };
 
   const handleCurrencyChange = async (portfolioId: string, currency: Currency) => {
@@ -167,10 +180,10 @@ export default function PortfoliosPage() {
                     <CurrencySelect value={currency} onChange={(c) => handleCurrencyChange(p.id, c)} />
                     <button
                       className="portfolio-card-delete"
-                      aria-label={`Delete ${p.name}`}
-                      onClick={() => deletePortfolio(p.id)}
+                      aria-label={`Edit ${p.name}`}
+                      onClick={() => setEditing({ id: p.id, name: p.name })}
                     >
-                      <MaskIcon src={deleteIcon} size={20} />
+                      <MaskIcon src={editIcon} size={20} />
                     </button>
                   </div>
                 </div>
@@ -214,6 +227,15 @@ export default function PortfoliosPage() {
             );
           })}
       </div>
+
+      {editing && (
+        <EditPortfolioModal
+          name={editing.name}
+          onSave={(name) => renamePortfolio(editing.id, name)}
+          onDelete={() => deletePortfolio(editing.id)}
+          onClose={() => setEditing(null)}
+        />
+      )}
 
       {isCreating && (
         <NewPortfolioModal onSave={handleCreate} onClose={() => setIsCreating(false)} />

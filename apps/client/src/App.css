@@ -207,7 +207,7 @@
 }
 
 .news-section {
-  margin: 8rem auto;
+  margin: 1.5rem auto 8rem;
   display: flex;
   flex-direction: column;
   background-color: var(--color-surface-raised);
@@ -222,17 +222,21 @@
 }
 
 .stocks-section {
-  margin: 8rem auto;
+  margin: 1.5rem var(--section-padding) 0;
+  padding: 1.5rem;
   background-color: var(--color-surface-raised);
   border: 1px solid var(--border-container);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   height: auto;
 }
 
 .stocks-section h1 {
   align-self: flex-start;
+  margin: 0;
+  font-size: var(--font-size-heading);
   text-align: left;
 }
 
@@ -472,8 +476,11 @@
     padding: 16px;
   }
 
+  .stocks-section {
+    gap: 12px;
+  }
+
   .news-section h1,
-  .stocks-section h1,
   .realestate-section h1 {
     margin: 0 0 12px;
     font-size: var(--font-size-heading);

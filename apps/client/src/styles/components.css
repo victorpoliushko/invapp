@@ -523,3 +523,115 @@ select.input option[value=""] {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+
+/* Date range calendar (Figma: Date range calendar) */
+.date-range-control {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+}
+
+.date-range-placeholder {
+  color: var(--text-secondary);
+}
+
+.date-range-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid var(--border-container);
+  border-radius: 12px;
+}
+
+.date-range-divider {
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-top: 1px solid var(--border-container);
+}
+
+.date-range-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+}
+
+.date-range-nav .icon-button {
+  width: 32px;
+  height: 32px;
+}
+
+.date-range-prev {
+  display: flex;
+  transform: rotate(180deg);
+}
+
+.date-range-month {
+  color: var(--text-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-semi-bold);
+}
+
+.date-range-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 4px;
+}
+
+.date-range-weekday {
+  height: 24px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-label);
+  text-align: center;
+}
+
+.date-range-day {
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-body);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.date-range-day-outside {
+  color: var(--text-tertiary);
+}
+
+.date-range-day-in-range {
+  border-radius: 0;
+  background-color: #183719;
+}
+
+.date-range-day-endpoint {
+  background-color: var(--action-primary);
+  color: var(--text-body);
+  font-weight: var(--weight-bold);
+}
+
+.date-range-day-start {
+  box-shadow: 8px 0 0 #183719;
+}
+
+.date-range-day-end {
+  box-shadow: -8px 0 0 #183719;
+}
+
+.date-range-summary {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: var(--font-size-label);
+}
+
+.date-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

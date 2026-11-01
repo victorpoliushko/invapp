@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "../Modal";
 import { RealEstate } from "./types";
 import { useRealEstateActions } from "./useRealEstate";
+import { DateRangePicker } from "../DateRangePicker";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -50,23 +51,14 @@ export function LendModal({ property, onClose }: { property: RealEstate; onClose
               autoFocus
             />
           </label>
-          <div className="field-row">
-            <label className="field">
-              <span className="field-label">Start date</span>
-              <input className="input" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-            </label>
-            <label className="field">
-              <span className="field-label">End date</span>
-              <input
-                className="input"
-                type="date"
-                value={endDate}
-                min={startDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                aria-invalid={badRange}
-              />
-            </label>
-          </div>
+          <DateRangePicker
+            start={startDate}
+            end={endDate}
+            onChange={(from, to) => {
+              setStartDate(from);
+              setEndDate(to);
+            }}
+          />
           {badRange && <span className="field-hint field-hint-error">End date must be after start date</span>}
         </div>
 

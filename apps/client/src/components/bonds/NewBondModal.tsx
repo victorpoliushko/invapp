@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "../Modal";
 import { BOND_CURRENCIES, CouponFrequency, FREQUENCY_LABEL } from "./types";
 import { useBondActions } from "./useBonds";
+import { DatePicker } from "../DatePicker";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -104,14 +105,14 @@ export function NewBondModal({ onClose }: { onClose: () => void }) {
           </label>
           {number("purchasePrice", "Purchase price")}
           {number("faceValue", "Face value")}
-          <label className="field">
+          <div className="field">
             <span className="field-label">Maturity date</span>
-            <input className="input" type="date" value={form.maturityDate} onChange={set("maturityDate")} />
-          </label>
-          <label className="field">
+            <DatePicker value={form.maturityDate} onChange={(v) => setForm((f) => ({ ...f, maturityDate: v }))} ariaLabel="Maturity date" />
+          </div>
+          <div className="field">
             <span className="field-label">Buying date</span>
-            <input className="input" type="date" value={form.purchaseDate} onChange={set("purchaseDate")} />
-          </label>
+            <DatePicker value={form.purchaseDate} onChange={(v) => setForm((f) => ({ ...f, purchaseDate: v }))} ariaLabel="Buying date" />
+          </div>
           {number("quantity", "Quantity")}
           {number("couponRate", "Coupon %")}
           <label className="field">

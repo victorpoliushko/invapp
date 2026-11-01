@@ -1,0 +1,96 @@
+.market-quotes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.market-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--border-container);
+  border-radius: 12px;
+  background-color: var(--background-tab);
+  text-align: left;
+}
+
+.market-quote-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.market-quote-title {
+  color: var(--text-secondary);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-semi-bold);
+}
+
+.market-quote-symbol {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-caption);
+}
+
+.market-quote-price {
+  color: var(--text-body);
+  font-size: var(--font-size-metric);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.market-quote-change {
+  display: flex;
+  gap: 8px;
+  font-size: var(--font-size-copy);
+  font-weight: var(--weight-semi-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.market-quote-change-abs {
+  font-weight: var(--weight-regular);
+}
+
+.market-status {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-body);
+}
+
+@media (max-width: 600px) {
+  .market-quotes {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .market-quote {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "header price"
+      "header change";
+    align-items: center;
+    row-gap: 2px;
+    padding: 12px 16px;
+  }
+
+  .market-quote-header {
+    grid-area: header;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .market-quote-price {
+    grid-area: price;
+    justify-self: end;
+    font-size: var(--font-size-title);
+  }
+
+  .market-quote-change {
+    grid-area: change;
+    justify-self: end;
+    font-size: var(--font-size-label);
+  }
+}

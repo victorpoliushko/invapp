@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import invappLogo from "../../assets/invapp-logo.png";
 import { useAuth } from "../../AuthContext";
 import "./header.css";
 
 export function Header() {
   const { userId, logout } = useAuth();
+  const { pathname } = useLocation();
+  const onAuthPage = pathname === "/login" || pathname === "/register";
   const handleLogin = () => {
     window.location.href = "/login";
   };
@@ -41,11 +43,11 @@ export function Header() {
           <button className="signin-button" onClick={handleLogout}>Logout</button>
           </>
         ) : (
-          <>
+          !onAuthPage && (
             <button className="signin-button" onClick={handleLogin}>
               Sign in
             </button>
-          </>
+          )
         )}
       </nav>
     </header>

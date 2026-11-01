@@ -5,9 +5,11 @@ import { AddMixedAsset } from "./AddMixedAsset";
 import { MixedAsset } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
 import { API_BASE_URL } from "../../config";
+import { usePortfolio } from "../../context/PortfolioContext";
 
 export function MixedAssetTable() {
   const { id: portfolioId } = useParams<{ id: string }>();
+  const { portfolio } = usePortfolio();
   const [assets, setAssets] = useState<MixedAsset[]>([]);
 
   const load = useCallback(async () => {
@@ -19,7 +21,7 @@ export function MixedAssetTable() {
     if (res.ok) setAssets(await res.json());
   }, [portfolioId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, portfolio]);
 
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");

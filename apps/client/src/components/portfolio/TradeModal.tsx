@@ -4,6 +4,8 @@ import { PositionDto } from "../../types/portfolio";
 import { Modal } from "../Modal";
 import { formatQuantity } from "../../utils/formatQuantity";
 import { useAddPositionTransaction } from "./useAddPositionTransaction";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { DatePicker } from "../DatePicker";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -33,18 +35,7 @@ export function TradeModal({
   const oversell = type === "SELL" && qty > position.quantity;
   const canSubmit = qty > 0 && parseFloat(price) > 0 && date !== "" && !oversell && !submitting;
 
-  const handleSellAll = async () => {
-    if (!window.confirm(`Sell all ${ticker}? The position and its trade history will be removed.`)) return;
-    setSubmitting(true);
-    setError(null);
-    try {
-      await deleteAsset(position.assetId);
-      onClose();
-    } catch {
-      setError("Couldn't sell. Please try again.");
-      setSubmitting(false);
-    }
-  };
+  const [confirmingSellAll, setConfirmingSellAll] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +56,21 @@ export function TradeModal({
       setSubmitting(false);
     }
   };
+
+  if (confirmingSellAll) {
+    return (
+      <ConfirmDialog
+        title={`Sell all ${ticker}?`}
+        message="The position and its trade history will be removed from this portfolio."
+        confirmLabel="Sell all"
+        onConfirm={async () => {
+          await deleteAsset(position.assetId);
+          onClose();
+        }}
+        onCancel={() => setConfirmingSellAll(false)}
+      />
+    );
+  }
 
   return (
     <Modal labelledBy="trade-title" onClose={onClose}>
@@ -106,10 +112,10 @@ export function TradeModal({
               onChange={(e) => setPrice(e.target.value)}
             />
           </label>
-          <label className="field">
+          <div className="field">
             <span className="field-label">Date</span>
-            <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
+            <DatePicker value={date} onChange={setDate} ariaLabel="Date" />
+          </div>
         </div>
 
         {error && <p className="form-error">{error}</p>}
@@ -119,7 +125,7 @@ export function TradeModal({
             {submitting ? "Saving…" : "Submit"}
           </button>
           {type === "SELL" && (
-            <button type="button" className="btn btn-danger" onClick={handleSellAll} disabled={submitting}>
+            <button type="button" className="btn btn-danger" onClick={() => setConfirmingSellAll(true)} disabled={submitting}>
               Sell all
             </button>
           )}

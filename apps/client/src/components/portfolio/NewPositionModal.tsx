@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "../Modal";
 import { isCryptoSuggestion, useAssetSearch } from "../../hooks/useAssetSearch";
 import { useAddPositionTransaction } from "./useAddPositionTransaction";
+import { DatePicker } from "../DatePicker";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -123,10 +124,10 @@ export function NewPositionModal({
               onChange={(e) => setPrice(e.target.value)}
             />
           </label>
-          <label className="field">
+          <div className="field">
             <span className="field-label">Date</span>
-            <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
+            <DatePicker value={date} onChange={setDate} ariaLabel="Date" />
+          </div>
         </div>
 
         {error && <p className="form-error">{error}</p>}

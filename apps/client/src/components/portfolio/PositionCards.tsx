@@ -53,6 +53,7 @@ export function PositionCards({
           key={p.assetId}
           position={p}
           currentPrice={currentPrices[p.assetId]}
+          assetType={assetType}
           onDetails={() => setDetailsId(p.assetId)}
           onTrade={(type) => setTrade({ assetId: p.assetId, type })}
         />
@@ -86,11 +87,13 @@ export function PositionCards({
 function PositionCard({
   position,
   currentPrice,
+  assetType,
   onDetails,
   onTrade,
 }: {
   position: PositionDto;
   currentPrice: number | undefined;
+  assetType: "stock" | "crypto";
   onDetails: () => void;
   onTrade: (type: "BUY" | "SELL") => void;
 }) {
@@ -100,6 +103,35 @@ function PositionCard({
   const change = pctChange(position, currentPrice);
   const ret = totalReturn(position, currentPrice);
   const total = totalPosition(position);
+
+  const avgCell = (
+    <div>
+      <dt>Avg price</dt>
+      <dd>{position.price != null ? money(position.price, "USD", 2) : "—"}</dd>
+    </div>
+  );
+  const totalCell = (
+    <div>
+      <dt>Total position</dt>
+      <dd>{total > 0 ? money(total) : "—"}</dd>
+    </div>
+  );
+  const changeCell = (label: string) => (
+    <div className="position-card-metric-end">
+      <dt>{label}</dt>
+      <dd style={change != null ? { color: gainColor(change) } : undefined}>
+        {change != null ? signedPct(change, 2) : "—"}
+      </dd>
+    </div>
+  );
+  const returnCell = (
+    <div className="position-card-metric-end">
+      <dt>Total return</dt>
+      <dd style={ret != null ? { color: gainColor(ret) } : undefined}>
+        {ret != null ? signedMoney(ret) : "—"}
+      </dd>
+    </div>
+  );
 
   return (
     <article className="position-card">
@@ -115,28 +147,21 @@ function PositionCard({
         </button>
       </div>
 
-      <dl className="position-card-metrics">
-        <div>
-          <dt>Avg price</dt>
-          <dd>{position.price != null ? money(position.price, "USD", 2) : "—"}</dd>
-        </div>
-        <div>
-          <dt>Total position</dt>
-          <dd>{total > 0 ? money(total) : "—"}</dd>
-        </div>
-        <div className="position-card-metric-end">
-          <dt>Change</dt>
-          <dd style={change != null ? { color: gainColor(change) } : undefined}>
-            {change != null ? signedPct(change, 2) : "—"}
-          </dd>
-        </div>
-        <div className="position-card-metric-end">
-          <dt>Total return</dt>
-          <dd style={ret != null ? { color: gainColor(ret) } : undefined}>
-            {ret != null ? signedMoney(ret) : "—"}
-          </dd>
-        </div>
-      </dl>
+      {assetType === "crypto" ? (
+        <dl className="position-card-metrics bond-card-metrics">
+          {avgCell}
+          {changeCell("Change, %")}
+          {totalCell}
+          {returnCell}
+        </dl>
+      ) : (
+        <dl className="position-card-metrics">
+          {avgCell}
+          {totalCell}
+          {changeCell("Change")}
+          {returnCell}
+        </dl>
+      )}
 
       <div className="position-card-actions">
         <button className="btn btn-primary" onClick={() => onTrade("BUY")}>Buy</button>

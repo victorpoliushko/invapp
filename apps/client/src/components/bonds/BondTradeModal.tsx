@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Modal } from "../Modal";
 import { Bond } from "./types";
 import { useBondActions } from "./useBonds";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { DatePicker } from "../DatePicker";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -26,18 +28,7 @@ export function BondTradeModal({
   const oversell = type === "SELL" && qty > bond.quantity;
   const canSubmit = qty > 0 && parseFloat(price) > 0 && date !== "" && !oversell && !submitting;
 
-  const handleSellAll = async () => {
-    if (!window.confirm(`Sell all ${bond.isin}? The bond and its trade history will be removed.`)) return;
-    setSubmitting(true);
-    setError(null);
-    try {
-      await deleteBond(bond.id);
-      onClose();
-    } catch {
-      setError("Couldn't sell. Please try again.");
-      setSubmitting(false);
-    }
-  };
+  const [confirmingSellAll, setConfirmingSellAll] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +43,21 @@ export function BondTradeModal({
       setSubmitting(false);
     }
   };
+
+  if (confirmingSellAll) {
+    return (
+      <ConfirmDialog
+        title={`Sell all ${bond.isin}?`}
+        message="The bond and its trade history will be removed from this portfolio."
+        confirmLabel="Sell all"
+        onConfirm={async () => {
+          await deleteBond(bond.id);
+          onClose();
+        }}
+        onCancel={() => setConfirmingSellAll(false)}
+      />
+    );
+  }
 
   return (
     <Modal labelledBy="bond-trade-title" onClose={onClose}>
@@ -93,10 +99,10 @@ export function BondTradeModal({
               onChange={(e) => setPrice(e.target.value)}
             />
           </label>
-          <label className="field">
+          <div className="field">
             <span className="field-label">Date</span>
-            <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
+            <DatePicker value={date} onChange={setDate} ariaLabel="Date" />
+          </div>
         </div>
 
         {error && <p className="form-error">{error}</p>}
@@ -106,7 +112,7 @@ export function BondTradeModal({
             {submitting ? "Saving…" : "Submit"}
           </button>
           {type === "SELL" && (
-            <button type="button" className="btn btn-danger" onClick={handleSellAll} disabled={submitting}>
+            <button type="button" className="btn btn-danger" onClick={() => setConfirmingSellAll(true)} disabled={submitting}>
               Sell all
             </button>
           )}

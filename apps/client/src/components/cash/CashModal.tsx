@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "../Modal";
 import { CURRENCIES } from "../../context/CurrencyContext";
 import { CashEntry, useCashActions } from "./useCash";
+import { ConfirmDialog } from "../ConfirmDialog";
 
 export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () => void }) {
   const { createCash, updateCash, deleteCash } = useCashActions();
@@ -35,10 +36,22 @@ export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () =
     );
   };
 
-  const handleDelete = () => {
-    if (!entry || !window.confirm(`Delete ${entry.name ?? `${entry.currency} cash`}?`)) return;
-    run(() => deleteCash(entry.id), "Couldn't delete. Please try again.");
-  };
+  const [confirming, setConfirming] = useState(false);
+
+  if (entry && confirming) {
+    return (
+      <ConfirmDialog
+        title={`Delete ${entry.name ?? `${entry.currency} cash`}?`}
+        message="This cash entry will be removed from the portfolio."
+        confirmLabel="Delete"
+        onConfirm={async () => {
+          await deleteCash(entry.id);
+          onClose();
+        }}
+        onCancel={() => setConfirming(false)}
+      />
+    );
+  }
 
   return (
     <Modal labelledBy="cash-modal-title" onClose={onClose}>
@@ -87,7 +100,7 @@ export function CashModal({ entry, onClose }: { entry?: CashEntry; onClose: () =
             {submitting ? "Saving…" : "Save"}
           </button>
           {entry && (
-            <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={submitting}>
+            <button type="button" className="btn btn-danger" onClick={() => setConfirming(true)} disabled={submitting}>
               Delete
             </button>
           )}

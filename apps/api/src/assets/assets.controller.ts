@@ -28,6 +28,11 @@ export class AssetsController {
     return await this.assetsService.fetchAndStoreAssets();
   }
 
+  @Get('market-summary')
+  getMarketSummary() {
+    return this.assetsService.getMarketSummary();
+  }
+
   @Get('search')
   async searchAsset(@Query('q') query: string) {
     return this.assetsService.findAssetInAPI(query);

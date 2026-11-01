@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "../Modal";
 import { REAL_ESTATE_TYPES, TYPE_LABELS } from "./types";
 import { useRealEstateActions } from "./useRealEstate";
+import { DatePicker } from "../DatePicker";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -63,10 +64,10 @@ export function NewRealEstateModal({ onClose }: { onClose: () => void }) {
             <input className="input" type="number" inputMode="decimal" min={0} step="any" placeholder="e.g. 10"
               value={price} onChange={(e) => setPrice(e.target.value)} />
           </label>
-          <label className="field">
+          <div className="field">
             <span className="field-label">Buying date</span>
-            <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
+            <DatePicker value={date} onChange={setDate} ariaLabel="Buying date" />
+          </div>
           <label className="field">
             <span className="field-label">Total area, m²</span>
             <input className="input" type="number" inputMode="decimal" min={0} step="any" placeholder="e.g. 10"

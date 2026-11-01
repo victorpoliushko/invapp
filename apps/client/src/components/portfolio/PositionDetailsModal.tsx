@@ -6,6 +6,8 @@ import xIcon from "../../assets/icons/x.svg";
 import { formatQuantity } from "../../utils/formatQuantity";
 import { TRANSACTION_COLORS } from "./transactionColors";
 import { useDisplayMoney } from "./DisplayCurrency";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { useState } from "react";
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric", year: "2-digit" };
 
@@ -26,11 +28,22 @@ export function PositionDetailsModal({
     .slice()
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const handleDelete = async () => {
-    if (!window.confirm(`Delete ${ticker} and all its transactions from this portfolio?`)) return;
-    await deleteAsset(position.assetId);
-    onClose();
-  };
+  const [confirming, setConfirming] = useState(false);
+
+  if (confirming) {
+    return (
+      <ConfirmDialog
+        title={`Delete ${ticker}?`}
+        message="The position and all its transactions will be removed from this portfolio."
+        confirmLabel="Delete"
+        onConfirm={async () => {
+          await deleteAsset(position.assetId);
+          onClose();
+        }}
+        onCancel={() => setConfirming(false)}
+      />
+    );
+  }
 
   return (
     <Modal labelledBy="position-details-title" onClose={onClose} className="position-details">
@@ -38,7 +51,7 @@ export function PositionDetailsModal({
         <div className="position-details-summary">
           <h2 id="position-details-title" className="position-details-title">{ticker} Details</h2>
           <p><span>Total q-ty</span><strong>{formatQuantity(position.quantity, assetType)}</strong></p>
-          <p><span>Current price</span><strong>{currentPrice != null ? money(currentPrice, "USD", 2) : "—"}</strong></p>
+          <p><span>{assetType === "crypto" ? "Current price/unit" : "Current price"}</span><strong>{currentPrice != null ? money(currentPrice, "USD", 2) : "—"}</strong></p>
           <p><span>Average price</span><strong>{position.price != null ? money(position.price, "USD", 2) : "—"}</strong></p>
         </div>
         <button className="icon-button" aria-label="Close" onClick={onClose}>
@@ -69,7 +82,7 @@ export function PositionDetailsModal({
         </table>
       </div>
 
-      <button className="btn btn-danger" onClick={handleDelete}>
+      <button className="btn btn-danger" onClick={() => setConfirming(true)}>
         Delete {ticker}
       </button>
     </Modal>

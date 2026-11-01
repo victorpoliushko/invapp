@@ -5,6 +5,8 @@ import { TRANSACTION_COLORS } from "../portfolio/transactionColors";
 import { Bond } from "./types";
 import { useBondActions } from "./useBonds";
 import { useDisplayMoney } from "../portfolio/DisplayCurrency";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { useState } from "react";
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric", year: "2-digit" };
 
@@ -13,15 +15,22 @@ export function BondDetailsModal({ bond, onClose }: { bond: Bond; onClose: () =>
   const { deleteBond } = useBondActions();
   const transactions = bond.transactions ?? [];
 
-  const handleDelete = async () => {
-    if (!window.confirm(`Delete ${bond.isin} and all its trades from this portfolio?`)) return;
-    try {
-      await deleteBond(bond.id);
-      onClose();
-    } catch {
-      alert("Failed to delete bond");
-    }
-  };
+  const [confirming, setConfirming] = useState(false);
+
+  if (confirming) {
+    return (
+      <ConfirmDialog
+        title={`Delete ${bond.isin}?`}
+        message="The bond and all its trades will be removed from this portfolio."
+        confirmLabel="Delete"
+        onConfirm={async () => {
+          await deleteBond(bond.id);
+          onClose();
+        }}
+        onCancel={() => setConfirming(false)}
+      />
+    );
+  }
 
   return (
     <Modal labelledBy="bond-details-title" onClose={onClose} className="position-details">
@@ -60,7 +69,7 @@ export function BondDetailsModal({ bond, onClose }: { bond: Bond; onClose: () =>
         </table>
       </div>
 
-      <button className="btn btn-danger" onClick={handleDelete}>
+      <button className="btn btn-danger" onClick={() => setConfirming(true)}>
         Delete {bond.isin}
       </button>
     </Modal>
