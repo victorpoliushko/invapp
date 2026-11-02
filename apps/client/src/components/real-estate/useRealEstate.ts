@@ -64,6 +64,7 @@ export function useRealEstateActions() {
         rooms: input.rooms ?? undefined,
       }),
     deleteProperty: (id: string) => send(`/real-estate/${id}`, "DELETE"),
+    sellProperty: (id: string) => send(`/real-estate/${id}/sell`, "POST"),
     lend: (realEstateId: string, input: LeaseInput) =>
       send("/real-estate/transaction", "POST", {
         realEstateId,

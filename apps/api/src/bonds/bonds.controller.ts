@@ -31,6 +31,11 @@ export class BondsController {
     return this.bondsService.delete(id, user.id);
   }
 
+  @Post(':id/sell-all')
+  sellAll(@Param('id') id: string, @GetUser() user: User) {
+    return this.bondsService.sellAll(id, user.id);
+  }
+
   @Post(':id/transactions')
   addTransaction(@Param('id') id: string, @Body() body: BondTransactionInputDto, @GetUser() user: User) {
     return this.bondsService.addTransaction(id, body, user.id);

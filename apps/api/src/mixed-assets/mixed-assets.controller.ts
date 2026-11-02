@@ -24,6 +24,11 @@ export class MixedAssetsController {
     return this.mixedAssetsService.update(id, body, user.id);
   }
 
+  @Post(':id/sell')
+  sell(@Param('id') id: string, @GetUser() user: User) {
+    return this.mixedAssetsService.sell(id, user.id);
+  }
+
   @Delete(':id')
   delete(@Param('id') id: string, @GetUser() user: User) {
     return this.mixedAssetsService.delete(id, user.id);

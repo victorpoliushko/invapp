@@ -47,10 +47,12 @@ export class AssetsService {
         return existing?.currentPrice ?? 0;
       }
 
-      await this.prismaService.asset.update({
-        where: { ticker: symbol },
-        data: { currentPrice: price, priceUpdatedAt: new Date() },
-      });
+      if (existing) {
+        await this.prismaService.asset.update({
+          where: { ticker: symbol },
+          data: { currentPrice: price, priceUpdatedAt: new Date() },
+        });
+      }
 
       return price;
     } catch (error) {

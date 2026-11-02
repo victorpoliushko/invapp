@@ -576,3 +576,25 @@ table.position-details-table {
     padding: 0 16px 8px;
   }
 }
+
+.positions-with-cash {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.digital-cash-amount {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-body);
+  font-size: var(--font-size-title);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.all-assets-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

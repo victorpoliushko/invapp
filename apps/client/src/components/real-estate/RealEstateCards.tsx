@@ -15,8 +15,8 @@ const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric
 
 type Action = { id: string; kind: "details" | "lend" | "terminate" | "sell" };
 
-export function RealEstateCards({ properties }: { properties: RealEstate[] }) {
-  const { deleteProperty, terminate } = useRealEstateActions();
+export function RealEstateCards({ properties, embedded = false }: { properties: RealEstate[]; embedded?: boolean }) {
+  const { sellProperty, terminate } = useRealEstateActions();
   const [query, setQuery] = useState("");
   const [action, setAction] = useState<Action | null>(null);
 
@@ -30,23 +30,25 @@ export function RealEstateCards({ properties }: { properties: RealEstate[] }) {
 
   return (
     <div className="position-cards">
-      <label className="search-input">
-        <MaskIcon src={searchIcon} size={24} />
-        <input
-          className="input"
-          type="search"
-          placeholder="Search"
-          aria-label="Search real estate"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+      {!embedded && (
+        <label className="search-input">
+          <MaskIcon src={searchIcon} size={24} />
+          <input
+            className="input"
+            type="search"
+            placeholder="Search"
+            aria-label="Search real estate"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      )}
 
       {visible.map((p) => (
         <RealEstateCard key={p.id} property={p} onAction={(kind) => setAction({ id: p.id, kind })} />
       ))}
 
-      {visible.length === 0 && (
+      {!embedded && visible.length === 0 && (
         <p className="position-cards-empty">{q ? "No matches" : "No real estate yet — add some with New Asset."}</p>
       )}
 
@@ -67,10 +69,10 @@ export function RealEstateCards({ properties }: { properties: RealEstate[] }) {
       {target && action?.kind === "sell" && (
         <ConfirmDialog
           title={`Sell ${target.name}?`}
-          message="The property and its history will be removed from this portfolio."
+          message="The property is sold at its current value and the money goes to Cash."
           confirmLabel="Sell"
           onConfirm={async () => {
-            await deleteProperty(target.id);
+            await sellProperty(target.id);
             close();
           }}
           onCancel={close}

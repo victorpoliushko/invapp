@@ -102,6 +102,12 @@ export class PortfoliosController {
     return this.portfoliosService.addAssetToPortfolio(id, addAssetToPortfolioDto, user.id);
   }
 
+  @Post('/:id/assets/:assetId/sell-all')
+  @UseGuards(AuthGuard('jwt'))
+  sellAllAsset(@Param('id') id: string, @Param('assetId') assetId: string, @GetUser() user: User) {
+    return this.portfoliosService.sellAllAsset(id, assetId, user.id);
+  }
+
   @Delete('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())

@@ -12,6 +12,22 @@ export type PositionTransactionInput = {
   coingeckoId?: string | null;
 };
 
+export function useSellAllPosition() {
+  const { id: portfolioId } = useParams<{ id: string }>();
+  const { refreshPortfolio } = usePortfolio();
+  const fetchWithRedirect = useFetchWithRedirect();
+
+  return async (assetId: string): Promise<void> => {
+    const token = localStorage.getItem("accessToken");
+    const res = await fetchWithRedirect(`${API_BASE_URL}/portfolios/${portfolioId}/assets/${assetId}/sell-all`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to sell");
+    await refreshPortfolio();
+  };
+}
+
 export function useAddPositionTransaction() {
   const { id: portfolioId } = useParams<{ id: string }>();
   const { refreshPortfolio } = usePortfolio();

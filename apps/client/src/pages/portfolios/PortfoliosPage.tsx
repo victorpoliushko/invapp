@@ -23,6 +23,8 @@ const TYPE_LABEL: Record<string, string> = {
   PRECIOUS_METAL: "Metal",
   PRIVATE_EQUITY: "PE",
   CASH: "Cash",
+  MIXED_ASSET: "Other",
+  MIXED_ASSETS: "Other",
 };
 
 function assetTypeLabel(type: string | null | undefined): string {

@@ -1,4 +1,5 @@
 import { plainToInstance } from 'class-transformer';
+import { creditCash } from '../cash/cash-ledger';
 import { FxService, ToUsd } from '../fx/fx.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
@@ -9,7 +10,7 @@ import { DeleteAssetsFromPortfolioDto } from './dto/DeleteAssetsFromPortfolio.dt
 import { Currency } from './dto/PortfolioBalance.dto';
 import { AssetsService } from '../assets/assets.service';
 import { UpdatePortfolioDto } from './dto/UpdatePortfolio.dto';
-import { TransactionType } from '@prisma/client';
+import { CashCategory, TransactionType } from '@prisma/client';
 
 export type ReturnPeriod = 'all' | 'year' | 'month';
 
@@ -166,7 +167,7 @@ function buildBondMovers(bonds: (PeriodBond & { isin: string })[], periodStart: 
 }
 
 function buildRealEstateMovers(
-  properties: { code: string; purchasePrice: number; currentValue: number | null; transactions: PeriodRentalTransaction[] }[],
+  properties: { name?: string; code: string | null; purchasePrice: number; currentValue: number | null; transactions: PeriodRentalTransaction[] }[],
   periodStart: Date | null,
   now: Date,
 ): Mover[] {
@@ -176,7 +177,7 @@ function buildRealEstateMovers(
     const income = calcRealEstateIncome(property.transactions, periodStart, now);
     const capitalGain = property.currentValue != null ? property.currentValue - property.purchasePrice : 0;
     const dollarReturn = income + capitalGain;
-    movers.push({ label: property.code, type: 'REAL_ESTATE', pct: (dollarReturn / property.purchasePrice) * 100, dollarReturn });
+    movers.push({ label: property.name ?? property.code ?? 'Real estate', type: 'REAL_ESTATE', pct: (dollarReturn / property.purchasePrice) * 100, dollarReturn });
   }
   return movers;
 }
@@ -219,7 +220,7 @@ function computeNetWorthByType(portfolio: {
   bonds: { currentValue: number | null; purchasePrice: number; quantity: number; currency: string }[];
   realEstateAssets: { currentValue: number | null; purchasePrice: number }[];
   mixedAssets?: { currentValue: number | null; purchasePrice: number; quantity: number }[];
-  cash?: { amount: number; currency: string }[];
+  cash?: { amount: number; currency: string; category?: string }[];
 }, toUsd: ToUsd): NetWorthByType {
   let stocks = 0;
   let crypto = 0;
@@ -244,7 +245,10 @@ function computeNetWorthByType(portfolio: {
     mixedAssets += (asset.currentValue ?? asset.purchasePrice) * asset.quantity;
   }
   for (const entry of portfolio.cash ?? []) {
-    cash += toUsd(entry.amount, entry.currency);
+    const usd = toUsd(entry.amount, entry.currency);
+    if (entry.category === 'STOCK') stocks += usd;
+    else if (entry.category === 'CRYPTO') crypto += usd;
+    else cash += usd;
   }
 
   return { stocks, crypto, bonds, realEstate, mixedAssets, cash };
@@ -395,6 +399,16 @@ export class PortfoliosService {
       await this.upsertPosition(this.prismaService.stockPosition, this.prismaService.stockTransaction, id, asset.id, input);
     }
 
+    if (input.type === TransactionType.SELL) {
+      await creditCash(
+        this.prismaService,
+        id,
+        isCrypto ? CashCategory.CRYPTO : CashCategory.STOCK,
+        'USD',
+        Number(input.quantityChange) * Number(input.pricePerUnit),
+      );
+    }
+
     const updatedPortfolio =
       await this.prismaService.portfolio.findUniqueOrThrow({
         where: { id },
@@ -464,6 +478,29 @@ export class PortfoliosService {
         price: Math.round(avgPrice),
       },
     });
+  }
+
+  async sellAllAsset(id: string, assetId: string, userId: string): Promise<PortfolioDto> {
+    await this.assertOwnership(id, userId);
+
+    const asset = await this.prismaService.asset.findUnique({ where: { id: assetId } });
+    const isCrypto = asset?.type === 'CRYPTOCURRENCY';
+    const key = { portfolioId_assetId: { portfolioId: id, assetId } };
+    const position = isCrypto
+      ? await this.prismaService.cryptoPosition.findUnique({ where: key })
+      : await this.prismaService.stockPosition.findUnique({ where: key });
+    if (!position) throw new NotFoundException('Position not found');
+
+    const unitPrice = asset?.currentPrice ?? position.price ?? 0;
+    await creditCash(
+      this.prismaService,
+      id,
+      isCrypto ? CashCategory.CRYPTO : CashCategory.STOCK,
+      'USD',
+      unitPrice * position.quantity,
+    );
+
+    return this.deleteAsset(id, { assetId } as DeleteAssetsFromPortfolioDto, userId);
   }
 
   async deleteAsset(

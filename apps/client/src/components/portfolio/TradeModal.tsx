@@ -3,7 +3,7 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { PositionDto } from "../../types/portfolio";
 import { Modal } from "../Modal";
 import { formatQuantity } from "../../utils/formatQuantity";
-import { useAddPositionTransaction } from "./useAddPositionTransaction";
+import { useAddPositionTransaction, useSellAllPosition } from "./useAddPositionTransaction";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { DatePicker } from "../DatePicker";
 
@@ -20,7 +20,8 @@ export function TradeModal({
   assetType: "stock" | "crypto";
   onClose: () => void;
 }) {
-  const { currentPrices, deleteAsset } = usePortfolio();
+  const { currentPrices } = usePortfolio();
+  const sellAll = useSellAllPosition();
   const addTransaction = useAddPositionTransaction();
   const ticker = position.asset.ticker;
   const currentPrice = currentPrices[position.assetId];
@@ -61,10 +62,10 @@ export function TradeModal({
     return (
       <ConfirmDialog
         title={`Sell all ${ticker}?`}
-        message="The position and its trade history will be removed from this portfolio."
+        message="The position is sold at the current price and the money goes to Digital cash."
         confirmLabel="Sell all"
         onConfirm={async () => {
-          await deleteAsset(position.assetId);
+          await sellAll(position.assetId);
           onClose();
         }}
         onCancel={() => setConfirmingSellAll(false)}

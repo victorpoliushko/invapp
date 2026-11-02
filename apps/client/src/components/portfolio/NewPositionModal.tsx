@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import { API_BASE_URL } from "../../config";
+import { formatCurrency } from "../../utils/money";
 import { Modal } from "../Modal";
 import { isCryptoSuggestion, useAssetSearch } from "../../hooks/useAssetSearch";
 import { useAddPositionTransaction } from "./useAddPositionTransaction";
@@ -25,6 +28,22 @@ export function NewPositionModal({
   const [error, setError] = useState<string | null>(null);
 
   const { suggestions, clearSuggestions } = useAssetSearch(name, assetType, searchEnabled);
+  const fetchWithRedirect = useFetchWithRedirect();
+  const [currentPrice, setCurrentPrice] = useState<number | null>(null);
+
+  const picked = !searchEnabled && name.trim() !== "";
+
+  useEffect(() => {
+    setCurrentPrice(null);
+    if (!picked || assetType !== "stock") return;
+    const token = localStorage.getItem("accessToken");
+    fetchWithRedirect(`${API_BASE_URL}/assets/price?asset=${encodeURIComponent(name.trim())}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setCurrentPrice(data?.price > 0 ? data.price : null))
+      .catch(() => setCurrentPrice(null));
+  }, [picked, name, assetType, fetchWithRedirect]);
 
   const canSubmit =
     name.trim() !== "" && parseFloat(quantity) > 0 && parseFloat(price) > 0 && date !== "" && !submitting;
@@ -123,6 +142,14 @@ export function NewPositionModal({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
+            {currentPrice != null && (
+              <span className="field-hint">
+                Current price: {formatCurrency(currentPrice, "USD", 2)}{" "}
+                <button type="button" className="link-button" onClick={() => setPrice(String(+currentPrice.toFixed(2)))}>
+                  Use
+                </button>
+              </span>
+            )}
           </label>
           <div className="field">
             <span className="field-label">Date</span>

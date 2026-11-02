@@ -10,8 +10,8 @@ import { UpdateValueModal } from "./UpdateValueModal";
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric", year: "2-digit" };
 
-export function MixedAssetCards({ assets }: { assets: MixedAsset[] }) {
-  const { deleteAsset } = useMixedAssetActions();
+export function MixedAssetCards({ assets, embedded = false }: { assets: MixedAsset[]; embedded?: boolean }) {
+  const { sellAsset } = useMixedAssetActions();
   const [query, setQuery] = useState("");
   const [action, setAction] = useState<{ id: string; kind: "value" | "sell" } | null>(null);
 
@@ -22,23 +22,25 @@ export function MixedAssetCards({ assets }: { assets: MixedAsset[] }) {
 
   return (
     <div className="position-cards">
-      <label className="search-input">
-        <MaskIcon src={searchIcon} size={24} />
-        <input
-          className="input"
-          type="search"
-          placeholder="Search"
-          aria-label="Search other assets"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+      {!embedded && (
+        <label className="search-input">
+          <MaskIcon src={searchIcon} size={24} />
+          <input
+            className="input"
+            type="search"
+            placeholder="Search"
+            aria-label="Search other assets"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      )}
 
       {visible.map((a) => (
         <MixedAssetCard key={a.id} asset={a} onAction={(kind) => setAction({ id: a.id, kind })} />
       ))}
 
-      {visible.length === 0 && (
+      {!embedded && visible.length === 0 && (
         <p className="position-cards-empty">{q ? "No matches" : "There are no assets yet."}</p>
       )}
 
@@ -46,10 +48,10 @@ export function MixedAssetCards({ assets }: { assets: MixedAsset[] }) {
       {target && action?.kind === "sell" && (
         <ConfirmDialog
           title={`Sell ${target.name}?`}
-          message="The asset will be removed from this portfolio."
+          message="The asset is sold at its current value and the money goes to Cash."
           confirmLabel="Sell"
           onConfirm={async () => {
-            await deleteAsset(target.id);
+            await sellAsset(target.id);
             close();
           }}
           onCancel={close}

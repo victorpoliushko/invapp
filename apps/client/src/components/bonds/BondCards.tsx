@@ -9,7 +9,7 @@ import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric", year: "2-digit" };
 
-export function BondCards({ bonds }: { bonds: Bond[] }) {
+export function BondCards({ bonds, embedded = false }: { bonds: Bond[]; embedded?: boolean }) {
   const [query, setQuery] = useState("");
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [trade, setTrade] = useState<{ bondId: string; type: "BUY" | "SELL" } | null>(null);
@@ -24,17 +24,19 @@ export function BondCards({ bonds }: { bonds: Bond[] }) {
 
   return (
     <div className="position-cards">
-      <label className="search-input">
-        <MaskIcon src={searchIcon} size={24} />
-        <input
-          className="input"
-          type="search"
-          placeholder="Search"
-          aria-label="Search bonds"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+      {!embedded && (
+        <label className="search-input">
+          <MaskIcon src={searchIcon} size={24} />
+          <input
+            className="input"
+            type="search"
+            placeholder="Search"
+            aria-label="Search bonds"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      )}
 
       {visible.map((b) => (
         <BondCard
@@ -45,7 +47,7 @@ export function BondCards({ bonds }: { bonds: Bond[] }) {
         />
       ))}
 
-      {visible.length === 0 && (
+      {!embedded && visible.length === 0 && (
         <p className="position-cards-empty">{q ? "No matches" : "No bonds yet — add one with New Asset."}</p>
       )}
 

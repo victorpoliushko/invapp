@@ -61,5 +61,6 @@ export function useMixedAssetActions() {
       }),
     updateValue: (id: string, currentValue: number) => send(`/mixed-assets/${id}`, "PATCH", { currentValue }),
     deleteAsset: (id: string) => send(`/mixed-assets/${id}`, "DELETE"),
+    sellAsset: (id: string) => send(`/mixed-assets/${id}/sell`, "POST"),
   };
 }

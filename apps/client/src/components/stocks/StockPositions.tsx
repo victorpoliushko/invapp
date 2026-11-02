@@ -2,10 +2,16 @@ import { PortfolioDto } from "../../types/portfolio";
 import { useIsPhone } from "../../hooks/useIsPhone";
 import { PositionCards } from "../portfolio/PositionCards";
 import { PositionTable } from "../portfolio/PositionTable";
+import { DigitalCashCard } from "../cash/DigitalCashCard";
 
 export function StockPositions({ portfolio }: { portfolio: PortfolioDto }) {
   const isPhone = useIsPhone();
-  return isPhone
-    ? <PositionCards portfolio={portfolio} assetType="stock" />
-    : <PositionTable portfolio={portfolio} assetType="stock" />;
+  return (
+    <div className="positions-with-cash">
+      <DigitalCashCard category="STOCK" />
+      {isPhone
+        ? <PositionCards portfolio={portfolio} assetType="stock" />
+        : <PositionTable portfolio={portfolio} assetType="stock" />}
+    </div>
+  );
 }

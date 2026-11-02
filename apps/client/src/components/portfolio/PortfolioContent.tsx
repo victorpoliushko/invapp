@@ -17,6 +17,7 @@ import { CashPositions } from "../cash/CashPositions";
 import { CashModal } from "../cash/CashModal";
 import { CurrencySelect } from "../CurrencySelect";
 import { DisplayCurrencyProvider } from "./DisplayCurrency";
+import { AllAssets } from "./AllAssets";
 import { Currency, useCurrency } from "../../context/CurrencyContext";
 import { MaskIcon } from "../MaskIcon";
 import chevronIcon from "../../assets/icons/chevron-right.svg";
@@ -26,6 +27,7 @@ import { API_BASE_URL } from "../../config";
 import "../../pages/portfolio/PortfolioPage.css";
 
 const TABS: { id: AssetTab; label: string }[] = [
+  { id: "all", label: "All" },
   { id: "stocks", label: "Stocks" },
   { id: "bonds", label: "Bonds" },
   { id: "realestate", label: "Real estate" },
@@ -41,7 +43,7 @@ export function PortfolioContent() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
-  const [selectedTab, setSelectedTab] = useState<AssetTab>("stocks");
+  const [selectedTab, setSelectedTab] = useState<AssetTab>("all");
   const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | "cash" | "realestate" | "other" | null>(null);
   const [netWorth, setNetWorth] = useState<number | null>(null);
 
@@ -95,6 +97,8 @@ export function PortfolioContent() {
 
   const renderTab = () => {
     switch (selectedTab) {
+      case "all":
+        return <AllAssets portfolio={portfolio} />;
       case "stocks":
         return <StockPositions portfolio={portfolio} />;
       case "crypto":

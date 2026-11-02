@@ -150,8 +150,10 @@
 }
 
 .portfolio-mover-value {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(4.5rem, auto) minmax(5rem, auto);
   align-items: center;
+  justify-items: end;
   gap: 8px;
   font-size: var(--font-size-copy);
   font-variant-numeric: tabular-nums;

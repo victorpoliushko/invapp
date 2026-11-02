@@ -191,6 +191,7 @@ describe('PortfoliosService', () => {
 
   beforeEach(() => {
     prisma = {
+      cash: { findFirst: jest.fn(), update: jest.fn(), create: jest.fn() },
       portfolio: {
         create: jest.fn(),
         findUnique: jest.fn().mockResolvedValue({ userId: OWNER_ID }),

@@ -9,9 +9,10 @@ export type CashEntry = {
   name: string | null;
   currency: string;
   amount: number;
+  category?: "GENERAL" | "STOCK" | "CRYPTO";
 };
 
-export type CashInput = Omit<CashEntry, "id">;
+export type CashInput = Omit<CashEntry, "id" | "category">;
 
 export function useCash() {
   const { id: portfolioId } = useParams<{ id: string }>();

@@ -35,6 +35,22 @@ function formatRange(min: number, max: number): string {
   return `~${formatDays(min)}–${formatDays(max)}`;
 }
 
+const SPEED_STOPS = [
+  [76, 175, 80],
+  [247, 147, 26],
+  [229, 115, 115],
+];
+
+function speedColor(index: number, count: number): string {
+  if (count <= 1) return `rgb(${SPEED_STOPS[0].join(", ")})`;
+  const t = index / (count - 1);
+  const scaled = t * (SPEED_STOPS.length - 1);
+  const i = Math.min(Math.floor(scaled), SPEED_STOPS.length - 2);
+  const f = scaled - i;
+  const mix = SPEED_STOPS[i].map((c, k) => Math.round(c + (SPEED_STOPS[i + 1][k] - c) * f));
+  return `rgb(${mix.join(", ")})`;
+}
+
 const ROWS: { key: "cash" | "stocks" | "bonds" | "crypto"; label: string }[] = [
   { key: "cash", label: "Cash" },
   { key: "stocks", label: "Stocks" },
@@ -89,10 +105,10 @@ export function LiquiditySummary() {
         </div>
 
         <div className="liquidity-summary-rows">
-          {rows.map((r) => (
+          {rows.map((r, i) => (
             <div key={r.key} className="liquidity-summary-row">
               <span className="liquidity-summary-row-label">{r.label}</span>
-              <span className="liquidity-summary-row-range">
+              <span className="liquidity-summary-row-range" style={{ color: speedColor(i, rows.length) }}>
                 {formatRange(r.line.minDays, r.line.maxDays)}
                 {r.isRealEstate && (
                   <span className="liquidity-summary-row-range-alt">

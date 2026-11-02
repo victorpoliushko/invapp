@@ -6,8 +6,16 @@ import { formatCurrency } from "../../utils/money";
 import { CashEntry, useCash } from "./useCash";
 import { CashModal } from "./CashModal";
 
-export function CashPositions({ displayCurrency }: { displayCurrency: string }) {
-  const entries = useCash();
+export function CashPositions({
+  displayCurrency,
+  ids,
+  embedded = false,
+}: {
+  displayCurrency: string;
+  ids?: string[];
+  embedded?: boolean;
+}) {
+  const entries = useCash().filter((e) => (ids ? ids.includes(e.id) : (e.category ?? "GENERAL") === "GENERAL"));
   const { convert } = useCurrency();
   const [editing, setEditing] = useState<CashEntry | null>(null);
 
@@ -15,7 +23,7 @@ export function CashPositions({ displayCurrency }: { displayCurrency: string }) 
 
   return (
     <div className="position-cards">
-      {entries.length > 0 && (
+      {!embedded && entries.length > 0 && (
         <div className="cash-total">
           <span>Total cash</span>
           <strong>{formatCurrency(total, displayCurrency, 2)}</strong>
@@ -44,7 +52,7 @@ export function CashPositions({ displayCurrency }: { displayCurrency: string }) 
         </article>
       ))}
 
-      {entries.length === 0 && <p className="position-cards-empty">No cash yet — add some with New Asset.</p>}
+      {!embedded && entries.length === 0 && <p className="position-cards-empty">No cash yet — add some with New Asset.</p>}
 
       {editing && <CashModal entry={editing} onClose={() => setEditing(null)} />}
     </div>

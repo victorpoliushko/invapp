@@ -75,5 +75,6 @@ export function useBondActions() {
         date: new Date(input.date).toISOString(),
       }),
     deleteBond: (bondId: string) => send(`/bonds/${bondId}`, "DELETE"),
+    sellAllBond: (bondId: string) => send(`/bonds/${bondId}/sell-all`, "POST"),
   };
 }

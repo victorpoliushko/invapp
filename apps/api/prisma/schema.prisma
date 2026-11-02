@@ -175,11 +175,18 @@ model MixedAsset {
   portfolioId String
 }
 
+enum CashCategory {
+  GENERAL
+  STOCK
+  CRYPTO
+}
+
 model Cash {
-  id       String  @id @default(uuid())
+  id       String       @id @default(uuid())
   name     String?
   currency String
   amount   Float
+  category CashCategory @default(GENERAL)
 
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
   portfolioId String

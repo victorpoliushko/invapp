@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { creditCash } from '../cash/cash-ledger';
 import { PrismaService } from '../prisma/prisma.service';
-import { CouponFrequency, Prisma, TransactionType } from '@prisma/client';
+import { CashCategory, CouponFrequency, Prisma, TransactionType } from '@prisma/client';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 import { BondTransactionInputDto, BondTransactionUpdateDto } from './dto/BondTransaction.dto';
 
@@ -124,6 +125,18 @@ export class BondsService {
     return this.prisma.bond.delete({ where: { id } });
   }
 
+  async sellAll(bondId: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForBond(bondId);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
+    return this.prisma.$transaction(async (tx) => {
+      const bond = await tx.bond.findUniqueOrThrow({ where: { id: bondId } });
+      await creditCash(tx, portfolioId, CashCategory.GENERAL, bond.currency, (bond.currentValue ?? bond.purchasePrice) * bond.quantity);
+      await tx.bond.delete({ where: { id: bondId } });
+      return null;
+    });
+  }
+
   async addTransaction(bondId: string, input: BondTransactionInputDto, userId: string) {
     const portfolioId = await this.getPortfolioIdForBond(bondId);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
@@ -139,6 +152,10 @@ export class BondsService {
         },
       });
       const bond = await this.recalculate(tx, bondId);
+
+      if (input.type === TransactionType.SELL) {
+        await creditCash(tx, bond.portfolioId, CashCategory.GENERAL, bond.currency, Number(input.quantity) * Number(input.pricePerUnit));
+      }
 
       if (input.type === TransactionType.SELL && bond.quantity <= SOLD_OUT_EPSILON) {
         await tx.bond.delete({ where: { id: bondId } });

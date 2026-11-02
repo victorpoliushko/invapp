@@ -27,6 +27,11 @@ export class RealEstateController {
     return this.realEstateService.update(id, dto, user.id);
   }
 
+  @Post(':id/sell')
+  sell(@Param('id') id: string, @GetUser() user: User) {
+    return this.realEstateService.sell(id, user.id);
+  }
+
   @Delete(':id')
   delete(@Param('id') id: string, @GetUser() user: User) {
     return this.realEstateService.delete(id, user.id);

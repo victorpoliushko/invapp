@@ -15,9 +15,13 @@ const SHORT_DATE: Intl.DateTimeFormatOptions = { month: "numeric", day: "numeric
 export function PositionCards({
   portfolio,
   assetType,
+  ids,
+  embedded = false,
 }: {
   portfolio: PortfolioDto;
   assetType: "stock" | "crypto";
+  ids?: string[];
+  embedded?: boolean;
 }) {
   const { currentPrices } = usePortfolio();
   const [query, setQuery] = useState("");
@@ -27,6 +31,7 @@ export function PositionCards({
   const all = assetType === "crypto" ? portfolio.cryptoPositions : portfolio.stockPositions;
   const q = query.trim().toLowerCase();
   const positions = all
+    .filter((p) => !ids || ids.includes(p.assetId))
     .filter((p) => !q || p.asset.ticker.toLowerCase().includes(q) || p.asset.name?.toLowerCase().includes(q))
     .sort((a, b) => totalPosition(b) - totalPosition(a));
 
@@ -36,17 +41,19 @@ export function PositionCards({
 
   return (
     <div className="position-cards">
-      <label className="search-input">
-        <MaskIcon src={searchIcon} size={24} />
-        <input
-          className="input"
-          type="search"
-          placeholder="Search"
-          aria-label={`Search ${assetType === "crypto" ? "crypto" : "stocks"}`}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+      {!embedded && (
+        <label className="search-input">
+          <MaskIcon src={searchIcon} size={24} />
+          <input
+            className="input"
+            type="search"
+            placeholder="Search"
+            aria-label={`Search ${assetType === "crypto" ? "crypto" : "stocks"}`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      )}
 
       {positions.map((p) => (
         <PositionCard
@@ -59,7 +66,7 @@ export function PositionCards({
         />
       ))}
 
-      {positions.length === 0 && (
+      {!embedded && positions.length === 0 && (
         <p className="position-cards-empty">
           {q ? "No matches" : `No ${assetType === "crypto" ? "crypto" : "stocks"} yet — add one with New Asset.`}
         </p>

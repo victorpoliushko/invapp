@@ -149,7 +149,7 @@ export interface LiquidityPortfolioInput {
     quantity: number;
     currency?: string;
   }[];
-  cash?: { amount: number; currency: string }[];
+  cash?: { amount: number; currency: string; category?: string }[];
   realEstateAssets: {
     currentValue: number | null;
     purchasePrice: number;
@@ -208,7 +208,8 @@ export function computeLiquidity(
   }
 
   for (const entry of portfolio.cash ?? []) {
-    addToLine(cash, toUsd(entry.amount, entry.currency), SAME_DAY);
+    const line = entry.category === 'STOCK' ? stocks : entry.category === 'CRYPTO' ? crypto : cash;
+    addToLine(line, toUsd(entry.amount, entry.currency), SAME_DAY);
   }
 
   const liquid = [cash, stocks, bonds, crypto].reduce(mergeLines, emptyLine());

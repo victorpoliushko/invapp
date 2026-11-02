@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CashCategory } from '@prisma/client';
+import { creditCash } from '../cash/cash-ledger';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRealEstateDto, CreateRealEstateTransactionDto, UpdateRealEstateDto } from './dto/real-estate.dto';
 import { PortfoliosService } from '../portfolios/portfolios.service';
@@ -73,6 +75,18 @@ export class RealEstateService {
         totalArea: dto.totalArea,
       },
       include: { transactions: true },
+    });
+  }
+
+  async sell(id: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForProperty(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
+    return this.prismaService.$transaction(async (tx) => {
+      const property = await tx.realEstate.findUniqueOrThrow({ where: { id } });
+      await creditCash(tx, portfolioId, CashCategory.GENERAL, 'USD', property.currentValue ?? property.purchasePrice);
+      await tx.realEstate.delete({ where: { id } });
+      return null;
     });
   }
 

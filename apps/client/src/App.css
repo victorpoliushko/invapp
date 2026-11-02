@@ -207,13 +207,23 @@
 }
 
 .news-section {
-  margin: 1.5rem auto 8rem;
+  margin: 1.5rem var(--section-padding) 0;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   background-color: var(--color-surface-raised);
   border: 1px solid var(--border-container);
   border-radius: var(--radius-lg);
   height: 600px;
+}
+
+.news-section .tradingview-widget-container,
+.news-section .tradingview-widget-container__widget {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
 .news-section h1 {
@@ -432,9 +442,7 @@
   }
 
   .news-section {
-    height: auto;
-    min-height: 300px;
-    padding: 1.5rem;
+    height: 480px;
   }
 
   .stocks-wrapper {
@@ -469,9 +477,9 @@
     padding-right: 0;
   }
 
-  .news-section,
-  .stocks-section,
-  .realestate-section {
+  .page-content .news-section,
+  .page-content .stocks-section,
+  .page-content .realestate-section {
     margin: 16px 0 0;
     padding: 16px;
   }

@@ -3,7 +3,7 @@ import { MaskIcon } from "../MaskIcon";
 import chevronDownIcon from "../../assets/icons/chevron-down.svg";
 import checkIcon from "../../assets/icons/check.svg";
 
-export type AssetTab = "stocks" | "bonds" | "realestate" | "crypto" | "cash" | "other";
+export type AssetTab = "all" | "stocks" | "bonds" | "realestate" | "crypto" | "cash" | "other";
 
 const OPTIONS: { tab: AssetTab; label: string }[] = [
   { tab: "stocks", label: "Stock" },

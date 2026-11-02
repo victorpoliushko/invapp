@@ -16,7 +16,7 @@ export function BondTradeModal({
   type: "BUY" | "SELL";
   onClose: () => void;
 }) {
-  const { addTrade, deleteBond } = useBondActions();
+  const { addTrade, sellAllBond } = useBondActions();
 
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
@@ -48,10 +48,10 @@ export function BondTradeModal({
     return (
       <ConfirmDialog
         title={`Sell all ${bond.isin}?`}
-        message="The bond and its trade history will be removed from this portfolio."
+        message="The bond is sold at its current value and the money goes to Cash."
         confirmLabel="Sell all"
         onConfirm={async () => {
-          await deleteBond(bond.id);
+          await sellAllBond(bond.id);
           onClose();
         }}
         onCancel={() => setConfirmingSellAll(false)}

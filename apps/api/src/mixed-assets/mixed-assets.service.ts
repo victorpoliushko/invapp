@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CashCategory } from '@prisma/client';
+import { creditCash } from '../cash/cash-ledger';
 import { PrismaService } from '../prisma/prisma.service';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 
@@ -72,6 +74,18 @@ export class MixedAssetsService {
         ...(data.purchaseDate && { purchaseDate: new Date(data.purchaseDate) }),
         ...(data.currentValue != null && { currentValue: Number(data.currentValue) }),
       },
+    });
+  }
+
+  async sell(id: string, userId: string) {
+    const portfolioId = await this.getPortfolioIdForMixedAsset(id);
+    await this.portfoliosService.assertOwnership(portfolioId, userId);
+
+    return this.prisma.$transaction(async (tx) => {
+      const asset = await tx.mixedAsset.findUniqueOrThrow({ where: { id } });
+      await creditCash(tx, portfolioId, CashCategory.GENERAL, 'USD', (asset.currentValue ?? asset.purchasePrice) * asset.quantity);
+      await tx.mixedAsset.delete({ where: { id } });
+      return null;
     });
   }
 

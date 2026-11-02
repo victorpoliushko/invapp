@@ -59,7 +59,7 @@ describe('AssetsService', () => {
     });
 
     it('fetches and stores a fresh price from Finnhub when the cache is stale', async () => {
-      prisma.asset.findUnique.mockResolvedValue(null);
+      prisma.asset.findUnique.mockResolvedValue({ currentPrice: 150, priceUpdatedAt: new Date(0) });
       httpService.get.mockReturnValue(of({ data: { c: 187.5 } }));
 
       const result = await service.getSharePrice('aapl');

@@ -333,6 +333,7 @@ describe('BondsService', () => {
           findMany: jest.fn(),
         },
         bond: { update: jest.fn().mockImplementation(({ data }) => data), delete: jest.fn() },
+        cash: { findFirst: jest.fn(), update: jest.fn(), create: jest.fn() },
       };
       prisma.$transaction = jest.fn((fn: (t: any) => unknown) => fn(tx));
       prisma.bondTransaction = {
