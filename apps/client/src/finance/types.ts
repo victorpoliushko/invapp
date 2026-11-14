@@ -27,6 +27,7 @@ export type HoldingProperty = {
   name?: string | null;
   code?: string | null;
   type: string;
+  purchaseDate?: string;
   purchasePrice: number;
   currentValue: number | null;
   transactions?: { startDate: string; endDate: string; monthlyRent: number }[];

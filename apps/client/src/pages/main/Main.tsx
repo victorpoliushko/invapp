@@ -5,6 +5,7 @@ import MarketNews from "../../components/marketNews";
 import { PropertyCard } from "../../components/PropertyCard";
 import { NetWorthAllocation } from "../../components/networth/NetWorthAllocation";
 import { LiquiditySummary } from "../../components/liquidity/LiquiditySummary";
+import { Prediction } from "../../components/prediction/Prediction";
 import { CurrencySelect } from "../../components/CurrencySelect";
 import { useCurrency } from "../../context/CurrencyContext";
 
@@ -70,6 +71,7 @@ export const MainPage = () => {
         />
       </div>
       <NetWorthAllocation />
+      <Prediction />
       <LiquiditySummary />
 
       <div className="">{/* <MarketHeatmap /> */}</div>
