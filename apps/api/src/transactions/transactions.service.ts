@@ -4,6 +4,9 @@ import { TransactionsDto } from './dto/Transations.dto';
 import { plainToInstance } from 'class-transformer';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PortfoliosService } from 'src/portfolios/portfolios.service';
+import { cipher, optionalCipher } from '../common/cipher';
+
+export type PositionUpdate = { quantity: string; price?: string | null };
 
 @Injectable()
 export class TransactionsService {
@@ -11,15 +14,6 @@ export class TransactionsService {
     private prismaService: PrismaService,
     private portfoliosService: PortfoliosService,
   ) {}
-
-  // Both stock and crypto transactions share the same shape, so routing
-  // between the two split tables comes down to one lookup: is the asset a
-  // cryptocurrency? Everything else (including untyped/legacy assets) is
-  // treated as a stock transaction.
-  private async isCrypto(assetId: string): Promise<boolean> {
-    const asset = await this.prismaService.asset.findUnique({ where: { id: assetId } });
-    return asset?.type === 'CRYPTOCURRENCY';
-  }
 
   private async getPortfolioIdForTransaction(id: string): Promise<{ portfolioId: string; isCrypto: boolean }> {
     const stockTransaction = await this.prismaService.stockTransaction.findUnique({
@@ -37,43 +31,8 @@ export class TransactionsService {
     throw new NotFoundException('Transaction not found');
   }
 
-  async create(input: CreateTransactionDto, userId: string): Promise<TransactionsDto> {
-    await this.portfoliosService.assertOwnership(input.portfolioId, userId);
-
-    let assetId = input.assetId;
-
-    if (!assetId && input.assetName) {
-      const asset = await this.prismaService.asset.findFirst({
-        where: { ticker: input.assetName },
-      });
-
-      assetId = asset.id;
-    }
-
-    const isCrypto = await this.isCrypto(assetId);
-    const transaction: any = isCrypto ? this.prismaService.cryptoTransaction : this.prismaService.stockTransaction;
-    const positionRelation = isCrypto ? 'cryptoPosition' : 'stockPosition';
-
-    const createdTransaction = await transaction.create({
-      data: {
-        type: input.type,
-        quantityChange: input.quantityChange,
-        date: input.date,
-        pricePerUnit: input.pricePerUnit,
-        [positionRelation]: {
-          connect: {
-            portfolioId_assetId: {
-              portfolioId: input.portfolioId,
-              assetId,
-            },
-          },
-        },
-      },
-    });
-
-    this.portfoliosService.addAssetToPortfolio(input.portfolioId, { ...input, assetId } as any, userId);
-
-    return plainToInstance(TransactionsDto, createdTransaction);
+  async create(input: CreateTransactionDto, userId: string) {
+    return this.portfoliosService.addAssetToPortfolio(input.portfolioId, input as any, userId);
   }
 
   async getById(id: string): Promise<TransactionsDto> {
@@ -84,10 +43,7 @@ export class TransactionsService {
     const found = await transaction.findUnique({
       where: { id },
       include: {
-        [positionRelation]: { include: {
-          portfolio: true,
-          asset: true
-        }}
+        [positionRelation]: { include: { portfolio: true, asset: true } },
       },
     });
     return plainToInstance(TransactionsDto, found);
@@ -95,100 +51,53 @@ export class TransactionsService {
 
   async update(
     id: string,
-    data: { date: string; quantityChange: number; pricePerUnit: number },
+    data: { date: string; quantityChange: string; pricePerUnit: string; position: PositionUpdate },
     userId: string,
   ) {
     const { portfolioId, isCrypto } = await this.getPortfolioIdForTransaction(id);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
-    return await this.prismaService.$transaction(async (trx) => {
+    const quantityChange = cipher(data.quantityChange, 'quantityChange');
+    const pricePerUnit = cipher(data.pricePerUnit, 'pricePerUnit');
+    const position = this.parsePosition(data.position);
+
+    return this.prismaService.$transaction(async (trx) => {
       const transaction: any = isCrypto ? trx.cryptoTransaction : trx.stockTransaction;
-      const position: any = isCrypto ? trx.cryptoPosition : trx.stockPosition;
+      const positions: any = isCrypto ? trx.cryptoPosition : trx.stockPosition;
 
-      await transaction.update({
+      const updated = await transaction.update({
         where: { id },
-        data: {
-          date: new Date(data.date),
-          quantityChange: Number(data.quantityChange),
-          pricePerUnit: Number(data.pricePerUnit),
-        },
+        data: { date: new Date(data.date), quantityChange, pricePerUnit },
       });
-
-      const updated = await transaction.findUniqueOrThrow({ where: { id } });
-      const { assetId } = updated;
-
-      const allTransactions = await transaction.findMany({
-        where: { portfolioId, assetId },
-      });
-
-      let totalQuantityBought = 0;
-      let totalQuantitySold = 0;
-      let totalCostBasis = 0;
-
-      allTransactions.forEach((t) => {
-        if (t.type === 'BUY') {
-          totalQuantityBought += t.quantityChange;
-          totalCostBasis += t.quantityChange * t.pricePerUnit;
-        } else if (t.type === 'SELL') {
-          totalQuantitySold += t.quantityChange;
-        }
-      });
-
-      const currentQuantity = totalQuantityBought - totalQuantitySold;
-      const avgBuyPrice =
-        totalQuantityBought > 0 ? totalCostBasis / totalQuantityBought : 0;
-
-      await position.update({
-        where: { portfolioId_assetId: { portfolioId, assetId } },
-        data: { quantity: currentQuantity, price: avgBuyPrice },
+      await positions.update({
+        where: { portfolioId_assetId: { portfolioId, assetId: updated.assetId } },
+        data: position,
       });
     });
   }
 
-  async delete(id: string, userId: string) {
+  async delete(id: string, position: PositionUpdate, userId: string) {
     const { portfolioId, isCrypto } = await this.getPortfolioIdForTransaction(id);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
-    return await this.prismaService.$transaction(async (trx) => {
+    const values = this.parsePosition(position);
+
+    return this.prismaService.$transaction(async (trx) => {
       const transaction: any = isCrypto ? trx.cryptoTransaction : trx.stockTransaction;
-      const position: any = isCrypto ? trx.cryptoPosition : trx.stockPosition;
+      const positions: any = isCrypto ? trx.cryptoPosition : trx.stockPosition;
 
-      const found = await transaction.findUniqueOrThrow({
-        where: { id },
-      });
-
-      const { assetId } = found;
-
-      await transaction.delete({ where: { id } });
-
-      const remainingTransactions = await transaction.findMany({
-        where: { portfolioId, assetId },
-      });
-
-      let totalQuantityBought = 0;
-      let totalQuantitySold = 0;
-      let totalCostBasis = 0;
-
-      remainingTransactions.forEach((t) => {
-        if (t.type === 'BUY') {
-          totalQuantityBought += t.quantityChange;
-          totalCostBasis += t.quantityChange * t.pricePerUnit;
-        } else if (t.type === 'SELL') {
-          totalQuantitySold += t.quantityChange;
-        }
-      });
-
-      const currentQuantity = totalQuantityBought - totalQuantitySold;
-      const avgBuyPrice =
-        totalQuantityBought > 0 ? totalCostBasis / totalQuantityBought : 0;
-
-      await position.update({
-        where: { portfolioId_assetId: { portfolioId, assetId } },
-        data: {
-          quantity: currentQuantity,
-          price: avgBuyPrice,
-        },
+      const found = await transaction.delete({ where: { id } });
+      await positions.update({
+        where: { portfolioId_assetId: { portfolioId, assetId: found.assetId } },
+        data: values,
       });
     });
+  }
+
+  private parsePosition(position: PositionUpdate | undefined) {
+    return {
+      quantity: cipher(position?.quantity, 'position.quantity'),
+      price: optionalCipher(position?.price, 'position.price') ?? null,
+    };
   }
 }

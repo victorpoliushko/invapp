@@ -5,6 +5,7 @@ import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstate, TYPE_LABELS } from "./types";
 import { calcRealEstateStats as calcStats } from "./realEstateMetrics";
 import { API_BASE_URL } from "../../config";
+import { secureFetch } from "../../api/secureFetch";
 import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 type Props = {
@@ -57,7 +58,7 @@ export function RealEstateRow({ property, isExpanded, onExpand, onDelete, onUpda
     if (!code || !name || !purchaseDate || !purchasePrice || !rooms || !totalArea) return;
 
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/real-estate/${property.id}`, {
+    const res = await secureFetch(`${API_BASE_URL}/real-estate/${property.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({

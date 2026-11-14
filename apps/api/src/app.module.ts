@@ -25,7 +25,7 @@ import { UploadModule } from './upload/upload.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { RealEstateModule } from './real-estate/real-estate.module';
 import { BondsModule } from './bonds/bonds.module';
-import { LiquidityModule } from './liquidity/liquidity.module';
+import { VaultModule } from './vault/vault.module';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { LiquidityModule } from './liquidity/liquidity.module';
     MixedAssetsModule,
     RealEstateModule,
     BondsModule,
-    LiquidityModule,
+    VaultModule,
     CashModule,
     FxModule,
     PrometheusModule.register(),

@@ -13,7 +13,8 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { PortfoliosService, ReturnPeriod } from './portfolios.service';
+import { PortfoliosService } from './portfolios.service';
+import { CashCredit } from '../cash/cash-ledger';
 import { AuthGuard } from '@nestjs/passport';
 import { CreatePortfolioDto } from './dto/CreatePortfolio.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
@@ -82,15 +83,6 @@ export class PortfoliosController {
     return this.portfoliosService.getByUserId(userId);
   }
 
-  @Get('/user/:userId/net-worth')
-  @UseGuards(AuthGuard('jwt'))
-  getNetWorth(@Param('userId') userId: string, @GetUser() user: User) {
-    if (userId !== user.id) {
-      throw new ForbiddenException('You do not have access to this user\'s net worth');
-    }
-    return this.portfoliosService.getNetWorth(userId);
-  }
-
   @Post('/:id/assets')
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
@@ -104,8 +96,13 @@ export class PortfoliosController {
 
   @Post('/:id/assets/:assetId/sell-all')
   @UseGuards(AuthGuard('jwt'))
-  sellAllAsset(@Param('id') id: string, @Param('assetId') assetId: string, @GetUser() user: User) {
-    return this.portfoliosService.sellAllAsset(id, assetId, user.id);
+  sellAllAsset(
+    @Param('id') id: string,
+    @Param('assetId') assetId: string,
+    @Body() body: { cash?: CashCredit },
+    @GetUser() user: User,
+  ) {
+    return this.portfoliosService.sellAllAsset(id, assetId, body?.cash, user.id);
   }
 
   @Delete('/:id/assets')
@@ -127,31 +124,5 @@ export class PortfoliosController {
     @GetUser() user: User,
   ) {
     return this.portfoliosService.getPortfolioBalance(id, currency, user.id);
-  }
-
-  @Get(':id/returns')
-  @UseGuards(AuthGuard('jwt'))
-  getReturns(
-    @Param('id') id: string,
-    @Query('period') period: ReturnPeriod = 'all',
-    @GetUser() user: User,
-  ) {
-    return this.portfoliosService.getPortfolioReturns(id, period, user.id);
-  }
-
-  @Get(':id/movers')
-  @UseGuards(AuthGuard('jwt'))
-  getTopMovers(
-    @Param('id') id: string,
-    @Query('period') period: ReturnPeriod = 'all',
-    @GetUser() user: User,
-  ) {
-    return this.portfoliosService.getTopMovers(id, period, user.id);
-  }
-
-  @Get(':id/net-worth')
-  @UseGuards(AuthGuard('jwt'))
-  getPortfolioNetWorth(@Param('id') id: string, @GetUser() user: User) {
-    return this.portfoliosService.getPortfolioNetWorth(id, user.id);
   }
 }

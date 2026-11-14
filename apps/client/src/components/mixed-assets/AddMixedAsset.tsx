@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { alertMissingFields } from "../../utils/formValidation";
 import { API_BASE_URL } from "../../config";
+import { secureFetch } from "../../api/secureFetch";
 
 type Props = { onAdded: () => void };
 
@@ -23,7 +24,7 @@ export function AddMixedAsset({ onAdded }: Props) {
     })) return;
 
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/mixed-assets`, {
+    const res = await secureFetch(`${API_BASE_URL}/mixed-assets`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({

@@ -4,6 +4,7 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { API_BASE_URL } from "../../config";
 import { RealEstate, RealEstateTransaction } from "./types";
+import { cashCredit } from "../../finance/cash";
 
 export type NewRealEstateInput = {
   name: string;
@@ -38,7 +39,7 @@ export function useRealEstate() {
 
 export function useRealEstateActions() {
   const { id: portfolioId } = useParams<{ id: string }>();
-  const { refreshPortfolio } = usePortfolio();
+  const { portfolio, refreshPortfolio } = usePortfolio();
   const fetchWithRedirect = useFetchWithRedirect();
 
   const send = async (path: string, method: string, body?: unknown) => {
@@ -64,7 +65,11 @@ export function useRealEstateActions() {
         rooms: input.rooms ?? undefined,
       }),
     deleteProperty: (id: string) => send(`/real-estate/${id}`, "DELETE"),
-    sellProperty: (id: string) => send(`/real-estate/${id}/sell`, "POST"),
+    sellProperty: (id: string) => {
+      const property = portfolio?.realEstateAssets.find((r) => r.id === id);
+      const proceeds = property ? property.currentValue ?? property.purchasePrice : 0;
+      return send(`/real-estate/${id}/sell`, "POST", { cash: cashCredit(portfolio?.cash, "GENERAL", "USD", proceeds) });
+    },
     lend: (realEstateId: string, input: LeaseInput) =>
       send("/real-estate/transaction", "POST", {
         realEstateId,

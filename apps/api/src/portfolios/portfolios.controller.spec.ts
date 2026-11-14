@@ -17,10 +17,7 @@ describe('PortfoliosController', () => {
       addAssetToPortfolio: jest.fn(),
       deleteAsset: jest.fn(),
       getPortfolioBalance: jest.fn(),
-      getPortfolioReturns: jest.fn(),
-      getTopMovers: jest.fn(),
-      getNetWorth: jest.fn(),
-      getPortfolioNetWorth: jest.fn(),
+      sellAllAsset: jest.fn(),
     };
 
     controller = new PortfoliosController(service);
@@ -83,22 +80,9 @@ describe('PortfoliosController', () => {
     });
   });
 
-  describe('getNetWorth', () => {
-    it('delegates to the service when the requested user id matches the authenticated user', () => {
-      controller.getNetWorth('u1', user);
-
-      expect(service.getNetWorth).toHaveBeenCalledWith('u1');
-    });
-
-    it('throws Forbidden when requesting another user\'s net worth', () => {
-      expect(() => controller.getNetWorth('someone-else', user)).toThrow(ForbiddenException);
-      expect(service.getNetWorth).not.toHaveBeenCalled();
-    });
-  });
-
   describe('addAssetToPortfolio', () => {
     it('delegates to the service with the portfolio id, dto and authenticated user id', () => {
-      const dto = { assetName: 'AAPL', quantityChange: 1, pricePerUnit: 100, date: '2026-01-01', type: 'BUY' };
+      const dto = { assetName: 'AAPL', quantityChange: 'v1:aQ==:cQ==', pricePerUnit: 'v1:aQ==:cA==', date: '2026-01-01', type: 'BUY' };
       controller.addAssetToPortfolio('p1', dto as any, user);
 
       expect(service.addAssetToPortfolio).toHaveBeenCalledWith('p1', dto, 'u1');
@@ -122,39 +106,11 @@ describe('PortfoliosController', () => {
     });
   });
 
-  describe('getReturns', () => {
-    it('defaults to the "all" period when none is provided', () => {
-      controller.getReturns('p1', undefined as any, user);
-
-      expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'all', 'u1');
-    });
-
-    it('passes through an explicit period', () => {
-      controller.getReturns('p1', 'year', user);
-
-      expect(service.getPortfolioReturns).toHaveBeenCalledWith('p1', 'year', 'u1');
-    });
-  });
-
-  describe('getTopMovers', () => {
-    it('defaults to the "all" period when none is provided', () => {
-      controller.getTopMovers('p1', undefined as any, user);
-
-      expect(service.getTopMovers).toHaveBeenCalledWith('p1', 'all', 'u1');
-    });
-
-    it('passes through an explicit period', () => {
-      controller.getTopMovers('p1', 'month', user);
-
-      expect(service.getTopMovers).toHaveBeenCalledWith('p1', 'month', 'u1');
-    });
-  });
-
-  describe('getPortfolioNetWorth', () => {
-    it('delegates to the service with the portfolio id and authenticated user id', () => {
-      controller.getPortfolioNetWorth('p1', user);
-
-      expect(service.getPortfolioNetWorth).toHaveBeenCalledWith('p1', 'u1');
+  describe('sellAllAsset', () => {
+    it('passes the device-computed cash credit through to the service', () => {
+      const cash = { id: 'c1', amount: 'v1:aQ==:cQ==' };
+      controller.sellAllAsset('p1', 'a1', { cash }, user);
+      expect(service.sellAllAsset).toHaveBeenCalledWith('p1', 'a1', cash, 'u1');
     });
   });
 });

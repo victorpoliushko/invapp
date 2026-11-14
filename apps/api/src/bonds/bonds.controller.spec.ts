@@ -58,7 +58,7 @@ describe('BondsController', () => {
 
   describe('trades', () => {
     it('adds a trade to the bond', () => {
-      const body = { type: 'BUY', quantity: 2, pricePerUnit: 100, date: '2026-01-01' } as any;
+      const body = { type: 'BUY', quantity: 'v1:aQ==:cQ==', pricePerUnit: 'v1:aQ==:cA==', date: '2026-01-01' } as any;
 
       controller.addTransaction('b1', body, user);
 
@@ -66,7 +66,7 @@ describe('BondsController', () => {
     });
 
     it('updates a trade by id', () => {
-      const body = { quantity: 3 } as any;
+      const body = { quantity: 'v1:aQ==:cQ==' } as any;
 
       controller.updateTransaction('t1', body, user);
 
@@ -74,9 +74,9 @@ describe('BondsController', () => {
     });
 
     it('deletes a trade by id', () => {
-      controller.deleteTransaction('t1', user);
-
-      expect(service.deleteTransaction).toHaveBeenCalledWith('t1', 'u1');
+      const bond = { quantity: 'v1:aQ==:cQ==', purchasePrice: 'v1:aQ==:cA==' };
+      controller.deleteTransaction('t1', { bond }, user);
+      expect(service.deleteTransaction).toHaveBeenCalledWith('t1', bond, 'u1');
     });
   });
 });

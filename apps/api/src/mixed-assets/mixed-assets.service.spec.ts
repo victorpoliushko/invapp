@@ -1,6 +1,10 @@
 /// <reference types="jest" />
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { MixedAssetsService } from './mixed-assets.service';
+
+const QTY = 'v1:aQ==:cQ==';
+const PRICE = 'v1:aQ==:cA==';
+const VALUE = 'v1:aQ==:dg==';
 
 describe('MixedAssetsService', () => {
   const OWNER_ID = 'u1';
@@ -25,12 +29,12 @@ describe('MixedAssetsService', () => {
   });
 
   describe('create', () => {
-    it('coerces numeric string inputs and parses the purchase date', async () => {
+    it('stores the encrypted amounts and parses the purchase date', async () => {
       await service.create({
         portfolioId: 'p1',
         name: 'Vintage Watch',
-        quantity: '1' as any,
-        purchasePrice: '5000' as any,
+        quantity: QTY,
+        purchasePrice: PRICE,
         purchaseDate: '2026-01-01',
       }, OWNER_ID);
 
@@ -39,27 +43,37 @@ describe('MixedAssetsService', () => {
         data: {
           portfolioId: 'p1',
           name: 'Vintage Watch',
-          quantity: 1,
-          purchasePrice: 5000,
+          quantity: QTY,
+          purchasePrice: PRICE,
           purchaseDate: new Date('2026-01-01'),
           currentValue: undefined,
         },
       });
     });
 
-    it('coerces currentValue when provided', async () => {
+    it('stores currentValue when provided', async () => {
       await service.create({
         portfolioId: 'p1',
         name: 'Vintage Watch',
-        quantity: 1,
-        purchasePrice: 5000,
+        quantity: QTY,
+        purchasePrice: PRICE,
         purchaseDate: '2026-01-01',
-        currentValue: '6200' as any,
+        currentValue: VALUE,
       }, OWNER_ID);
-
       expect(prisma.mixedAsset.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ currentValue: 6200 }) }),
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: VALUE }) }),
       );
+    });
+
+    it('rejects plaintext amounts', async () => {
+      await expect(service.create({
+        portfolioId: 'p1',
+        name: 'Vintage Watch',
+        quantity: '1',
+        purchasePrice: PRICE,
+        purchaseDate: '2026-01-01',
+      }, OWNER_ID)).rejects.toThrow(BadRequestException);
+      expect(prisma.mixedAsset.create).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden when the portfolio belongs to another user', async () => {
@@ -68,8 +82,8 @@ describe('MixedAssetsService', () => {
       await expect(service.create({
         portfolioId: 'p1',
         name: 'Vintage Watch',
-        quantity: 1,
-        purchasePrice: 5000,
+        quantity: QTY,
+        purchasePrice: PRICE,
         purchaseDate: '2026-01-01',
       }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
       expect(prisma.mixedAsset.create).not.toHaveBeenCalled();
@@ -78,8 +92,7 @@ describe('MixedAssetsService', () => {
 
   describe('update', () => {
     it('only includes fields that were provided', async () => {
-      await service.update('asset-1', { quantity: 2 }, OWNER_ID);
-
+      await service.update('asset-1', { quantity: QTY }, OWNER_ID);
       expect(prisma.mixedAsset.findUnique).toHaveBeenCalledWith({
         where: { id: 'asset-1' },
         select: { portfolioId: true },
@@ -87,7 +100,7 @@ describe('MixedAssetsService', () => {
       expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
       expect(prisma.mixedAsset.update).toHaveBeenCalledWith({
         where: { id: 'asset-1' },
-        data: { quantity: 2 },
+        data: { quantity: QTY },
       });
     });
 
@@ -99,26 +112,26 @@ describe('MixedAssetsService', () => {
       expect(call.data).toEqual({ name: 'Renamed' });
     });
 
-    it('parses currentValue when provided', async () => {
-      await service.update('asset-1', { currentValue: 7000 }, OWNER_ID);
+    it('stores currentValue when provided', async () => {
+      await service.update('asset-1', { currentValue: VALUE }, OWNER_ID);
 
       expect(prisma.mixedAsset.update).toHaveBeenCalledWith({
         where: { id: 'asset-1' },
-        data: { currentValue: 7000 },
+        data: { currentValue: VALUE },
       });
     });
 
     it('throws NotFound when the mixed asset does not exist', async () => {
       prisma.mixedAsset.findUnique.mockResolvedValue(null);
 
-      await expect(service.update('missing', { quantity: 2 }, OWNER_ID)).rejects.toThrow(NotFoundException);
+      await expect(service.update('missing', { quantity: QTY }, OWNER_ID)).rejects.toThrow(NotFoundException);
       expect(prisma.mixedAsset.update).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden when the owning portfolio belongs to another user', async () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
-      await expect(service.update('asset-1', { quantity: 2 }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      await expect(service.update('asset-1', { quantity: QTY }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
       expect(prisma.mixedAsset.update).not.toHaveBeenCalled();
     });
   });

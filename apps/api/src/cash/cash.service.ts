@@ -2,8 +2,9 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 import { isSupportedCurrency, SUPPORTED_CURRENCIES } from '../fx/currencies';
+import { cipher } from '../common/cipher';
 
-type CashInput = { name?: string | null; currency: string; amount: number };
+type CashInput = { name?: string | null; currency: string; amount: string };
 
 @Injectable()
 export class CashService {
@@ -32,7 +33,7 @@ export class CashService {
         portfolioId: data.portfolioId,
         name: parseName(data.name),
         currency: parseCurrency(data.currency),
-        amount: parseAmount(data.amount),
+        amount: cipher(data.amount, 'amount'),
       },
     });
   }
@@ -46,7 +47,7 @@ export class CashService {
       data: {
         ...(data.name !== undefined && { name: parseName(data.name) }),
         ...(data.currency != null && { currency: parseCurrency(data.currency) }),
-        ...(data.amount != null && { amount: parseAmount(data.amount) }),
+        ...(data.amount != null && { amount: cipher(data.amount, 'amount') }),
       },
     });
   }
@@ -70,10 +71,4 @@ function parseCurrency(value: unknown): string {
     throw new BadRequestException(`currency must be one of ${SUPPORTED_CURRENCIES.join(', ')}`);
   }
   return code;
-}
-
-function parseAmount(value: unknown): number {
-  const amount = Number(value);
-  if (!Number.isFinite(amount) || amount < 0) throw new BadRequestException('amount must be a non-negative number');
-  return amount;
 }

@@ -1,14 +1,7 @@
 import { TransactionType } from '@prisma/client';
 import { Expose, Transform } from 'class-transformer';
-import {
-  IsDefined,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUUID,
-  ValidateIf,
-} from 'class-validator';
+import { IsDefined, IsEnum, IsObject, IsOptional, IsString, IsUUID, ValidateIf } from 'class-validator';
+import { CashCredit } from '../../cash/cash-ledger';
 
 export class AddAssetInputDto {
   @ValidateIf(i => !i.assetName || i.assetId)
@@ -27,13 +20,11 @@ export class AddAssetInputDto {
   @Transform(({ value }) => value instanceof Date ? value.toISOString().split('T')[0] : value)
   date: string;
 
-  @IsNumber()
-  @IsDefined()
-  quantityChange: number;
+  @IsString()
+  quantityChange: string;
 
-  @IsNumber()
-  @IsDefined()
-  pricePerUnit: number;
+  @IsString()
+  pricePerUnit: string;
 
   @IsEnum(TransactionType, {
     message: 'type must be "BUY" or "SELL"',
@@ -43,4 +34,11 @@ export class AddAssetInputDto {
   @IsOptional()
   @IsString()
   coingeckoId?: string;
+
+  @IsObject()
+  position: { quantity: string; price?: string | null };
+
+  @IsOptional()
+  @IsObject()
+  cash?: CashCredit;
 }

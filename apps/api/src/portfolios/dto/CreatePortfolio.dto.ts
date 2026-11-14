@@ -1,4 +1,4 @@
-import { IsDefined, IsNotEmpty, IsNumber, IsOptional, Max, Min } from "class-validator";
+import { IsDefined, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreatePortfolioDto {
   @IsDefined()
@@ -10,8 +10,6 @@ export class CreatePortfolioDto {
   userId: string;
 
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(1000)
-  goal?: number;
+  @IsString()
+  goal?: string;
 }

@@ -1,16 +1,11 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../../AuthContext";
+import { useMemo } from "react";
 import "./NetWorthAllocation.css";
-import { API_BASE_URL } from "../../config";
 import { useCurrency } from "../../context/CurrencyContext";
 import { formatCurrency } from "../../utils/money";
+import { useAllPortfolios } from "../../hooks/useAllPortfolios";
+import { combinedNetWorth, NetWorthByType } from "../../finance/valuation";
 
-type NetWorth = {
-  total: number;
-  byType: { stocks: number; crypto: number; bonds: number; realEstate: number; mixedAssets: number; cash?: number };
-};
-
-const ASSET_CLASSES: { key: keyof NetWorth["byType"]; label: string; color: string }[] = [
+const ASSET_CLASSES: { key: keyof NetWorthByType; label: string; color: string }[] = [
   { key: "cash", label: "Cash", color: "var(--decorative-cash)" },
   { key: "stocks", label: "Stocks", color: "var(--decorative-green)" },
   { key: "crypto", label: "Crypto", color: "var(--decorative-orange)" },
@@ -20,20 +15,9 @@ const ASSET_CLASSES: { key: keyof NetWorth["byType"]; label: string; color: stri
 ];
 
 export function NetWorthAllocation() {
-  const { userId } = useAuth();
-  const { defaultCurrency, fromUsd } = useCurrency();
-  const [netWorth, setNetWorth] = useState<NetWorth | null>(null);
-
-  useEffect(() => {
-    if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    fetch(`${API_BASE_URL}/portfolios/user/${userId}/net-worth`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then(setNetWorth)
-      .catch(() => setNetWorth(null));
-  }, [userId]);
+  const { defaultCurrency, fromUsd, toUsd } = useCurrency();
+  const portfolios = useAllPortfolios();
+  const netWorth = useMemo(() => (portfolios ? combinedNetWorth(portfolios, toUsd) : null), [portfolios, toUsd]);
 
   if (!netWorth || netWorth.total <= 0) return null;
 

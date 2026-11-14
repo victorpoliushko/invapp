@@ -1,6 +1,8 @@
 /// <reference types="jest" />
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { RealEstateService } from './real-estate.service';
+
+const enc = (value: string) => `v1:aQ==:${Buffer.from(value).toString('base64')}`;
 
 describe('RealEstateService', () => {
   const OWNER_ID = 'u1';
@@ -35,7 +37,7 @@ describe('RealEstateService', () => {
     it('attaches the transaction to an existing property when the code already exists', async () => {
       prisma.realEstate.findFirst.mockResolvedValue({ id: 're-1', code: 'LVIV-01' });
 
-      await service.addTransactionByCode('p1', 'LVIV-01', '2026-01-01', '2026-02-01', 500, OWNER_ID);
+      await service.addTransactionByCode('p1', 'LVIV-01', '2026-01-01', '2026-02-01', enc('500'), enc('0'), OWNER_ID);
 
       expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
       expect(prisma.realEstate.create).not.toHaveBeenCalled();
@@ -44,7 +46,7 @@ describe('RealEstateService', () => {
           realEstateId: 're-1',
           startDate: new Date('2026-01-01'),
           endDate: new Date('2026-02-01'),
-          monthlyRent: 500,
+          monthlyRent: enc('500'),
         },
       });
     });
@@ -53,7 +55,7 @@ describe('RealEstateService', () => {
       prisma.realEstate.findFirst.mockResolvedValue(null);
       prisma.realEstate.create.mockResolvedValue({ id: 're-new', code: 'NEW-01' });
 
-      await service.addTransactionByCode('p1', 'NEW-01', '2026-01-01', '2026-02-01', 750, OWNER_ID);
+      await service.addTransactionByCode('p1', 'NEW-01', '2026-01-01', '2026-02-01', enc('750'), enc('0'), OWNER_ID);
 
       expect(prisma.realEstate.create).toHaveBeenCalledWith({
         data: {
@@ -61,7 +63,7 @@ describe('RealEstateService', () => {
           name: 'NEW-01',
           type: 'APARTMENT',
           purchaseDate: expect.any(Date),
-          purchasePrice: 0,
+          purchasePrice: enc('0'),
           portfolioId: 'p1',
         },
       });
@@ -70,26 +72,25 @@ describe('RealEstateService', () => {
           realEstateId: 're-new',
           startDate: new Date('2026-01-01'),
           endDate: new Date('2026-02-01'),
-          monthlyRent: 750,
+          monthlyRent: enc('750'),
         },
       });
     });
 
-    it('coerces a string monthlyRent to a number', async () => {
+    it('rejects a plaintext monthlyRent', async () => {
       prisma.realEstate.findFirst.mockResolvedValue({ id: 're-1', code: 'LVIV-01' });
 
-      await service.addTransactionByCode('p1', 'LVIV-01', '2026-01-01', '2026-02-01', '500' as any, OWNER_ID);
-
-      expect(prisma.realEstateTransaction.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ monthlyRent: 500 }) }),
-      );
+      await expect(
+        service.addTransactionByCode('p1', 'LVIV-01', '2026-01-01', '2026-02-01', '500', enc('0'), OWNER_ID),
+      ).rejects.toThrow(BadRequestException);
+      expect(prisma.realEstateTransaction.create).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden when the portfolio belongs to another user', async () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
       await expect(
-        service.addTransactionByCode('p1', 'LVIV-01', '2026-01-01', '2026-02-01', 500, OWNER_ID),
+        service.addTransactionByCode('p1', 'LVIV-01', '2026-01-01', '2026-02-01', enc('500'), enc('0'), OWNER_ID),
       ).rejects.toThrow(ForbiddenException);
       expect(prisma.realEstate.findFirst).not.toHaveBeenCalled();
     });
@@ -104,7 +105,7 @@ describe('RealEstateService', () => {
         name: 'City Apartment',
         type: 'APARTMENT' as any,
         purchaseDate: '2026-01-01',
-        purchasePrice: 150000,
+        purchasePrice: enc('150000'),
         rooms: 3,
         totalArea: 72.5,
         portfolioId: 'p1',
@@ -117,7 +118,7 @@ describe('RealEstateService', () => {
           name: 'City Apartment',
           type: 'APARTMENT',
           purchaseDate: new Date('2026-01-01'),
-          purchasePrice: 150000,
+          purchasePrice: enc('150000'),
           rooms: 3,
           totalArea: 72.5,
           portfolioId: 'p1',
@@ -134,7 +135,7 @@ describe('RealEstateService', () => {
         name: 'Studio',
         type: 'APARTMENT' as any,
         purchaseDate: '2026-01-01',
-        purchasePrice: 90000,
+        purchasePrice: enc('90000'),
         portfolioId: 'p1',
       }, OWNER_ID);
 
@@ -152,7 +153,7 @@ describe('RealEstateService', () => {
           name: 'City Apartment',
           type: 'APARTMENT' as any,
           purchaseDate: '2026-01-01',
-          purchasePrice: 150000,
+          purchasePrice: enc('150000'),
           portfolioId: 'p1',
         }, OTHER_USER_ID),
       ).rejects.toThrow(ForbiddenException);
@@ -167,13 +168,13 @@ describe('RealEstateService', () => {
         name: 'City Apartment',
         type: 'APARTMENT' as any,
         purchaseDate: '2026-01-01',
-        purchasePrice: 150000,
-        currentValue: 165000,
+        purchasePrice: enc('150000'),
+        currentValue: enc('165000'),
         portfolioId: 'p1',
       }, OWNER_ID);
 
       expect(prisma.realEstate.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ currentValue: 165000 }) }),
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: enc('165000') }) }),
       );
     });
   });
@@ -187,7 +188,7 @@ describe('RealEstateService', () => {
         name: 'Renovated Apartment',
         type: 'APARTMENT' as any,
         purchaseDate: '2026-02-01',
-        purchasePrice: 160000,
+        purchasePrice: enc('160000'),
         rooms: 4,
         totalArea: 80,
       }, OWNER_ID);
@@ -204,7 +205,7 @@ describe('RealEstateService', () => {
           name: 'Renovated Apartment',
           type: 'APARTMENT',
           purchaseDate: new Date('2026-02-01'),
-          purchasePrice: 160000,
+          purchasePrice: enc('160000'),
           rooms: 4,
           totalArea: 80,
         },
@@ -223,7 +224,6 @@ describe('RealEstateService', () => {
           code: undefined,
           name: undefined,
           type: undefined,
-          purchasePrice: undefined,
           rooms: 2,
           totalArea: undefined,
         },
@@ -234,10 +234,10 @@ describe('RealEstateService', () => {
     it('includes currentValue in the update when provided', async () => {
       prisma.realEstate.update.mockResolvedValue({ id: 're-1' });
 
-      await service.update('re-1', { currentValue: 170000 }, OWNER_ID);
+      await service.update('re-1', { currentValue: enc('170000') }, OWNER_ID);
 
       expect(prisma.realEstate.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ currentValue: 170000 }) }),
+        expect.objectContaining({ data: expect.objectContaining({ currentValue: enc('170000') }) }),
       );
     });
 
@@ -303,7 +303,7 @@ describe('RealEstateService', () => {
   describe('createTransaction', () => {
     it('creates the transaction after verifying ownership via the property', async () => {
       await service.createTransaction(
-        { realEstateId: 're-1', startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 500 } as any,
+        { realEstateId: 're-1', startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: enc('500') } as any,
         OWNER_ID,
       );
 
@@ -317,7 +317,7 @@ describe('RealEstateService', () => {
           realEstateId: 're-1',
           startDate: new Date('2026-01-01'),
           endDate: new Date('2026-02-01'),
-          monthlyRent: 500,
+          monthlyRent: enc('500'),
         },
       });
     });
@@ -327,7 +327,7 @@ describe('RealEstateService', () => {
     it('updates the transaction after verifying ownership via the parent property', async () => {
       await service.updateTransaction(
         'tx-1',
-        { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 600 },
+        { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: enc('600') },
         OWNER_ID,
       );
 
@@ -342,7 +342,7 @@ describe('RealEstateService', () => {
       prisma.realEstateTransaction.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.updateTransaction('missing', { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 600 }, OWNER_ID),
+        service.updateTransaction('missing', { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: enc('600') }, OWNER_ID),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -350,7 +350,7 @@ describe('RealEstateService', () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
       await expect(
-        service.updateTransaction('tx-1', { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 600 }, OTHER_USER_ID),
+        service.updateTransaction('tx-1', { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: enc('600') }, OTHER_USER_ID),
       ).rejects.toThrow(ForbiddenException);
     });
   });

@@ -15,12 +15,12 @@ export class CreateRealEstateDto {
   @IsString()
   purchaseDate: string;
 
-  @IsNumber()
-  purchasePrice: number;
+  @IsString()
+  purchasePrice: string;
 
   @IsOptional()
-  @IsNumber()
-  currentValue?: number;
+  @IsString()
+  currentValue?: string;
 
   @IsOptional()
   @IsNumber()
@@ -52,12 +52,12 @@ export class UpdateRealEstateDto {
   purchaseDate?: string;
 
   @IsOptional()
-  @IsNumber()
-  purchasePrice?: number;
+  @IsString()
+  purchasePrice?: string;
 
   @IsOptional()
-  @IsNumber()
-  currentValue?: number;
+  @IsString()
+  currentValue?: string;
 
   @IsOptional()
   @IsNumber()
@@ -78,6 +78,6 @@ export class CreateRealEstateTransactionDto {
   @IsString()
   endDate: string;
 
-  @IsNumber()
-  monthlyRent: number;
+  @IsString()
+  monthlyRent: string;
 }

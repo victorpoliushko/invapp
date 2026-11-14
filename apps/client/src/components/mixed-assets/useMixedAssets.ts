@@ -4,6 +4,7 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { API_BASE_URL } from "../../config";
 import { MixedAsset } from "./types";
+import { cashCredit } from "../../finance/cash";
 
 export type NewMixedAssetInput = {
   name: string;
@@ -35,7 +36,7 @@ export function useMixedAssets() {
 
 export function useMixedAssetActions() {
   const { id: portfolioId } = useParams<{ id: string }>();
-  const { refreshPortfolio } = usePortfolio();
+  const { portfolio, refreshPortfolio } = usePortfolio();
   const fetchWithRedirect = useFetchWithRedirect();
 
   const send = async (path: string, method: string, body?: unknown) => {
@@ -61,6 +62,10 @@ export function useMixedAssetActions() {
       }),
     updateValue: (id: string, currentValue: number) => send(`/mixed-assets/${id}`, "PATCH", { currentValue }),
     deleteAsset: (id: string) => send(`/mixed-assets/${id}`, "DELETE"),
-    sellAsset: (id: string) => send(`/mixed-assets/${id}/sell`, "POST"),
+    sellAsset: (id: string) => {
+      const asset = portfolio?.mixedAssets.find((m) => m.id === id);
+      const proceeds = asset ? (asset.currentValue ?? asset.purchasePrice) * asset.quantity : 0;
+      return send(`/mixed-assets/${id}/sell`, "POST", { cash: cashCredit(portfolio?.cash, "GENERAL", "USD", proceeds) });
+    },
   };
 }

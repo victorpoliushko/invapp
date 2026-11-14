@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./PortfoliosPage.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
 import editIcon from "../../assets/icons/edit.svg";
 import plusIcon from "../../assets/icons/plus.svg";
-import { API_BASE_URL } from "../../config";
+import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import { Mover, portfolioReturns, ReturnPeriod, topMovers } from "../../finance/returns";
+import { netWorthByType, totalNetWorth } from "../../finance/valuation";
 import { MaskIcon } from "../../components/MaskIcon";
 import { NewPortfolioModal } from "./NewPortfolioModal";
 import { formatCurrency, gainColor, signedCurrency, signedPct } from "../../utils/money";
@@ -32,48 +34,15 @@ function assetTypeLabel(type: string | null | undefined): string {
   return TYPE_LABEL[type] ?? type;
 }
 
-type ReturnPeriod = "all" | "year" | "month";
-
 const RETURN_PERIOD_OPTIONS: { value: ReturnPeriod; label: string }[] = [
   { value: "all", label: "All time" },
   { value: "year", label: "Last year" },
   { value: "month", label: "This month" },
 ];
 
-type PortfolioReturns = { pctReturn: number | null; dollarReturn: number | null };
-type Mover = { label: string; type: string; pct: number; dollarReturn: number };
-type PortfolioMovers = { topPerformers: Mover[]; topLosers: Mover[] };
-type PortfolioNetWorth = { total: number };
-
-async function fetchPortfolioReturns(portfolioId: string, period: ReturnPeriod): Promise<PortfolioReturns | null> {
-  const token = localStorage.getItem("accessToken");
-  const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}/returns?period=${period}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function fetchTopMovers(portfolioId: string, period: ReturnPeriod): Promise<PortfolioMovers | null> {
-  const token = localStorage.getItem("accessToken");
-  const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}/movers?period=${period}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function fetchPortfolioNetWorth(portfolioId: string): Promise<PortfolioNetWorth | null> {
-  const token = localStorage.getItem("accessToken");
-  const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}/net-worth`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
 export default function PortfoliosPage() {
-  const { defaultCurrency, fromUsd } = useCurrency();
+  const { defaultCurrency, fromUsd, toUsd } = useCurrency();
+  const fetchWithRedirect = useFetchWithRedirect();
   const { userId } = useParams();
   const navigate = useNavigate();
   const { createPortolio, deletePortfolio, refreshUserPortfolios, portfolios } =
@@ -81,9 +50,6 @@ export default function PortfoliosPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
   const [returnPeriods, setReturnPeriods] = useState<Record<string, ReturnPeriod>>({});
-  const [portfolioReturns, setPortfolioReturns] = useState<Record<string, PortfolioReturns>>({});
-  const [portfolioMovers, setPortfolioMovers] = useState<Record<string, PortfolioMovers>>({});
-  const [portfolioNetWorth, setPortfolioNetWorth] = useState<Record<string, PortfolioNetWorth>>({});
 
   const handleCreate = (name: string, goal: number | undefined) => {
     createPortolio(name, userId ?? "", goal);
@@ -91,10 +57,8 @@ export default function PortfoliosPage() {
   };
 
   const renamePortfolio = async (portfolioId: string, name: string) => {
-    const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}`, {
+    const res = await fetchWithRedirect(`/portfolios/${portfolioId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ id: portfolioId, name }),
     });
     if (!res.ok) throw new Error("Failed to rename portfolio");
@@ -102,10 +66,8 @@ export default function PortfoliosPage() {
   };
 
   const handleCurrencyChange = async (portfolioId: string, currency: Currency) => {
-    const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/portfolios/${portfolioId}`, {
+    const res = await fetchWithRedirect(`/portfolios/${portfolioId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ id: portfolioId, displayCurrency: currency }),
     });
     if (!res.ok) {
@@ -119,27 +81,23 @@ export default function PortfoliosPage() {
     refreshUserPortfolios();
   }, [userId, refreshUserPortfolios]);
 
-  useEffect(() => {
-    if (!portfolios) return;
-    portfolios.forEach((p) => {
-      const period = returnPeriods[p.id] ?? "all";
-      fetchPortfolioReturns(p.id, period).then((data) => {
-        if (data) setPortfolioReturns((prev) => ({ ...prev, [p.id]: data }));
-      });
-      fetchTopMovers(p.id, period).then((data) => {
-        if (data) setPortfolioMovers((prev) => ({ ...prev, [p.id]: data }));
-      });
-    });
-  }, [portfolios, returnPeriods]);
-
-  useEffect(() => {
-    if (!portfolios) return;
-    portfolios.forEach((p) => {
-      fetchPortfolioNetWorth(p.id).then((data) => {
-        if (data) setPortfolioNetWorth((prev) => ({ ...prev, [p.id]: data }));
-      });
-    });
-  }, [portfolios]);
+  const summaries = useMemo(
+    () =>
+      Object.fromEntries(
+        (portfolios ?? []).map((p) => {
+          const period = returnPeriods[p.id] ?? "all";
+          return [
+            p.id,
+            {
+              netWorth: totalNetWorth(netWorthByType(p, toUsd)),
+              returns: portfolioReturns(p, period, toUsd),
+              movers: topMovers(p, period, toUsd),
+            },
+          ];
+        }),
+      ),
+    [portfolios, returnPeriods, toUsd],
+  );
 
   return (
     <section className="portfolios-section section-container">
@@ -155,11 +113,11 @@ export default function PortfoliosPage() {
         {portfolios && portfolios.length > 0 &&
           portfolios.map((p) => {
             const period = returnPeriods[p.id] ?? "all";
-            const returns = portfolioReturns[p.id];
-            const movers = portfolioMovers[p.id];
-            const performers = movers?.topPerformers ?? [];
-            const losers = movers?.topLosers ?? [];
-            const netWorth = portfolioNetWorth[p.id]?.total;
+            const summary = summaries[p.id];
+            const returns = summary?.returns;
+            const performers = summary?.movers.topPerformers ?? [];
+            const losers = summary?.movers.topLosers ?? [];
+            const netWorth = summary?.netWorth;
             const currency = p.displayCurrency ?? defaultCurrency;
             const money = (usd: number) => formatCurrency(fromUsd(usd, currency), currency);
             return (

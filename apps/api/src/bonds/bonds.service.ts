@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { creditCash } from '../cash/cash-ledger';
+import { applyCashCredit, CashCredit } from '../cash/cash-ledger';
+import { cipher, optionalCipher } from '../common/cipher';
 import { PrismaService } from '../prisma/prisma.service';
-import { CashCategory, CouponFrequency, Prisma, TransactionType } from '@prisma/client';
+import { CouponFrequency, TransactionType } from '@prisma/client';
 import { PortfoliosService } from '../portfolios/portfolios.service';
-import { BondTransactionInputDto, BondTransactionUpdateDto } from './dto/BondTransaction.dto';
+import { BondHolding, BondTransactionInputDto, BondTransactionUpdateDto } from './dto/BondTransaction.dto';
 
 function parseCurrency(value: string): string {
   const code = String(value).trim().toUpperCase();
@@ -11,7 +12,13 @@ function parseCurrency(value: string): string {
   return code;
 }
 
-const SOLD_OUT_EPSILON = 1e-9;
+function holding(bond: BondHolding | undefined) {
+  return {
+    quantity: cipher(bond?.quantity, 'bond.quantity'),
+    purchasePrice: cipher(bond?.purchasePrice, 'bond.purchasePrice'),
+    ...(bond?.purchaseDate && { purchaseDate: new Date(bond.purchaseDate) }),
+  };
+}
 
 const WITH_TRANSACTIONS = {
   transactions: { orderBy: { date: 'desc' as const } },
@@ -44,22 +51,21 @@ export class BondsService {
       portfolioId: string;
       isin: string;
       name: string;
-      faceValue: number;
-      couponRate: number;
+      faceValue: string;
+      couponRate: string;
       couponFrequency: CouponFrequency;
       currency?: string;
-      quantity: number;
-      purchasePrice: number;
-      currentValue?: number;
+      quantity: string;
+      purchasePrice: string;
+      currentValue?: string;
       purchaseDate: string;
       maturityDate?: string;
+      transaction?: { quantity: string; pricePerUnit: string };
     },
     userId: string,
   ) {
     await this.portfoliosService.assertOwnership(data.portfolioId, userId);
 
-    const quantity = Number(data.quantity);
-    const purchasePrice = Number(data.purchasePrice);
     const purchaseDate = new Date(data.purchaseDate);
 
     return this.prisma.bond.create({
@@ -68,18 +74,23 @@ export class BondsService {
         portfolioId: data.portfolioId,
         isin: data.isin,
         name: data.name,
-        faceValue: Number(data.faceValue),
-        couponRate: Number(data.couponRate),
+        faceValue: cipher(data.faceValue, 'faceValue'),
+        couponRate: cipher(data.couponRate, 'couponRate'),
         couponFrequency: data.couponFrequency,
         currency: data.currency ? parseCurrency(data.currency) : undefined,
-        quantity,
-        purchasePrice,
-        currentValue: data.currentValue != null ? Number(data.currentValue) : undefined,
+        quantity: cipher(data.quantity, 'quantity'),
+        purchasePrice: cipher(data.purchasePrice, 'purchasePrice'),
+        currentValue: optionalCipher(data.currentValue, 'currentValue') ?? undefined,
         purchaseDate,
         maturityDate: data.maturityDate ? new Date(data.maturityDate) : undefined,
-        ...(quantity > 0 && {
+        ...(data.transaction && {
           transactions: {
-            create: { type: TransactionType.BUY, quantity, pricePerUnit: purchasePrice, date: purchaseDate },
+            create: {
+              type: TransactionType.BUY,
+              quantity: cipher(data.transaction.quantity, 'transaction.quantity'),
+              pricePerUnit: cipher(data.transaction.pricePerUnit, 'transaction.pricePerUnit'),
+              date: purchaseDate,
+            },
           },
         }),
       },
@@ -91,11 +102,11 @@ export class BondsService {
     data: Partial<{
       isin: string;
       name: string;
-      faceValue: number;
-      couponRate: number;
+      faceValue: string;
+      couponRate: string;
       couponFrequency: CouponFrequency;
       currency: string;
-      currentValue: number;
+      currentValue: string;
       maturityDate: string;
     }>,
     userId: string,
@@ -108,11 +119,11 @@ export class BondsService {
       data: {
         ...(data.isin && { isin: data.isin }),
         ...(data.name && { name: data.name }),
-        ...(data.faceValue != null && { faceValue: Number(data.faceValue) }),
-        ...(data.couponRate != null && { couponRate: Number(data.couponRate) }),
+        ...(data.faceValue != null && { faceValue: cipher(data.faceValue, 'faceValue') }),
+        ...(data.couponRate != null && { couponRate: cipher(data.couponRate, 'couponRate') }),
         ...(data.couponFrequency && { couponFrequency: data.couponFrequency }),
         ...(data.currency && { currency: parseCurrency(data.currency) }),
-        ...(data.currentValue != null && { currentValue: Number(data.currentValue) }),
+        ...(data.currentValue != null && { currentValue: cipher(data.currentValue, 'currentValue') }),
         ...(data.maturityDate && { maturityDate: new Date(data.maturityDate) }),
       },
     });
@@ -125,13 +136,12 @@ export class BondsService {
     return this.prisma.bond.delete({ where: { id } });
   }
 
-  async sellAll(bondId: string, userId: string) {
+  async sellAll(bondId: string, cash: CashCredit | undefined, userId: string) {
     const portfolioId = await this.getPortfolioIdForBond(bondId);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
     return this.prisma.$transaction(async (tx) => {
-      const bond = await tx.bond.findUniqueOrThrow({ where: { id: bondId } });
-      await creditCash(tx, portfolioId, CashCategory.GENERAL, bond.currency, (bond.currentValue ?? bond.purchasePrice) * bond.quantity);
+      await applyCashCredit(tx, portfolioId, cash);
       await tx.bond.delete({ where: { id: bondId } });
       return null;
     });
@@ -141,53 +151,50 @@ export class BondsService {
     const portfolioId = await this.getPortfolioIdForBond(bondId);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
+    const quantity = cipher(input.quantity, 'quantity');
+    const pricePerUnit = cipher(input.pricePerUnit, 'pricePerUnit');
+    const values = input.soldOut ? null : holding(input.bond);
+
     return this.prisma.$transaction(async (tx) => {
-      await tx.bondTransaction.create({
-        data: {
-          bondId,
-          type: input.type,
-          quantity: Number(input.quantity),
-          pricePerUnit: Number(input.pricePerUnit),
-          date: new Date(input.date),
-        },
-      });
-      const bond = await this.recalculate(tx, bondId);
+      await applyCashCredit(tx, portfolioId, input.cash);
 
-      if (input.type === TransactionType.SELL) {
-        await creditCash(tx, bond.portfolioId, CashCategory.GENERAL, bond.currency, Number(input.quantity) * Number(input.pricePerUnit));
-      }
-
-      if (input.type === TransactionType.SELL && bond.quantity <= SOLD_OUT_EPSILON) {
+      if (!values) {
         await tx.bond.delete({ where: { id: bondId } });
         return null;
       }
-      return bond;
+
+      await tx.bondTransaction.create({
+        data: { bondId, type: input.type, quantity, pricePerUnit, date: new Date(input.date) },
+      });
+      return tx.bond.update({ where: { id: bondId }, include: WITH_TRANSACTIONS, data: values });
     });
   }
 
   async updateTransaction(transactionId: string, input: BondTransactionUpdateDto, userId: string) {
     const bondId = await this.getBondIdForTransaction(transactionId, userId);
+    const values = holding(input.bond);
 
     return this.prisma.$transaction(async (tx) => {
       await tx.bondTransaction.update({
         where: { id: transactionId },
         data: {
           ...(input.type && { type: input.type }),
-          ...(input.quantity != null && { quantity: Number(input.quantity) }),
-          ...(input.pricePerUnit != null && { pricePerUnit: Number(input.pricePerUnit) }),
+          ...(input.quantity != null && { quantity: cipher(input.quantity, 'quantity') }),
+          ...(input.pricePerUnit != null && { pricePerUnit: cipher(input.pricePerUnit, 'pricePerUnit') }),
           ...(input.date && { date: new Date(input.date) }),
         },
       });
-      return this.recalculate(tx, bondId);
+      return tx.bond.update({ where: { id: bondId }, include: WITH_TRANSACTIONS, data: values });
     });
   }
 
-  async deleteTransaction(transactionId: string, userId: string) {
+  async deleteTransaction(transactionId: string, bond: BondHolding, userId: string) {
     const bondId = await this.getBondIdForTransaction(transactionId, userId);
+    const values = holding(bond);
 
     return this.prisma.$transaction(async (tx) => {
       await tx.bondTransaction.delete({ where: { id: transactionId } });
-      return this.recalculate(tx, bondId);
+      return tx.bond.update({ where: { id: bondId }, include: WITH_TRANSACTIONS, data: values });
     });
   }
 
@@ -199,33 +206,5 @@ export class BondsService {
     if (!transaction) throw new NotFoundException('Bond transaction not found');
     await this.portfoliosService.assertOwnership(transaction.bond.portfolioId, userId);
     return transaction.bondId;
-  }
-
-  // Quantity, average purchase price and first purchase date are derived from
-  // the bond's trades. Throws (rolling back the surrounding transaction) if
-  // the trades would leave a negative holding, e.g. selling more than owned.
-  private async recalculate(tx: Prisma.TransactionClient, bondId: string) {
-    const transactions = await tx.bondTransaction.findMany({ where: { bondId } });
-    const buys = transactions.filter((t) => t.type === TransactionType.BUY);
-
-    const bought = buys.reduce((sum, t) => sum + t.quantity, 0);
-    const sold = transactions
-      .filter((t) => t.type === TransactionType.SELL)
-      .reduce((sum, t) => sum + t.quantity, 0);
-    const quantity = bought - sold;
-    if (quantity < 0) throw new BadRequestException('Cannot sell more bonds than are held');
-
-    const cost = buys.reduce((sum, t) => sum + t.quantity * t.pricePerUnit, 0);
-    const firstBuy = buys.reduce<Date | null>((min, t) => (!min || t.date < min ? t.date : min), null);
-
-    return tx.bond.update({
-      where: { id: bondId },
-      include: WITH_TRANSACTIONS,
-      data: {
-        quantity,
-        purchasePrice: bought > 0 ? cost / bought : 0,
-        ...(firstBuy && { purchaseDate: firstBuy }),
-      },
-    });
   }
 }

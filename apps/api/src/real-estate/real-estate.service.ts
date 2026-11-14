@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CashCategory } from '@prisma/client';
-import { creditCash } from '../cash/cash-ledger';
+import { applyCashCredit, CashCredit } from '../cash/cash-ledger';
+import { cipher, optionalCipher } from '../common/cipher';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRealEstateDto, CreateRealEstateTransactionDto, UpdateRealEstateDto } from './dto/real-estate.dto';
 import { PortfoliosService } from '../portfolios/portfolios.service';
@@ -48,8 +48,8 @@ export class RealEstateService {
         name: dto.name,
         type: dto.type,
         purchaseDate: new Date(dto.purchaseDate),
-        purchasePrice: dto.purchasePrice,
-        currentValue: dto.currentValue,
+        purchasePrice: cipher(dto.purchasePrice, 'purchasePrice'),
+        currentValue: optionalCipher(dto.currentValue, 'currentValue') ?? undefined,
         rooms: dto.rooms,
         totalArea: dto.totalArea,
         portfolioId: dto.portfolioId,
@@ -69,8 +69,8 @@ export class RealEstateService {
         name: dto.name,
         type: dto.type,
         ...(dto.purchaseDate && { purchaseDate: new Date(dto.purchaseDate) }),
-        purchasePrice: dto.purchasePrice,
-        ...(dto.currentValue != null && { currentValue: dto.currentValue }),
+        ...(dto.purchasePrice != null && { purchasePrice: cipher(dto.purchasePrice, 'purchasePrice') }),
+        ...(dto.currentValue != null && { currentValue: cipher(dto.currentValue, 'currentValue') }),
         rooms: dto.rooms,
         totalArea: dto.totalArea,
       },
@@ -78,13 +78,12 @@ export class RealEstateService {
     });
   }
 
-  async sell(id: string, userId: string) {
+  async sell(id: string, cash: CashCredit | undefined, userId: string) {
     const portfolioId = await this.getPortfolioIdForProperty(id);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
     return this.prismaService.$transaction(async (tx) => {
-      const property = await tx.realEstate.findUniqueOrThrow({ where: { id } });
-      await creditCash(tx, portfolioId, CashCategory.GENERAL, 'USD', property.currentValue ?? property.purchasePrice);
+      await applyCashCredit(tx, portfolioId, cash);
       await tx.realEstate.delete({ where: { id } });
       return null;
     });
@@ -102,7 +101,8 @@ export class RealEstateService {
     code: string,
     startDate: string,
     endDate: string,
-    monthlyRent: number,
+    monthlyRent: string,
+    purchasePrice: string,
     userId: string,
   ) {
     await this.portfoliosService.assertOwnership(portfolioId, userId);
@@ -118,7 +118,7 @@ export class RealEstateService {
           name: code,
           type: 'APARTMENT',
           purchaseDate: new Date(),
-          purchasePrice: 0,
+          purchasePrice: cipher(purchasePrice, 'purchasePrice'),
           portfolioId,
         },
       });
@@ -129,7 +129,7 @@ export class RealEstateService {
         realEstateId: property.id,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        monthlyRent: Number(monthlyRent),
+        monthlyRent: cipher(monthlyRent, 'monthlyRent'),
       },
     });
   }
@@ -143,14 +143,14 @@ export class RealEstateService {
         realEstateId: dto.realEstateId,
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
-        monthlyRent: dto.monthlyRent,
+        monthlyRent: cipher(dto.monthlyRent, 'monthlyRent'),
       },
     });
   }
 
   async updateTransaction(
     id: string,
-    data: { startDate: string; endDate: string; monthlyRent: number },
+    data: { startDate: string; endDate: string; monthlyRent: string },
     userId: string,
   ) {
     const portfolioId = await this.getPortfolioIdForTransaction(id);
@@ -161,7 +161,7 @@ export class RealEstateService {
       data: {
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
-        monthlyRent: Number(data.monthlyRent),
+        monthlyRent: cipher(data.monthlyRent, 'monthlyRent'),
       },
     });
   }

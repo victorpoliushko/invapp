@@ -3,6 +3,7 @@ import { MixedAssetsService } from './mixed-assets.service';
 import { PassportJwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
+import { CashCredit } from '../cash/cash-ledger';
 
 @UseGuards(PassportJwtAuthGuard)
 @Controller('mixed-assets')
@@ -25,8 +26,8 @@ export class MixedAssetsController {
   }
 
   @Post(':id/sell')
-  sell(@Param('id') id: string, @GetUser() user: User) {
-    return this.mixedAssetsService.sell(id, user.id);
+  sell(@Param('id') id: string, @Body() body: { cash?: CashCredit }, @GetUser() user: User) {
+    return this.mixedAssetsService.sell(id, body?.cash, user.id);
   }
 
   @Delete(':id')

@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useFetchWithRedirect } from "../hooks/useApiWithRedirect";
 import { PortfolioDto } from "../types/portfolio";
 import { useAuth } from "../AuthContext";
-import { API_BASE_URL } from "../config";
 
 interface PortfolioContextType {
   portfolio: PortfolioDto | undefined;
@@ -36,20 +35,14 @@ export const PortfolioProvider = ({
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
   const [loadingPortfolios, setLoadingPortfolios] = useState(false);
   const fetchWithRedirect = useFetchWithRedirect();
-  const token = localStorage.getItem("accessToken");
-  const { accessToken, userId } = useAuth();
+  const { userId } = useAuth();
 
   const updatePortfolioName = async (newName: string) => {
     if (!newName.trim() || newName === portfolio?.name) return;
 
-    const token = localStorage.getItem("accessToken");
     try {
-      const res = await fetch(`${API_BASE_URL}/portfolios/${id}`, {
+      const res = await fetchWithRedirect(`/portfolios/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ name: newName, id }),
       });
 
@@ -65,7 +58,7 @@ export const PortfolioProvider = ({
   const fetchCurrentPrices = async (assets: { assetId: string; ticker: string }[]) => {
     assets.forEach(({ assetId, ticker }) => {
       setLoadingPrices((prev) => ({ ...prev, [assetId]: true }));
-      fetchWithRedirect(`${API_BASE_URL}/assets/price?asset=${ticker}`)
+      fetchWithRedirect(`/assets/price?asset=${ticker}`)
         .then((res) => res.json())
         .then(({ price }) => {
           setCurrentPrices((prev) => ({ ...prev, [assetId]: price }));
@@ -78,16 +71,8 @@ export const PortfolioProvider = ({
 
   const refreshPortfolio = async () => {
     if (!id) return;
-    const res = await fetchWithRedirect(
-      `${API_BASE_URL}/portfolios/${id}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
+    const res = await fetchWithRedirect(`/portfolios/${id}`);
+    if (!res.ok) return;
     const data = await res.json();
     setPortfolio(data);
 
@@ -100,16 +85,9 @@ export const PortfolioProvider = ({
   };
 
   const refreshUserPortfolios = useCallback(async () => {
-  setLoadingPortfolios(true);
-    const res = await fetchWithRedirect(
-      `${API_BASE_URL}/portfolios/user/${userId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+    if (!userId) return;
+    setLoadingPortfolios(true);
+    const res = await fetchWithRedirect(`/portfolios/user/${userId}`);
 
     const text = await res.text();
 
@@ -129,29 +107,20 @@ export const PortfolioProvider = ({
         setLoadingPortfolios(false);
       }
     }
-  }, [userId, token, fetchWithRedirect]);
+  }, [userId, fetchWithRedirect]);
 
   const deleteAsset = async (assetId: string) => {
-    await fetch(`${API_BASE_URL}/portfolios/${id}/assets`, {
+    const res = await fetchWithRedirect(`/portfolios/${id}/assets`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify({ assetId }),
     });
+    if (!res.ok) throw new Error("Failed to delete asset");
 
     await refreshPortfolio();
   };
 
   const deletePortfolio = async (id: string) => {
-    const res = await fetch(`${API_BASE_URL}/portfolios/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await fetchWithRedirect(`/portfolios/${id}`, { method: "DELETE" });
     if (res.ok) {
       await refreshUserPortfolios();
     } else {
@@ -164,12 +133,8 @@ export const PortfolioProvider = ({
   }, [id]);
 
   const createPortolio = async (name: string, userId: string, goal?: number) => {
-    const res = await fetch(`${API_BASE_URL}/portfolios`, {
+    const res = await fetchWithRedirect(`/portfolios`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
       body: JSON.stringify({
         name,
         userId,

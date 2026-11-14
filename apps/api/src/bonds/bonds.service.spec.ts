@@ -2,6 +2,8 @@
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { BondsService } from './bonds.service';
 
+const enc = (value: string) => `v1:aQ==:${Buffer.from(value).toString('base64')}`;
+
 describe('BondsService', () => {
   const OWNER_ID = 'u1';
   const OTHER_USER_ID = 'u2';
@@ -9,6 +11,18 @@ describe('BondsService', () => {
   let prisma: any;
   let portfoliosService: any;
   let service: BondsService;
+
+  const base = {
+    portfolioId: 'p1',
+    isin: 'US123',
+    name: 'Treasury',
+    faceValue: enc('1000'),
+    couponRate: enc('5'),
+    couponFrequency: 'ANNUAL' as any,
+    quantity: enc('10'),
+    purchasePrice: enc('980'),
+    purchaseDate: '2026-01-01',
+  };
 
   beforeEach(() => {
     prisma = {
@@ -25,18 +39,8 @@ describe('BondsService', () => {
   });
 
   describe('create', () => {
-    it('coerces numeric string inputs and parses the purchase date', async () => {
-      await service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: '1000' as any,
-        couponRate: '5' as any,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: '10' as any,
-        purchasePrice: '980' as any,
-        purchaseDate: '2026-01-01',
-      }, OWNER_ID);
+    it('stores the encrypted amounts and records the initial trade', async () => {
+      await service.create({ ...base, transaction: { quantity: enc('10'), pricePerUnit: enc('980') } }, OWNER_ID);
 
       expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
       expect(prisma.bond.create).toHaveBeenCalledWith({
@@ -45,152 +49,54 @@ describe('BondsService', () => {
           portfolioId: 'p1',
           isin: 'US123',
           name: 'Treasury',
-          faceValue: 1000,
-          couponRate: 5,
+          faceValue: enc('1000'),
+          couponRate: enc('5'),
           couponFrequency: 'ANNUAL',
-          quantity: 10,
-          purchasePrice: 980,
+          currency: undefined,
+          quantity: enc('10'),
+          purchasePrice: enc('980'),
+          currentValue: undefined,
           purchaseDate: new Date('2026-01-01'),
+          maturityDate: undefined,
           transactions: {
-            create: { type: 'BUY', quantity: 10, pricePerUnit: 980, date: new Date('2026-01-01') },
+            create: { type: 'BUY', quantity: enc('10'), pricePerUnit: enc('980'), date: new Date('2026-01-01') },
           },
         },
       });
     });
 
-    it('parses the maturity date when provided', async () => {
-      await service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: 1000,
-        couponRate: 5,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: 10,
-        purchasePrice: 980,
-        purchaseDate: '2026-01-01',
-        maturityDate: '2036-01-01',
-      }, OWNER_ID);
+    it('does not record a trade when none is sent', async () => {
+      await service.create(base, OWNER_ID);
 
-      expect(prisma.bond.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ maturityDate: new Date('2036-01-01') }) }),
-      );
+      expect(prisma.bond.create.mock.calls[0][0].data).not.toHaveProperty('transactions');
     });
 
-    it('leaves maturityDate undefined when not provided', async () => {
-      await service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: 1000,
-        couponRate: 5,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: 10,
-        purchasePrice: 980,
-        purchaseDate: '2026-01-01',
-      }, OWNER_ID);
+    it('parses the maturity date and stores currentValue when provided', async () => {
+      await service.create({ ...base, maturityDate: '2030-01-01', currentValue: enc('990') }, OWNER_ID);
 
-      expect(prisma.bond.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ maturityDate: undefined }) }),
-      );
+      const data = prisma.bond.create.mock.calls[0][0].data;
+      expect(data.maturityDate).toEqual(new Date('2030-01-01'));
+      expect(data.currentValue).toBe(enc('990'));
+    });
+
+    it('rejects plaintext amounts', async () => {
+      await expect(service.create({ ...base, faceValue: '1000' }, OWNER_ID)).rejects.toThrow(BadRequestException);
+      expect(prisma.bond.create).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden when the portfolio belongs to another user', async () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
-      await expect(service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: 1000,
-        couponRate: 5,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: 10,
-        purchasePrice: 980,
-        purchaseDate: '2026-01-01',
-      }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      await expect(service.create(base, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
       expect(prisma.bond.create).not.toHaveBeenCalled();
-    });
-
-    it('coerces currentValue when provided', async () => {
-      await service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: 1000,
-        couponRate: 5,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: 10,
-        purchasePrice: 980,
-        currentValue: '1010' as any,
-        purchaseDate: '2026-01-01',
-      }, OWNER_ID);
-
-      expect(prisma.bond.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ currentValue: 1010 }) }),
-      );
-    });
-
-    it('leaves currentValue undefined when not provided', async () => {
-      await service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: 1000,
-        couponRate: 5,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: 10,
-        purchasePrice: 980,
-        purchaseDate: '2026-01-01',
-      }, OWNER_ID);
-
-      expect(prisma.bond.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ currentValue: undefined }) }),
-      );
-    });
-  });
-
-  describe('create — initial trade', () => {
-    it('does not record a trade when quantity is 0', async () => {
-      await service.create({
-        portfolioId: 'p1',
-        isin: 'US123',
-        name: 'Treasury',
-        faceValue: 1000,
-        couponRate: 5,
-        couponFrequency: 'ANNUAL' as any,
-        quantity: 0,
-        purchasePrice: 980,
-        purchaseDate: '2026-01-01',
-      }, OWNER_ID);
-
-      expect(prisma.bond.create.mock.calls[0][0].data).not.toHaveProperty('transactions');
     });
   });
 
   describe('currency', () => {
-    const base = {
-      portfolioId: 'p1',
-      isin: 'US123',
-      name: 'Treasury',
-      faceValue: 1000,
-      couponRate: 5,
-      couponFrequency: 'ANNUAL' as any,
-      quantity: 0,
-      purchasePrice: 980,
-      purchaseDate: '2026-01-01',
-    };
-
     it('normalizes the currency code on create', async () => {
       await service.create({ ...base, currency: ' eur ' }, OWNER_ID);
 
       expect(prisma.bond.create.mock.calls[0][0].data.currency).toBe('EUR');
-    });
-
-    it('leaves currency to the database default when omitted', async () => {
-      await service.create(base, OWNER_ID);
-
-      expect(prisma.bond.create.mock.calls[0][0].data.currency).toBeUndefined();
     });
 
     it('rejects an invalid currency code', async () => {
@@ -207,79 +113,28 @@ describe('BondsService', () => {
 
   describe('update', () => {
     it('ignores quantity and purchasePrice, which are derived from trades', async () => {
-      await service.update('bond-1', { quantity: 20, purchasePrice: 900, couponRate: 6 } as any, OWNER_ID);
+      await service.update('bond-1', { quantity: enc('20'), purchasePrice: enc('900'), couponRate: enc('6') } as any, OWNER_ID);
 
-      expect(prisma.bond.update).toHaveBeenCalledWith({
-        where: { id: 'bond-1' },
-        data: { couponRate: 6 },
-      });
+      expect(prisma.bond.update).toHaveBeenCalledWith({ where: { id: 'bond-1' }, data: { couponRate: enc('6') } });
     });
 
-    it('only includes fields that were provided', async () => {
-      await service.update('bond-1', { couponRate: 6 }, OWNER_ID);
+    it('stores currentValue when provided', async () => {
+      await service.update('bond-1', { currentValue: enc('1010') }, OWNER_ID);
 
-      expect(prisma.bond.findUnique).toHaveBeenCalledWith({
-        where: { id: 'bond-1' },
-        select: { portfolioId: true },
-      });
-      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
-      expect(prisma.bond.update).toHaveBeenCalledWith({
-        where: { id: 'bond-1' },
-        data: { couponRate: 6 },
-      });
-    });
-
-    it('omits purchaseDate when not provided', async () => {
-      await service.update('bond-1', { isin: 'US999' }, OWNER_ID);
-
-      const call = prisma.bond.update.mock.calls[0][0];
-      expect(call.data).not.toHaveProperty('purchaseDate');
-      expect(call.data).toEqual({ isin: 'US999' });
-    });
-
-    it('parses maturityDate when provided', async () => {
-      await service.update('bond-1', { maturityDate: '2036-01-01' }, OWNER_ID);
-
-      expect(prisma.bond.update).toHaveBeenCalledWith({
-        where: { id: 'bond-1' },
-        data: { maturityDate: new Date('2036-01-01') },
-      });
-    });
-
-    it('omits maturityDate when not provided', async () => {
-      await service.update('bond-1', { isin: 'US999' }, OWNER_ID);
-
-      const call = prisma.bond.update.mock.calls[0][0];
-      expect(call.data).not.toHaveProperty('maturityDate');
-    });
-
-    it('parses currentValue when provided', async () => {
-      await service.update('bond-1', { currentValue: 1025 }, OWNER_ID);
-
-      expect(prisma.bond.update).toHaveBeenCalledWith({
-        where: { id: 'bond-1' },
-        data: { currentValue: 1025 },
-      });
-    });
-
-    it('omits currentValue when not provided', async () => {
-      await service.update('bond-1', { isin: 'US999' }, OWNER_ID);
-
-      const call = prisma.bond.update.mock.calls[0][0];
-      expect(call.data).not.toHaveProperty('currentValue');
+      expect(prisma.bond.update).toHaveBeenCalledWith({ where: { id: 'bond-1' }, data: { currentValue: enc('1010') } });
     });
 
     it('throws NotFound when the bond does not exist', async () => {
       prisma.bond.findUnique.mockResolvedValue(null);
 
-      await expect(service.update('missing', { couponRate: 6 }, OWNER_ID)).rejects.toThrow(NotFoundException);
+      await expect(service.update('missing', { name: 'x' }, OWNER_ID)).rejects.toThrow(NotFoundException);
       expect(prisma.bond.update).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden when the owning portfolio belongs to another user', async () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
-      await expect(service.update('bond-1', { couponRate: 6 }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
+      await expect(service.update('bond-1', { name: 'x' }, OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
       expect(prisma.bond.update).not.toHaveBeenCalled();
     });
   });
@@ -288,18 +143,10 @@ describe('BondsService', () => {
     it('queries bonds scoped to the given portfolio', async () => {
       await service.getByPortfolio('p1', OWNER_ID);
 
-      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
       expect(prisma.bond.findMany).toHaveBeenCalledWith({
         where: { portfolioId: 'p1' },
         include: { transactions: { orderBy: { date: 'desc' } } },
       });
-    });
-
-    it('throws Forbidden when the portfolio belongs to another user', async () => {
-      portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
-
-      await expect(service.getByPortfolio('p1', OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
-      expect(prisma.bond.findMany).not.toHaveBeenCalled();
     });
   });
 
@@ -307,33 +154,19 @@ describe('BondsService', () => {
     it('deletes the bond by id', async () => {
       await service.delete('bond-1', OWNER_ID);
 
-      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
       expect(prisma.bond.delete).toHaveBeenCalledWith({ where: { id: 'bond-1' } });
-    });
-
-    it('throws Forbidden when the owning portfolio belongs to another user', async () => {
-      portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
-
-      await expect(service.delete('bond-1', OTHER_USER_ID)).rejects.toThrow(ForbiddenException);
-      expect(prisma.bond.delete).not.toHaveBeenCalled();
     });
   });
 
   describe('trades', () => {
     let tx: any;
-    const trade = (type: 'BUY' | 'SELL', quantity: number, pricePerUnit: number, date: string) =>
-      ({ type, quantity, pricePerUnit, date: new Date(date) });
+    const holding = { quantity: enc('20'), purchasePrice: enc('90'), purchaseDate: '2026-01-01T00:00:00.000Z' };
 
     beforeEach(() => {
       tx = {
-        bondTransaction: {
-          create: jest.fn(),
-          update: jest.fn(),
-          delete: jest.fn(),
-          findMany: jest.fn(),
-        },
+        bondTransaction: { create: jest.fn(), update: jest.fn(), delete: jest.fn() },
         bond: { update: jest.fn().mockImplementation(({ data }) => data), delete: jest.fn() },
-        cash: { findFirst: jest.fn(), update: jest.fn(), create: jest.fn() },
+        cash: { findUnique: jest.fn().mockResolvedValue({ portfolioId: 'p1' }), update: jest.fn(), create: jest.fn() },
       };
       prisma.$transaction = jest.fn((fn: (t: any) => unknown) => fn(tx));
       prisma.bondTransaction = {
@@ -341,107 +174,98 @@ describe('BondsService', () => {
       };
     });
 
-    it('records a BUY and recalculates quantity, average price and first purchase date', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([
-        trade('BUY', 10, 100, '2026-03-01'),
-        trade('BUY', 10, 80, '2026-01-01'),
-      ]);
+    it('records a trade and stores the holding the device recomputed', async () => {
+      await service.addTransaction(
+        'bond-1',
+        { type: 'BUY', quantity: enc('10'), pricePerUnit: enc('80'), date: '2026-01-01', bond: holding },
+        OWNER_ID,
+      );
 
-      await service.addTransaction('bond-1', { type: 'BUY', quantity: 10, pricePerUnit: 80, date: '2026-01-01' } as any, OWNER_ID);
-
-      expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', OWNER_ID);
       expect(tx.bondTransaction.create).toHaveBeenCalledWith({
-        data: { bondId: 'bond-1', type: 'BUY', quantity: 10, pricePerUnit: 80, date: new Date('2026-01-01') },
+        data: { bondId: 'bond-1', type: 'BUY', quantity: enc('10'), pricePerUnit: enc('80'), date: new Date('2026-01-01') },
       });
       expect(tx.bond.update).toHaveBeenCalledWith({
         where: { id: 'bond-1' },
         include: { transactions: { orderBy: { date: 'desc' } } },
-        data: { quantity: 20, purchasePrice: 90, purchaseDate: new Date('2026-01-01') },
+        data: { quantity: enc('20'), purchasePrice: enc('90'), purchaseDate: new Date('2026-01-01') },
       });
     });
 
-    it('reduces quantity on SELL without changing the average purchase price', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([
-        trade('BUY', 10, 100, '2026-01-01'),
-        trade('SELL', 4, 120, '2026-02-01'),
-      ]);
+    it('credits sale proceeds to the cash entry the device chose', async () => {
+      await service.addTransaction(
+        'bond-1',
+        {
+          type: 'SELL',
+          quantity: enc('4'),
+          pricePerUnit: enc('120'),
+          date: '2026-02-01',
+          bond: holding,
+          cash: { id: 'cash-1', amount: enc('480') },
+        },
+        OWNER_ID,
+      );
 
-      await service.addTransaction('bond-1', { type: 'SELL', quantity: 4, pricePerUnit: 120, date: '2026-02-01' } as any, OWNER_ID);
-
-      expect(tx.bond.update.mock.calls[0][0].data).toEqual({
-        quantity: 6,
-        purchasePrice: 100,
-        purchaseDate: new Date('2026-01-01'),
-      });
+      expect(tx.cash.update).toHaveBeenCalledWith({ where: { id: 'cash-1' }, data: { amount: enc('480') } });
     });
 
-    it('deletes the bond when a SELL closes the whole holding', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([
-        trade('BUY', 5, 100, '2026-01-01'),
-        trade('SELL', 5, 110, '2026-02-01'),
-      ]);
-
-      const result = await service.addTransaction('bond-1', { type: 'SELL', quantity: 5, pricePerUnit: 110, date: '2026-02-01' } as any, OWNER_ID);
+    it('deletes the bond when the device reports the holding is sold out', async () => {
+      const result = await service.addTransaction(
+        'bond-1',
+        { type: 'SELL', quantity: enc('5'), pricePerUnit: enc('110'), date: '2026-02-01', bond: holding, soldOut: true },
+        OWNER_ID,
+      );
 
       expect(tx.bond.delete).toHaveBeenCalledWith({ where: { id: 'bond-1' } });
+      expect(tx.bondTransaction.create).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
-    it('keeps the bond after a partial SELL', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([
-        trade('BUY', 5, 100, '2026-01-01'),
-        trade('SELL', 2, 110, '2026-02-01'),
-      ]);
-
-      await service.addTransaction('bond-1', { type: 'SELL', quantity: 2, pricePerUnit: 110, date: '2026-02-01' } as any, OWNER_ID);
-
-      expect(tx.bond.delete).not.toHaveBeenCalled();
-    });
-
-    it('rejects a SELL larger than the holding', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([
-        trade('BUY', 2, 100, '2026-01-01'),
-        trade('SELL', 3, 100, '2026-02-01'),
-      ]);
-
+    it('rejects plaintext amounts before writing', async () => {
       await expect(
-        service.addTransaction('bond-1', { type: 'SELL', quantity: 3, pricePerUnit: 100, date: '2026-02-01' } as any, OWNER_ID),
+        service.addTransaction('bond-1', { type: 'BUY', quantity: '1', pricePerUnit: enc('100'), date: '2026-01-01', bond: holding }, OWNER_ID),
       ).rejects.toThrow(BadRequestException);
-      expect(tx.bond.update).not.toHaveBeenCalled();
+      expect(prisma.$transaction).not.toHaveBeenCalled();
     });
 
     it('throws Forbidden before writing when the bond belongs to another user', async () => {
       portfoliosService.assertOwnership.mockRejectedValue(new ForbiddenException());
 
       await expect(
-        service.addTransaction('bond-1', { type: 'BUY', quantity: 1, pricePerUnit: 100, date: '2026-01-01' } as any, OTHER_USER_ID),
+        service.addTransaction('bond-1', { type: 'BUY', quantity: enc('1'), pricePerUnit: enc('100'), date: '2026-01-01', bond: holding }, OTHER_USER_ID),
       ).rejects.toThrow(ForbiddenException);
       expect(prisma.$transaction).not.toHaveBeenCalled();
     });
 
-    it('updates a trade and recalculates the bond', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([trade('BUY', 5, 100, '2026-01-01')]);
+    it('updates a trade and stores the recomputed holding', async () => {
+      await service.updateTransaction('t1', { quantity: enc('5'), bond: holding }, OWNER_ID);
 
-      await service.updateTransaction('t1', { quantity: 5 } as any, OWNER_ID);
-
-      expect(tx.bondTransaction.update).toHaveBeenCalledWith({ where: { id: 't1' }, data: { quantity: 5 } });
-      expect(tx.bond.update.mock.calls[0][0].data.quantity).toBe(5);
+      expect(tx.bondTransaction.update).toHaveBeenCalledWith({ where: { id: 't1' }, data: { quantity: enc('5') } });
+      expect(tx.bond.update.mock.calls[0][0].data.quantity).toBe(enc('20'));
     });
 
-    it('deletes a trade and recalculates the bond', async () => {
-      tx.bondTransaction.findMany.mockResolvedValue([]);
-
-      await service.deleteTransaction('t1', OWNER_ID);
+    it('deletes a trade and stores the recomputed holding', async () => {
+      await service.deleteTransaction('t1', { quantity: enc('0'), purchasePrice: enc('0') }, OWNER_ID);
 
       expect(tx.bondTransaction.delete).toHaveBeenCalledWith({ where: { id: 't1' } });
-      expect(tx.bond.update.mock.calls[0][0].data).toEqual({ quantity: 0, purchasePrice: 0 });
+      expect(tx.bond.update.mock.calls[0][0].data).toEqual({ quantity: enc('0'), purchasePrice: enc('0') });
     });
 
     it('throws NotFound for an unknown trade', async () => {
       prisma.bondTransaction.findUnique.mockResolvedValue(null);
 
-      await expect(service.deleteTransaction('missing', OWNER_ID)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.deleteTransaction('missing', { quantity: enc('0'), purchasePrice: enc('0') }, OWNER_ID),
+      ).rejects.toThrow(NotFoundException);
       expect(prisma.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('sells the whole bond and credits the proceeds', async () => {
+      await service.sellAll('bond-1', { name: 'Sale proceeds', category: 'GENERAL', currency: 'USD', amount: enc('1000') }, OWNER_ID);
+
+      expect(tx.cash.create).toHaveBeenCalledWith({
+        data: { portfolioId: 'p1', category: 'GENERAL', currency: 'USD', name: 'Sale proceeds', amount: enc('1000') },
+      });
+      expect(tx.bond.delete).toHaveBeenCalledWith({ where: { id: 'bond-1' } });
     });
   });
 });

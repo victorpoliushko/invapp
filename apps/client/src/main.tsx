@@ -13,6 +13,7 @@ import { HomePage } from "./pages/HomePage.tsx";
 import { MainPage } from "./pages/main/Main.tsx";
 import { AuthProvider } from "./AuthContext.tsx";
 import { CurrencyProvider } from "./context/CurrencyContext.tsx";
+import { VaultProvider } from "./context/VaultContext.tsx";
 import { Layout } from "./Layout.tsx";
 import AuthCallback from "./pages/auth/AuthCallback.tsx";
 import { PortfolioProvider } from "./context/PortfolioContext.tsx";
@@ -83,9 +84,11 @@ function PortfolioProviderWrapper() {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-      <CurrencyProvider>
-        <RouterProvider router={router} />
-      </CurrencyProvider>
+      <VaultProvider>
+        <CurrencyProvider>
+          <RouterProvider router={router} />
+        </CurrencyProvider>
+      </VaultProvider>
     </AuthProvider>
   </StrictMode>,
 );

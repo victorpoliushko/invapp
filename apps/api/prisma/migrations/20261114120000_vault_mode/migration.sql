@@ -1,0 +1,11 @@
+-- CreateEnum
+CREATE TYPE "VaultMode" AS ENUM ('STANDARD', 'PRIVATE');
+
+-- AlterTable
+ALTER TABLE "UserVault" ADD COLUMN "mode" "VaultMode" NOT NULL DEFAULT 'PRIVATE',
+ADD COLUMN "managedKey" TEXT,
+ALTER COLUMN "salt" DROP NOT NULL,
+ALTER COLUMN "iterations" DROP NOT NULL,
+ALTER COLUMN "wrappedKey" DROP NOT NULL,
+ALTER COLUMN "recoverySalt" DROP NOT NULL,
+ALTER COLUMN "recoveryWrappedKey" DROP NOT NULL;

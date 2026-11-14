@@ -2,7 +2,7 @@ import { TransactionType } from '@prisma/client';
 import {
   IsDefined,
   IsEnum,
-  IsNumber,
+  IsObject,
   IsString,
   IsUUID,
   ValidateIf,
@@ -10,14 +10,17 @@ import {
 
 export class CreateTransactionDto {
   @IsDefined()
-  @IsNumber()
-  pricePerUnit: number;
+  @IsString()
+  pricePerUnit: string;
 
   @IsEnum(TransactionType)
   type: TransactionType;
 
-  @IsNumber()
-  quantityChange: number;
+  @IsString()
+  quantityChange: string;
+
+  @IsObject()
+  position: { quantity: string; price?: string | null };
 
   @IsString()
   @IsDefined()

@@ -4,6 +4,7 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { RealEstateTransaction } from "./types";
 import { API_BASE_URL } from "../../config";
+import { secureFetch } from "../../api/secureFetch";
 import { useDisplayMoney } from "../portfolio/DisplayCurrency";
 
 type Props = {
@@ -29,7 +30,7 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
   const handleAddTransaction = async () => {
     const { startDate, endDate, monthlyRent } = newTx;
     if (!startDate || !endDate || !monthlyRent) return;
-    const res = await fetch(`${API_BASE_URL}/real-estate/transaction`, {
+    const res = await secureFetch(`${API_BASE_URL}/real-estate/transaction`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
       body: JSON.stringify({
@@ -57,7 +58,7 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
 
   const saveEdit = async (id: string) => {
     if (!editState) return;
-    const res = await fetch(`${API_BASE_URL}/real-estate/transaction/${id}`, {
+    const res = await secureFetch(`${API_BASE_URL}/real-estate/transaction/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
       body: JSON.stringify({
@@ -72,7 +73,7 @@ export function RealEstateTransactions({ realEstateId, transactions, onChanged }
   };
 
   const handleDelete = async (id: string) => {
-    const res = await fetch(`${API_BASE_URL}/real-estate/transaction/${id}`, {
+    const res = await secureFetch(`${API_BASE_URL}/real-estate/transaction/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token()}` },
     });

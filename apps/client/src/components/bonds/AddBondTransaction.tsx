@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { alertMissingFields } from "../../utils/formValidation";
 import { API_BASE_URL } from "../../config";
+import { secureFetch } from "../../api/secureFetch";
 import { BOND_CURRENCIES } from "./types";
 
 type Props = { onAdded: () => void };
@@ -29,7 +30,7 @@ export function AddBondTransaction({ onAdded }: Props) {
     })) return;
 
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/bonds`, {
+    const res = await secureFetch(`${API_BASE_URL}/bonds`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -40,6 +41,7 @@ export function AddBondTransaction({ onAdded }: Props) {
         purchasePrice: Number(purchasePrice),
         faceValue: Number(faceValue),
         couponRate: Number(couponRate),
+        ...(Number(quantity) > 0 && { transaction: { quantity: Number(quantity), pricePerUnit: Number(purchasePrice) } }),
       }),
     });
 

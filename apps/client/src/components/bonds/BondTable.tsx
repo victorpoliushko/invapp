@@ -3,11 +3,12 @@ import { AddBondTransaction } from "./AddBondTransaction";
 import { Bond } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
 import { API_BASE_URL } from "../../config";
+import { secureFetch } from "../../api/secureFetch";
 
 export function BondTable({ bonds, onChanged }: { bonds: Bond[]; onChanged: () => void }) {
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/bonds/${id}`, {
+    const res = await secureFetch(`${API_BASE_URL}/bonds/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

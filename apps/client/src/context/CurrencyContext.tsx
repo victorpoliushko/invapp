@@ -12,6 +12,7 @@ type CurrencyContextType = {
   setDefaultCurrency: (currency: Currency) => Promise<void>;
   ratesDate: string | null;
   fromUsd: (amountUsd: number, to: string) => number;
+  toUsd: (amount: number, from: string) => number;
   convert: (amount: number, from: string, to: string) => number;
 };
 
@@ -78,9 +79,10 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   );
 
   const fromUsd = useCallback((amountUsd: number, to: string) => convert(amountUsd, "USD", to), [convert]);
+  const toUsd = useCallback((amount: number, from: string) => convert(amount, from, "USD"), [convert]);
 
   return (
-    <CurrencyContext.Provider value={{ defaultCurrency, setDefaultCurrency, ratesDate, fromUsd, convert }}>
+    <CurrencyContext.Provider value={{ defaultCurrency, setDefaultCurrency, ratesDate, fromUsd, toUsd, convert }}>
       {children}
     </CurrencyContext.Provider>
   );

@@ -15,7 +15,7 @@ export type DataSource = "ALPHA_VANTAGE" | "COINGECKO";
 
 export type TransactionType = "BUY" | "SELL";
 
-export type RealEstateType = "APARTMENT" | "HOUSE" | "COMMERCIAL";
+export type RealEstateType = "APARTMENT" | "HOUSE" | "COMMERCIAL" | "PARKING_LOT" | "OTHER";
 
 export type CouponFrequency = "ANNUAL" | "SEMI_ANNUAL" | "QUARTERLY" | "MONTHLY";
 
@@ -35,6 +35,7 @@ export type AssetDto = {
   exchange: string;
   type: string;
   dataSource: DataSource;
+  currentPrice?: number | null;
   updatedAt?: string;
   transactions?: TransactionsDto[];
 };
@@ -71,6 +72,7 @@ export type RealEstate = {
   rooms: number | null;
   totalArea: number | null;
   portfolioId: string;
+  transactions?: { id: string; startDate: string; endDate: string; monthlyRent: number }[];
 };
 
 export type Bond = {
@@ -80,12 +82,14 @@ export type Bond = {
   faceValue: number;
   couponRate: number;
   couponFrequency: CouponFrequency;
+  currency: string;
   quantity: number;
   purchasePrice: number;
   currentValue: number | null;
   purchaseDate: string;
   maturityDate: string | null;
   portfolioId: string;
+  transactions?: { id: string; type: TransactionType; quantity: number; pricePerUnit: number; date: string }[];
 };
 
 export type MixedAsset = {
@@ -96,6 +100,14 @@ export type MixedAsset = {
   purchaseDate: string;
   currentValue: number | null;
   portfolioId: string;
+};
+
+export type CashDto = {
+  id: string;
+  name: string | null;
+  currency: string;
+  amount: number;
+  category?: "GENERAL" | "STOCK" | "CRYPTO";
 };
 
 export type PortfolioDto = {
@@ -109,4 +121,5 @@ export type PortfolioDto = {
   realEstateAssets: RealEstate[];
   bonds: Bond[];
   mixedAssets: MixedAsset[];
+  cash?: CashDto[];
 };

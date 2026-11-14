@@ -22,8 +22,8 @@ describe('TransactionsController', () => {
         assetName: 'AAPL',
         portfolioId: 'p1',
         type: 'BUY',
-        quantityChange: 10,
-        pricePerUnit: 100,
+        quantityChange: 'v1:aQ==:cQ==',
+        pricePerUnit: 'v1:aQ==:cA==',
         date: '2026-01-01',
       };
 
@@ -35,7 +35,8 @@ describe('TransactionsController', () => {
 
   describe('updateTransaction', () => {
     it('delegates to the service with the transaction id, full payload and authenticated user id', () => {
-      const data = { id: 'tx-1', date: '2026-01-01', quantityChange: 5, pricePerUnit: 150 };
+      const position = { quantity: 'v1:aQ==:cQ==', price: 'v1:aQ==:cA==' };
+      const data = { id: 'tx-1', date: '2026-01-01', quantityChange: 'v1:aQ==:cQ==', pricePerUnit: 'v1:aQ==:cA==', position };
 
       controller.updateTransaction(data, user);
 
@@ -45,9 +46,9 @@ describe('TransactionsController', () => {
 
   describe('removeTransaction', () => {
     it('delegates to the service with the transaction id and authenticated user id', () => {
-      controller.removeTransaction({ id: 'tx-1' }, user);
-
-      expect(service.delete).toHaveBeenCalledWith('tx-1', 'u1');
+      const position = { quantity: 'v1:aQ==:cQ==', price: 'v1:aQ==:cA==' };
+      controller.removeTransaction({ id: 'tx-1', position }, user);
+      expect(service.delete).toHaveBeenCalledWith('tx-1', position, 'u1');
     });
   });
 });

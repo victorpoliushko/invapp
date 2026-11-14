@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CashCategory } from '@prisma/client';
-import { creditCash } from '../cash/cash-ledger';
+import { applyCashCredit, CashCredit } from '../cash/cash-ledger';
+import { cipher, optionalCipher } from '../common/cipher';
 import { PrismaService } from '../prisma/prisma.service';
 import { PortfoliosService } from '../portfolios/portfolios.service';
 
@@ -30,10 +30,10 @@ export class MixedAssetsService {
     data: {
       portfolioId: string;
       name: string;
-      quantity: number;
-      purchasePrice: number;
+      quantity: string;
+      purchasePrice: string;
       purchaseDate: string;
-      currentValue?: number;
+      currentValue?: string;
     },
     userId: string,
   ) {
@@ -43,10 +43,10 @@ export class MixedAssetsService {
       data: {
         portfolioId: data.portfolioId,
         name: data.name,
-        quantity: Number(data.quantity),
-        purchasePrice: Number(data.purchasePrice),
+        quantity: cipher(data.quantity, 'quantity'),
+        purchasePrice: cipher(data.purchasePrice, 'purchasePrice'),
         purchaseDate: new Date(data.purchaseDate),
-        currentValue: data.currentValue != null ? Number(data.currentValue) : undefined,
+        currentValue: optionalCipher(data.currentValue, 'currentValue') ?? undefined,
       },
     });
   }
@@ -55,10 +55,10 @@ export class MixedAssetsService {
     id: string,
     data: Partial<{
       name: string;
-      quantity: number;
-      purchasePrice: number;
+      quantity: string;
+      purchasePrice: string;
       purchaseDate: string;
-      currentValue: number;
+      currentValue: string;
     }>,
     userId: string,
   ) {
@@ -69,21 +69,20 @@ export class MixedAssetsService {
       where: { id },
       data: {
         ...(data.name && { name: data.name }),
-        ...(data.quantity != null && { quantity: Number(data.quantity) }),
-        ...(data.purchasePrice != null && { purchasePrice: Number(data.purchasePrice) }),
+        ...(data.quantity != null && { quantity: cipher(data.quantity, 'quantity') }),
+        ...(data.purchasePrice != null && { purchasePrice: cipher(data.purchasePrice, 'purchasePrice') }),
         ...(data.purchaseDate && { purchaseDate: new Date(data.purchaseDate) }),
-        ...(data.currentValue != null && { currentValue: Number(data.currentValue) }),
+        ...(data.currentValue != null && { currentValue: cipher(data.currentValue, 'currentValue') }),
       },
     });
   }
 
-  async sell(id: string, userId: string) {
+  async sell(id: string, cash: CashCredit | undefined, userId: string) {
     const portfolioId = await this.getPortfolioIdForMixedAsset(id);
     await this.portfoliosService.assertOwnership(portfolioId, userId);
 
     return this.prisma.$transaction(async (tx) => {
-      const asset = await tx.mixedAsset.findUniqueOrThrow({ where: { id } });
-      await creditCash(tx, portfolioId, CashCategory.GENERAL, 'USD', (asset.currentValue ?? asset.purchasePrice) * asset.quantity);
+      await applyCashCredit(tx, portfolioId, cash);
       await tx.mixedAsset.delete({ where: { id } });
       return null;
     });

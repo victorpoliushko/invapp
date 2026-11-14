@@ -4,6 +4,7 @@ import { RealEstateService } from './real-estate.service';
 import { CreateRealEstateDto, CreateRealEstateTransactionDto, UpdateRealEstateDto } from './dto/real-estate.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
 import { User } from '@prisma/client';
+import { CashCredit } from '../cash/cash-ledger';
 
 @Controller('real-estate')
 @UseGuards(AuthGuard('jwt'))
@@ -28,8 +29,8 @@ export class RealEstateController {
   }
 
   @Post(':id/sell')
-  sell(@Param('id') id: string, @GetUser() user: User) {
-    return this.realEstateService.sell(id, user.id);
+  sell(@Param('id') id: string, @Body() body: { cash?: CashCredit }, @GetUser() user: User) {
+    return this.realEstateService.sell(id, body?.cash, user.id);
   }
 
   @Delete(':id')
@@ -45,18 +46,19 @@ export class RealEstateController {
 
   @Post('transaction/by-code')
   addTransactionByCode(
-    @Body() body: { portfolioId: string; code: string; startDate: string; endDate: string; monthlyRent: number },
+    @Body()
+    body: { portfolioId: string; code: string; startDate: string; endDate: string; monthlyRent: string; purchasePrice: string },
     @GetUser() user: User,
   ) {
     return this.realEstateService.addTransactionByCode(
-      body.portfolioId, body.code, body.startDate, body.endDate, body.monthlyRent, user.id,
+      body.portfolioId, body.code, body.startDate, body.endDate, body.monthlyRent, body.purchasePrice, user.id,
     );
   }
 
   @Patch('transaction/:id')
   updateTransaction(
     @Param('id') id: string,
-    @Body() data: { startDate: string; endDate: string; monthlyRent: number },
+    @Body() data: { startDate: string; endDate: string; monthlyRent: string },
     @GetUser() user: User,
   ) {
     return this.realEstateService.updateTransaction(id, data, user.id);

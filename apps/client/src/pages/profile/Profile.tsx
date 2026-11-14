@@ -7,6 +7,9 @@ import { CurrencySelect } from "../../components/CurrencySelect";
 import { useCurrency } from "../../context/CurrencyContext";
 import { MaskIcon } from "../../components/MaskIcon";
 import infoIcon from "../../assets/icons/info.svg";
+import { ChangePassphraseModal } from "./ChangePassphraseModal";
+import { SwitchModeModal } from "./SwitchModeModal";
+import { useVault } from "../../context/VaultContext";
 
 interface UserProfile {
   id: string;
@@ -29,6 +32,9 @@ export default function Profile() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [changingPassphrase, setChangingPassphrase] = useState(false);
+  const [switchingMode, setSwitchingMode] = useState(false);
+  const { mode } = useVault();
 
   useEffect(() => {
     if (!userId) return;
@@ -159,7 +165,28 @@ export default function Profile() {
         </div>
       </div>
 
+      <div className="settings-card">
+        <p className="settings-card-label">Security</p>
+        <div className="settings-rows">
+          <div className="settings-row">
+            <span>Storage mode: {mode === "PRIVATE" ? "Private" : "Standard"}</span>
+            <button className="settings-edit-btn" onClick={() => setSwitchingMode(true)}>
+              {mode === "PRIVATE" ? "Switch to standard" : "Switch to private"}
+            </button>
+          </div>
+          {mode === "PRIVATE" && (
+            <div className="settings-row">
+              <span>Encryption passphrase</span>
+              <button className="settings-edit-btn" onClick={() => setChangingPassphrase(true)}>Change</button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <button className="settings-logout" onClick={logout}>Log out</button>
+
+      {changingPassphrase && <ChangePassphraseModal onClose={() => setChangingPassphrase(false)} />}
+      {switchingMode && <SwitchModeModal onClose={() => setSwitchingMode(false)} />}
     </section>
   );
 }

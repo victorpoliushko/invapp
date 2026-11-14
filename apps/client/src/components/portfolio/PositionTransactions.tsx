@@ -6,8 +6,9 @@ import deleteIcon from "../../assets/crud-icons/delete.svg";
 import "../../pages/portfolio/PortfolioPage.css";
 import { TRANSACTION_COLORS } from "./transactionColors";
 import { formatQuantity } from "../../utils/formatQuantity";
-import { API_BASE_URL } from "../../config";
 import { useDisplayMoney } from "./DisplayCurrency";
+import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import { positionFromTrades } from "../../finance/positions";
 
 type EditState = {
   date: string;
@@ -26,7 +27,7 @@ export function PositionTransactions({
 }) {
   const { money } = useDisplayMoney();
   const { refreshPortfolio } = usePortfolio();
-  const token = localStorage.getItem("accessToken");
+  const fetchWithRedirect = useFetchWithRedirect();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editState, setEditState] = useState<EditState | null>(null);
 
@@ -46,19 +47,16 @@ export function PositionTransactions({
 
   const saveEdit = async (id: string) => {
     if (!editState) return;
+    const edited = {
+      date: editState.date,
+      quantityChange: parseFloat(editState.quantityChange),
+      pricePerUnit: parseFloat(editState.pricePerUnit),
+    };
+    const position = positionFromTrades(transactions.map((t) => (t.id === id ? { ...t, ...edited } : t)));
     try {
-      const res = await fetch(`${API_BASE_URL}/transactions`, {
+      const res = await fetchWithRedirect(`/transactions`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id,
-          date: editState.date,
-          quantityChange: parseFloat(editState.quantityChange),
-          pricePerUnit: parseFloat(editState.pricePerUnit),
-        }),
+        body: JSON.stringify({ id, ...edited, position }),
       });
       if (!res.ok) throw new Error("Update failed");
       cancelEdit();
@@ -69,14 +67,11 @@ export function PositionTransactions({
   };
 
   const onDeleteTransaction = async (id: string) => {
+    const position = positionFromTrades(transactions.filter((t) => t.id !== id));
     try {
-      const res = await fetch(`${API_BASE_URL}/transactions`, {
+      const res = await fetchWithRedirect(`/transactions`, {
         method: "DELETE",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, position }),
       });
       if (!res.ok) throw new Error("Delete failed");
       await refreshPortfolio();

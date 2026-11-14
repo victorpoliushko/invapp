@@ -22,31 +22,30 @@ describe('CashService', () => {
   });
 
   it('creates a cash entry with a normalized currency', async () => {
-    await service.create({ portfolioId: 'p1', name: ' Savings ', currency: 'eur', amount: '1200' as any }, 'u1');
+    await service.create({ portfolioId: 'p1', name: ' Savings ', currency: 'eur', amount: 'v1:aQ==:YQ==' }, 'u1');
 
     expect(portfoliosService.assertOwnership).toHaveBeenCalledWith('p1', 'u1');
     expect(prisma.cash.create).toHaveBeenCalledWith({
-      data: { portfolioId: 'p1', name: 'Savings', currency: 'EUR', amount: 1200 },
+      data: { portfolioId: 'p1', name: 'Savings', currency: 'EUR', amount: 'v1:aQ==:YQ==' },
     });
   });
 
   it('rejects an unsupported currency', async () => {
     await expect(
-      service.create({ portfolioId: 'p1', name: 'x', currency: 'GBP', amount: 1 }, 'u1'),
+      service.create({ portfolioId: 'p1', name: 'x', currency: 'GBP', amount: 'v1:aQ==:YQ==' }, 'u1'),
     ).rejects.toThrow(BadRequestException);
     expect(prisma.cash.create).not.toHaveBeenCalled();
   });
 
-  it('rejects a negative amount', async () => {
+  it('rejects a plaintext amount', async () => {
     await expect(
-      service.create({ portfolioId: 'p1', name: 'x', currency: 'USD', amount: -5 }, 'u1'),
+      service.create({ portfolioId: 'p1', name: 'x', currency: 'USD', amount: '5' }, 'u1'),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('updates only the provided fields', async () => {
-    await service.update('c1', { amount: 50 }, 'u1');
-
-    expect(prisma.cash.update).toHaveBeenCalledWith({ where: { id: 'c1' }, data: { amount: 50 } });
+    await service.update('c1', { amount: 'v1:aQ==:YQ==' }, 'u1');
+    expect(prisma.cash.update).toHaveBeenCalledWith({ where: { id: 'c1' }, data: { amount: 'v1:aQ==:YQ==' } });
   });
 
   it('throws NotFound for an unknown entry', async () => {

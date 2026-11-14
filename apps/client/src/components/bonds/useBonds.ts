@@ -4,6 +4,8 @@ import { usePortfolio } from "../../context/PortfolioContext";
 import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
 import { API_BASE_URL } from "../../config";
 import { Bond, CouponFrequency } from "./types";
+import { bondHoldingFromTrades } from "../../finance/positions";
+import { cashCredit } from "../../finance/cash";
 
 export type NewBondInput = {
   isin: string;
@@ -47,7 +49,7 @@ export function useBonds() {
 
 export function useBondActions() {
   const { id: portfolioId } = useParams<{ id: string }>();
-  const { refreshPortfolio } = usePortfolio();
+  const { portfolio, refreshPortfolio } = usePortfolio();
   const fetchWithRedirect = useFetchWithRedirect();
 
   const send = async (path: string, method: string, body?: unknown) => {
@@ -61,6 +63,38 @@ export function useBondActions() {
     await refreshPortfolio();
   };
 
+  const findBond = (bondId: string) => {
+    const bond = portfolio?.bonds.find((b) => b.id === bondId);
+    if (!bond) throw new Error("Bond not found");
+    return bond;
+  };
+
+  const addTrade = (bondId: string, input: BondTradeInput) => {
+    const bond = findBond(bondId);
+    const date = new Date(input.date).toISOString();
+    if (input.type === "SELL" && input.quantity > bond.quantity + 1e-9) {
+      return Promise.reject(new Error("Cannot sell more bonds than are held"));
+    }
+    const holding = bondHoldingFromTrades([...(bond.transactions ?? []), { ...input, date }]);
+    const cash =
+      input.type === "SELL"
+        ? cashCredit(portfolio?.cash, "GENERAL", bond.currency, input.quantity * input.pricePerUnit)
+        : undefined;
+    return send(`/bonds/${bondId}/transactions`, "POST", {
+      ...input,
+      date,
+      bond: holding,
+      soldOut: input.type === "SELL" && holding.quantity <= 1e-9,
+      cash,
+    });
+  };
+
+  const sellAllBond = (bondId: string) => {
+    const bond = findBond(bondId);
+    const proceeds = (bond.currentValue ?? bond.purchasePrice) * bond.quantity;
+    return send(`/bonds/${bondId}/sell-all`, "POST", { cash: cashCredit(portfolio?.cash, "GENERAL", bond.currency, proceeds) });
+  };
+
   return {
     createBond: (input: NewBondInput) =>
       send("/bonds", "POST", {
@@ -68,13 +102,10 @@ export function useBondActions() {
         portfolioId,
         purchaseDate: new Date(input.purchaseDate).toISOString(),
         maturityDate: new Date(input.maturityDate).toISOString(),
+        ...(input.quantity > 0 && { transaction: { quantity: input.quantity, pricePerUnit: input.purchasePrice } }),
       }),
-    addTrade: (bondId: string, input: BondTradeInput) =>
-      send(`/bonds/${bondId}/transactions`, "POST", {
-        ...input,
-        date: new Date(input.date).toISOString(),
-      }),
+    addTrade,
     deleteBond: (bondId: string) => send(`/bonds/${bondId}`, "DELETE"),
-    sellAllBond: (bondId: string) => send(`/bonds/${bondId}/sell-all`, "POST"),
+    sellAllBond,
   };
 }

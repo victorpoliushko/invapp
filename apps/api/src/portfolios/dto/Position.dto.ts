@@ -1,4 +1,4 @@
-import { IsArray, IsDefined, IsNumber, IsOptional, ValidateNested } from "class-validator";
+import { IsArray, IsDefined, IsOptional, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { AssetDto } from "../../assets/dto/Asset.dto";
 import { TransactionsDto } from "src/transactions/dto/Transations.dto";
@@ -10,16 +10,16 @@ export class PositionDto {
   @IsDefined()
   assetId: string;
 
-  @IsNumber()
-  quantity: number;
+  @IsString()
+  quantity: string;
 
   @IsOptional()
-  @IsNumber()
-  price?: number;
+  @IsString()
+  price?: string;
 
   @IsOptional()
-  @IsNumber()
-  avgBuyPrice?: number;
+  @IsString()
+  avgBuyPrice?: string;
 
   @ValidateNested()
   @Type(() => AssetDto)

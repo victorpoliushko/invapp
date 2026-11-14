@@ -1,20 +1,32 @@
 import { TransactionType } from '@prisma/client';
-import { IsDateString, IsEnum, IsNumber, IsOptional, IsPositive } from 'class-validator';
+import { IsBoolean, IsDateString, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import { CashCredit } from '../../cash/cash-ledger';
+
+export type BondHolding = { quantity: string; purchasePrice: string; purchaseDate?: string | null };
 
 export class BondTransactionInputDto {
   @IsEnum(TransactionType, { message: 'type must be "BUY" or "SELL"' })
   type: TransactionType;
 
-  @IsNumber()
-  @IsPositive()
-  quantity: number;
+  @IsString()
+  quantity: string;
 
-  @IsNumber()
-  @IsPositive()
-  pricePerUnit: number;
+  @IsString()
+  pricePerUnit: string;
 
   @IsDateString()
   date: string;
+
+  @IsObject()
+  bond: BondHolding;
+
+  @IsOptional()
+  @IsBoolean()
+  soldOut?: boolean;
+
+  @IsOptional()
+  @IsObject()
+  cash?: CashCredit;
 }
 
 export class BondTransactionUpdateDto {
@@ -23,16 +35,22 @@ export class BondTransactionUpdateDto {
   type?: TransactionType;
 
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  quantity?: number;
+  @IsString()
+  quantity?: string;
 
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  pricePerUnit?: number;
+  @IsString()
+  pricePerUnit?: string;
 
   @IsOptional()
   @IsDateString()
   date?: string;
+
+  @IsObject()
+  bond: BondHolding;
+}
+
+export class BondTransactionDeleteDto {
+  @IsObject()
+  bond: BondHolding;
 }

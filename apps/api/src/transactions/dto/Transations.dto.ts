@@ -1,10 +1,8 @@
 import { TransactionType } from '@prisma/client';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
-  IsDecimal,
   IsDefined,
   IsEnum,
-  IsNumber,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -27,12 +25,12 @@ export class TransactionsDto {
   @IsEnum(TransactionType)
   type: TransactionType;
 
-  @IsDecimal()
-  quantityChange: number;
+  @IsString()
+  quantityChange: string;
 
-  @IsNumber()
+  @IsString()
   @IsDefined()
-  pricePerUnit: number;
+  pricePerUnit: string;
 
   @IsString()
   @IsDefined()

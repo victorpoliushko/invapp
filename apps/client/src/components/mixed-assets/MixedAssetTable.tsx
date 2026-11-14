@@ -5,6 +5,7 @@ import { AddMixedAsset } from "./AddMixedAsset";
 import { MixedAsset } from "./types";
 import "../../pages/portfolio/PortfolioPage.css";
 import { API_BASE_URL } from "../../config";
+import { secureFetch } from "../../api/secureFetch";
 import { usePortfolio } from "../../context/PortfolioContext";
 
 export function MixedAssetTable() {
@@ -15,7 +16,7 @@ export function MixedAssetTable() {
   const load = useCallback(async () => {
     if (!portfolioId) return;
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/mixed-assets/${portfolioId}`, {
+    const res = await secureFetch(`${API_BASE_URL}/mixed-assets/${portfolioId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) setAssets(await res.json());
@@ -25,7 +26,7 @@ export function MixedAssetTable() {
 
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/mixed-assets/${id}`, {
+    const res = await secureFetch(`${API_BASE_URL}/mixed-assets/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { useAuth } from "../../AuthContext";
@@ -23,7 +23,8 @@ import { MaskIcon } from "../MaskIcon";
 import chevronIcon from "../../assets/icons/chevron-right.svg";
 import editIcon from "../../assets/icons/edit.svg";
 import { formatCurrency } from "../../utils/money";
-import { API_BASE_URL } from "../../config";
+import { useFetchWithRedirect } from "../../hooks/useApiWithRedirect";
+import { netWorthByType, totalNetWorth } from "../../finance/valuation";
 import "../../pages/portfolio/PortfolioPage.css";
 
 const TABS: { id: AssetTab; label: string }[] = [
@@ -38,39 +39,31 @@ const TABS: { id: AssetTab; label: string }[] = [
 
 export function PortfolioContent() {
   const { portfolio, updatePortfolioName, refreshPortfolio } = usePortfolio();
-  const { defaultCurrency, fromUsd } = useCurrency();
+  const { defaultCurrency, fromUsd, toUsd } = useCurrency();
   const { userId } = useAuth();
+  const fetchWithRedirect = useFetchWithRedirect();
 
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedTab, setSelectedTab] = useState<AssetTab>("all");
   const [newAssetModal, setNewAssetModal] = useState<"stock" | "crypto" | "bond" | "cash" | "realestate" | "other" | null>(null);
-  const [netWorth, setNetWorth] = useState<number | null>(null);
 
   useEffect(() => {
     if (portfolio) setNewName(portfolio.name);
   }, [portfolio]);
 
-  useEffect(() => {
-    if (!portfolio) return;
-    const token = localStorage.getItem("accessToken");
-    fetch(`${API_BASE_URL}/portfolios/${portfolio.id}/net-worth`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setNetWorth(data?.total ?? null))
-      .catch(() => setNetWorth(null));
-  }, [portfolio]);
+  const netWorth = useMemo(
+    () => (portfolio ? totalNetWorth(netWorthByType(portfolio, toUsd)) : null),
+    [portfolio, toUsd],
+  );
 
   if (!portfolio) return <p className="portfolio-detail-status">Loading...</p>;
 
   const displayCurrency = portfolio.displayCurrency ?? defaultCurrency;
 
   const handleCurrencyChange = async (currency: Currency) => {
-    const token = localStorage.getItem("accessToken");
-    const res = await fetch(`${API_BASE_URL}/portfolios/${portfolio.id}`, {
+    const res = await fetchWithRedirect(`/portfolios/${portfolio.id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ id: portfolio.id, displayCurrency: currency }),
     });
     if (!res.ok) {

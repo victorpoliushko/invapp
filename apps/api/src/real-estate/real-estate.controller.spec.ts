@@ -36,7 +36,7 @@ describe('RealEstateController', () => {
         name: 'City Apartment',
         type: 'APARTMENT',
         purchaseDate: '2026-01-01',
-        purchasePrice: 150000,
+        purchasePrice: 'v1:aQ==:cA==',
         rooms: 3,
         totalArea: 72.5,
         portfolioId: 'p1',
@@ -68,7 +68,7 @@ describe('RealEstateController', () => {
 
   describe('createTransaction', () => {
     it('delegates to the service with the transaction dto and authenticated user id', () => {
-      const dto = { realEstateId: 're-1', startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 500 };
+      const dto = { realEstateId: 're-1', startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 'v1:aQ==:cg==' };
 
       controller.createTransaction(dto as any, user);
 
@@ -78,17 +78,24 @@ describe('RealEstateController', () => {
 
   describe('addTransactionByCode', () => {
     it('delegates to the service with each field from the body and authenticated user id', () => {
-      const body = { portfolioId: 'p1', code: 'LVIV-01', startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 500 };
-
+      const body = {
+        portfolioId: 'p1',
+        code: 'LVIV-01',
+        startDate: '2026-01-01',
+        endDate: '2026-02-01',
+        monthlyRent: 'v1:aQ==:cg==',
+        purchasePrice: 'v1:aQ==:cA==',
+      };
       controller.addTransactionByCode(body, user);
-
-      expect(service.addTransactionByCode).toHaveBeenCalledWith('p1', 'LVIV-01', '2026-01-01', '2026-02-01', 500, 'u1');
+      expect(service.addTransactionByCode).toHaveBeenCalledWith(
+        'p1', 'LVIV-01', '2026-01-01', '2026-02-01', 'v1:aQ==:cg==', 'v1:aQ==:cA==', 'u1',
+      );
     });
   });
 
   describe('updateTransaction', () => {
     it('delegates to the service with the transaction id, data and authenticated user id', () => {
-      const data = { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 600 };
+      const data = { startDate: '2026-01-01', endDate: '2026-02-01', monthlyRent: 'v1:aQ==:cg==' };
 
       controller.updateTransaction('tx-1', data, user);
 

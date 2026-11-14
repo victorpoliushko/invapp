@@ -8,7 +8,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { TransactionsService } from './transactions.service';
+import { PositionUpdate, TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTransactionDto } from './dto/CreateTransaction.dto';
 import { GetUser } from '../auth/decorators/GetUser.decorator';
@@ -31,7 +31,7 @@ export class TransactionsController {
   @Patch()
   @UseGuards(AuthGuard('jwt'))
   updateTransaction(
-    @Body() data: { id: string; date: string; quantityChange: number; pricePerUnit: number },
+    @Body() data: { id: string; date: string; quantityChange: string; pricePerUnit: string; position: PositionUpdate },
     @GetUser() user: User,
   ) {
     return this.transactionsService.update(data.id, data, user.id);
@@ -40,7 +40,7 @@ export class TransactionsController {
   @Delete()
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe())
-  removeTransaction(@Body() data: { id: string }, @GetUser() user: User) {
-    return this.transactionsService.delete(data.id, user.id);
+  removeTransaction(@Body() data: { id: string; position: PositionUpdate }, @GetUser() user: User) {
+    return this.transactionsService.delete(data.id, data.position, user.id);
   }
 }
